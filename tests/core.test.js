@@ -96,10 +96,28 @@ describe('snapshot helpers', () => {
     const snapshot = Core.buildSnapshotFromWindows(windows, 42);
     expect(snapshot.timestamp).toBe(42);
     expect(snapshot.windows).toHaveLength(1);
+    expect(snapshot.windows[0].groups).toEqual([]);
     expect(snapshot.windows[0].tabs).toEqual([
-      { url: 'https://a.com', title: 'A', favIconUrl: null, pinned: false },
-      { url: 'https://b.com', title: 'B', favIconUrl: null, pinned: true },
+      { url: 'https://a.com', title: 'A', favIconUrl: null, pinned: false, groupId: -1 },
+      { url: 'https://b.com', title: 'B', favIconUrl: null, pinned: true, groupId: -1 },
     ]);
+  });
+
+  test('buildSnapshotFromWindows carries tab groups through', () => {
+    const withGroups = [
+      {
+        id: 1,
+        groups: [{ id: 7, title: 'Work', color: 'blue', collapsed: true }],
+        tabs: [
+          { url: 'https://a.com', title: 'A', groupId: 7 },
+          { url: 'https://b.com', title: 'B', groupId: -1 },
+        ],
+      },
+    ];
+    const snapshot = Core.buildSnapshotFromWindows(withGroups, 1);
+    expect(snapshot.windows[0].groups).toEqual([{ id: 7, title: 'Work', color: 'blue', collapsed: true }]);
+    expect(snapshot.windows[0].tabs[0].groupId).toBe(7);
+    expect(snapshot.windows[0].tabs[1].groupId).toBe(-1);
   });
 
   test('isDuplicateSnapshot detects identical url sets', () => {
@@ -199,6 +217,8 @@ describe('sanitizeSettings', () => {
     backupIntervalMinutes: 1,
     maxSnapshots: 20,
     neverDiscardDomains: [],
+    smartTabActivation: true,
+    protectUnsavedForms: true,
   };
 
   test('fills in missing fields with defaults', () => {
@@ -224,5 +244,195 @@ describe('sanitizeSettings', () => {
   test('ignores non-array neverDiscardDomains', () => {
     const result = Core.sanitizeSettings({ neverDiscardDomains: 'nope' }, defaults);
     expect(result.neverDiscardDomains).toEqual([]);
+  });
+
+  test('coerces smartTabActivation and protectUnsavedForms to boolean, defaulting from defaults', () => {
+    expect(Core.sanitizeSettings({}, defaults).smartTabActivation).toBe(true);
+    expect(Core.sanitizeSettings({ smartTabActivation: false }, defaults).smartTabActivation).toBe(false);
+    expect(Core.sanitizeSettings({ protectUnsavedForms: 0 }, defaults).protectUnsavedForms).toBe(false);
+  });
+});
+
+describe('pickReplacementActiveTab', () => {
+  test('returns null when the activated tab is not discarded', () => {
+    const tabs = [
+      { id: 1, index: 0, discarded: false },
+      { id: 2, index: 1, discarded: false },
+    ];
+    expect(Core.pickReplacementActiveTab(tabs, 2)).toBeNull();
+  });
+
+  test('picks the nearest non-discarded tab to the right first', () => {
+    const tabs = [
+      { id: 1, index: 0, discarded: false },
+      { id: 2, index: 1, discarded: true },
+      { id: 3, index: 2, discarded: false },
+    ];
+    expect(Core.pickReplacementActiveTab(tabs, 2)).toBe(3);
+  });
+
+  test('falls back to the left when the right side is also discarded', () => {
+    const tabs = [
+      { id: 1, index: 0, discarded: false },
+      { id: 2, index: 1, discarded: true },
+      { id: 3, index: 2, discarded: true },
+    ];
+    expect(Core.pickReplacementActiveTab(tabs, 2)).toBe(1);
+  });
+
+  test('returns null when every other tab is also discarded', () => {
+    const tabs = [
+      { id: 1, index: 0, discarded: true },
+      { id: 2, index: 1, discarded: true },
+    ];
+    expect(Core.pickReplacementActiveTab(tabs, 1)).toBeNull();
+  });
+
+  test('returns null when the activated tab cannot be found', () => {
+    const tabs = [{ id: 1, index: 0, discarded: true }];
+    expect(Core.pickReplacementActiveTab(tabs, 999)).toBeNull();
+  });
+});
+
+describe('buildGroupPlan', () => {
+  const groups = [
+    { id: 5, title: 'Work', color: 'blue' },
+    { id: 6, title: 'Reading', color: 'green' },
+  ];
+  const tabs = [
+    { url: 'https://a.com', groupId: 5 },
+    { url: 'https://b.com', groupId: -1 },
+    { url: 'https://c.com', groupId: 5 },
+    { url: 'https://d.com', groupId: 6 },
+  ];
+
+  test('groups tab indexes by their original groupId', () => {
+    const plan = Core.buildGroupPlan(tabs, groups);
+    expect(plan).toEqual([
+      { title: 'Work', color: 'blue', collapsed: false, tabIndexes: [0, 2] },
+      { title: 'Reading', color: 'green', collapsed: false, tabIndexes: [3] },
+    ]);
+  });
+
+  test('returns an empty plan when there are no groups', () => {
+    expect(Core.buildGroupPlan(tabs, [])).toEqual([]);
+  });
+
+  test('skips groups with no matching tabs', () => {
+    const plan = Core.buildGroupPlan([{ url: 'https://a.com', groupId: -1 }], groups);
+    expect(plan).toEqual([]);
+  });
+});
+
+describe('planRestoreTargets', () => {
+  const windows = [
+    { tabs: [{ url: 'https://a.com' }, { url: 'about:blank' }], groups: [] },
+    { tabs: [{ url: 'https://b.com' }], groups: [] },
+  ];
+
+  test('all windows restore as new windows by default', () => {
+    const plan = Core.planRestoreTargets(windows, false);
+    expect(plan.map((p) => p.mode)).toEqual(['new', 'new']);
+  });
+
+  test('the first window restores into the current window when requested', () => {
+    const plan = Core.planRestoreTargets(windows, true);
+    expect(plan.map((p) => p.mode)).toEqual(['current', 'new']);
+  });
+
+  test('filters out about: urls and drops windows left with no tabs', () => {
+    const onlyAbout = [{ tabs: [{ url: 'about:blank' }], groups: [] }];
+    expect(Core.planRestoreTargets(onlyAbout, false)).toEqual([]);
+  });
+});
+
+describe('shouldShowCrashPrompt', () => {
+  test('is false on first ever run (no prior session state)', () => {
+    expect(Core.shouldShowCrashPrompt(null)).toBe(false);
+    expect(Core.shouldShowCrashPrompt(undefined)).toBe(false);
+  });
+
+  test('is false when the previous session exited cleanly', () => {
+    expect(Core.shouldShowCrashPrompt({ cleanExit: true })).toBe(false);
+  });
+
+  test('is true when the previous session did not exit cleanly', () => {
+    expect(Core.shouldShowCrashPrompt({ cleanExit: false })).toBe(true);
+  });
+});
+
+describe('tabDisplayState', () => {
+  test('classifies discarded tabs', () => {
+    expect(Core.tabDisplayState({ discarded: true, active: false })).toBe('discarded');
+  });
+
+  test('classifies the active tab', () => {
+    expect(Core.tabDisplayState({ discarded: false, active: true })).toBe('active');
+  });
+
+  test('classifies a normal loaded background tab', () => {
+    expect(Core.tabDisplayState({ discarded: false, active: false })).toBe('loaded');
+  });
+
+  test('defaults to loaded for missing tab', () => {
+    expect(Core.tabDisplayState(null)).toBe('loaded');
+  });
+});
+
+describe('parseImportedSnapshots', () => {
+  test('parses our own native export format unchanged', () => {
+    const native = JSON.stringify([
+      { timestamp: 100, windows: [{ tabs: [{ url: 'https://a.com', title: 'A' }] }] },
+    ]);
+    const { snapshots, skippedEntries } = Core.parseImportedSnapshots(native);
+    expect(snapshots).toHaveLength(1);
+    expect(snapshots[0].timestamp).toBe(100);
+    expect(snapshots[0].windows[0].tabs[0].url).toBe('https://a.com');
+    expect(skippedEntries).toBe(0);
+  });
+
+  test('accepts a flat array of URL strings', () => {
+    const { snapshots } = Core.parseImportedSnapshots(JSON.stringify(['https://a.com', 'https://b.com']));
+    expect(snapshots).toHaveLength(1);
+    expect(snapshots[0].windows[0].tabs.map((t) => t.url)).toEqual(['https://a.com', 'https://b.com']);
+  });
+
+  test('accepts a flat array of tab-like objects', () => {
+    const { snapshots } = Core.parseImportedSnapshots(JSON.stringify([{ url: 'https://a.com', title: 'A' }]));
+    expect(snapshots[0].windows[0].tabs[0]).toMatchObject({ url: 'https://a.com', title: 'A' });
+  });
+
+  test('accepts a {sessions:[...]} wrapper (Tab Session Manager style)', () => {
+    const raw = JSON.stringify({
+      sessions: [{ windows: [{ tabs: [{ url: 'https://a.com' }] }] }, { windows: [{ tabs: [{ url: 'https://b.com' }] }] }],
+    });
+    const { snapshots } = Core.parseImportedSnapshots(raw);
+    expect(snapshots).toHaveLength(2);
+  });
+
+  test('accepts a bare {tabs:[...]} object', () => {
+    const { snapshots } = Core.parseImportedSnapshots(JSON.stringify({ tabs: [{ url: 'https://a.com' }] }));
+    expect(snapshots).toHaveLength(1);
+  });
+
+  test('falls back to plain-text one-url-per-line parsing when JSON is invalid', () => {
+    const text = 'https://a.com\nhttps://b.com\tMy Tab Title\nnot a url';
+    const { snapshots, skippedEntries } = Core.parseImportedSnapshots(text);
+    expect(snapshots).toHaveLength(1);
+    expect(snapshots[0].windows[0].tabs).toHaveLength(2);
+    expect(snapshots[0].windows[0].tabs[1].title).toBe('My Tab Title');
+    expect(skippedEntries).toBe(1);
+  });
+
+  test('drops invalid entries instead of failing the whole import', () => {
+    const raw = JSON.stringify([{ url: 'https://a.com' }, { url: 'not-a-url' }, { title: 'no url at all' }]);
+    const { snapshots, skippedEntries } = Core.parseImportedSnapshots(raw);
+    expect(snapshots[0].windows[0].tabs).toHaveLength(1);
+    expect(skippedEntries).toBe(2);
+  });
+
+  test('returns no snapshots for empty/blank input', () => {
+    expect(Core.parseImportedSnapshots('')).toEqual({ snapshots: [], skippedEntries: 0 });
+    expect(Core.parseImportedSnapshots('   ')).toEqual({ snapshots: [], skippedEntries: 0 });
   });
 });

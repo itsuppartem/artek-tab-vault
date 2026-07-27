@@ -41,7 +41,16 @@
 
   <section class="snapshots">
     <h2>Снимки сессий</h2>
+    <label class="row restore-mode-row">
+      <span>Восстанавливать в текущее окно</span>
+      <input type="checkbox" id="restoreIntoCurrentWindow" />
+    </label>
     <ul id="snapshotList"></ul>
+  </section>
+
+  <section class="tabs-state">
+    <h2>Вкладки этого окна</h2>
+    <ul id="tabList"></ul>
   </section>
 
   <script src="popup.js"></script>

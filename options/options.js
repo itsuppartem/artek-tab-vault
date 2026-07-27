@@ -10,11 +10,15 @@ const DEFAULT_SETTINGS = {
   backupIntervalMinutes: 1,
   maxSnapshots: 20,
   neverDiscardDomains: [],
+  smartTabActivation: true,
+  protectUnsavedForms: true,
 };
 
 const els = {
   guardianEnabled: document.getElementById('guardianEnabled'),
   idleMinutes: document.getElementById('idleMinutes'),
+  protectUnsavedForms: document.getElementById('protectUnsavedForms'),
+  smartTabActivation: document.getElementById('smartTabActivation'),
   whitelist: document.getElementById('whitelist'),
   backupIntervalMinutes: document.getElementById('backupIntervalMinutes'),
   maxSnapshots: document.getElementById('maxSnapshots'),
@@ -34,6 +38,8 @@ function showStatus(text) {
 function fillForm(settings) {
   els.guardianEnabled.checked = settings.guardianEnabled;
   els.idleMinutes.value = settings.idleMinutes;
+  els.protectUnsavedForms.checked = settings.protectUnsavedForms;
+  els.smartTabActivation.checked = settings.smartTabActivation;
   els.backupIntervalMinutes.value = settings.backupIntervalMinutes;
   els.maxSnapshots.value = settings.maxSnapshots;
   els.whitelist.value = (settings.neverDiscardDomains || []).join('\n');
@@ -44,6 +50,8 @@ function readForm() {
     {
       guardianEnabled: els.guardianEnabled.checked,
       idleMinutes: els.idleMinutes.value,
+      protectUnsavedForms: els.protectUnsavedForms.checked,
+      smartTabActivation: els.smartTabActivation.checked,
       backupIntervalMinutes: els.backupIntervalMinutes.value,
       maxSnapshots: els.maxSnapshots.value,
       neverDiscardDomains: Core.parseDomainList(els.whitelist.value),
@@ -89,8 +97,11 @@ els.importInput.addEventListener('change', async () => {
   if (!file) return;
   try {
     const text = await file.text();
-    const imported = JSON.parse(text);
-    if (!Array.isArray(imported)) throw new Error('bad format');
+    const { snapshots: imported, skippedEntries } = Core.parseImportedSnapshots(text);
+    if (!imported.length) {
+      showStatus('Ничего не найдено для импорта - проверьте файл');
+      return;
+    }
 
     const stored = await browser.storage.local.get(SNAPSHOTS_KEY);
     const existing = stored[SNAPSHOTS_KEY] || [];
@@ -99,7 +110,11 @@ els.importInput.addEventListener('change', async () => {
       DEFAULT_SETTINGS.maxSnapshots
     );
     await browser.storage.local.set({ [SNAPSHOTS_KEY]: merged });
-    showStatus(`Импортировано ${imported.length} снимков`);
+    showStatus(
+      skippedEntries > 0
+        ? `Импортировано ${imported.length} снимков, пропущено ${skippedEntries} некорректных вкладок`
+        : `Импортировано ${imported.length} снимков`
+    );
   } catch (err) {
     showStatus('Ошибка импорта: неверный файл');
   } finally {

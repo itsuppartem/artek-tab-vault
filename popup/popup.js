@@ -8,6 +8,14 @@ const discardNowBtn = document.getElementById('discardNowBtn');
 const backupNowBtn = document.getElementById('backupNowBtn');
 const openOptionsBtn = document.getElementById('openOptionsBtn');
 const snapshotListEl = document.getElementById('snapshotList');
+const restoreIntoCurrentWindowEl = document.getElementById('restoreIntoCurrentWindow');
+const tabListEl = document.getElementById('tabList');
+
+const TAB_STATE_LABELS = {
+  active: 'активна',
+  discarded: 'выгружена',
+  loaded: 'загружена',
+};
 
 const SETTINGS_KEY = 'tabvault_settings';
 
@@ -44,12 +52,45 @@ function renderSnapshots(snapshots) {
     const button = document.createElement('button');
     button.textContent = 'Восстановить';
     button.addEventListener('click', async () => {
-      await browser.runtime.sendMessage({ type: 'RESTORE_SNAPSHOT', timestamp: snap.timestamp });
+      await browser.runtime.sendMessage({
+        type: 'RESTORE_SNAPSHOT',
+        timestamp: snap.timestamp,
+        intoCurrentWindow: restoreIntoCurrentWindowEl.checked,
+      });
     });
 
     li.appendChild(span);
     li.appendChild(button);
     snapshotListEl.appendChild(li);
+  }
+}
+
+function renderTabList(tabs) {
+  tabListEl.textContent = '';
+  if (!tabs || !tabs.length) return;
+  for (const tab of tabs) {
+    const li = document.createElement('li');
+    li.className = 'tab-item';
+
+    const dot = document.createElement('span');
+    dot.className = `tab-dot tab-dot--${tab.state}`;
+    dot.title = TAB_STATE_LABELS[tab.state] || tab.state;
+
+    const title = document.createElement('span');
+    title.className = 'tab-title';
+    title.textContent = tab.title || '(без названия)';
+
+    const state = document.createElement('span');
+    state.className = 'tab-state-label';
+    state.textContent = TAB_STATE_LABELS[tab.state] || tab.state;
+
+    li.appendChild(dot);
+    li.appendChild(title);
+    li.appendChild(state);
+    li.addEventListener('click', () => {
+      browser.runtime.sendMessage({ type: 'ACTIVATE_TAB', tabId: tab.id });
+    });
+    tabListEl.appendChild(li);
   }
 }
 
@@ -60,6 +101,7 @@ async function refresh() {
   guardianEnabledEl.checked = state.settings.guardianEnabled;
   idleMinutesEl.value = state.settings.idleMinutes;
   renderSnapshots(state.snapshots);
+  renderTabList(state.tabsList);
 }
 
 async function patchSettings(partial) {

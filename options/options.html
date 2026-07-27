@@ -25,6 +25,17 @@
         <input type="number" id="idleMinutes" min="1" max="720" />
       </label>
 
+      <label class="row">
+        <span>Не выгружать вкладки с незаполненной формой</span>
+        <input type="checkbox" id="protectUnsavedForms" />
+      </label>
+
+      <label class="row">
+        <span>Умная активация при закрытии вкладки</span>
+        <input type="checkbox" id="smartTabActivation" />
+      </label>
+      <small>При закрытии активной вкладки Firefox иногда переключает фокус на уже выгруженную соседнюю - она тут же начинает перезагружаться. Эта опция сразу переключает фокус на другую, уже загруженную вкладку.</small>
+
       <label class="block">
         <span>Никогда не выгружать эти домены (по одному в строке)</span>
         <textarea id="whitelist" rows="5" placeholder="example.com&#10;mail.google.com"></textarea>
@@ -50,11 +61,12 @@
         <div class="btn-group">
           <button id="exportBtn" class="btn secondary">Экспорт .json</button>
           <label class="btn secondary file-btn">
-            Импорт .json
-            <input type="file" id="importInput" accept="application/json" hidden />
+            Импорт файла
+            <input type="file" id="importInput" accept="application/json,.txt" hidden />
           </label>
         </div>
       </div>
+      <small>Импорт понимает наш формат, а также похожие форматы других менеджеров вкладок (список URL, объект с <code>tabs</code>/<code>windows</code>/<code>sessions</code>) и обычный текстовый список ссылок - некорректные строки просто пропускаются, а не ломают весь импорт.</small>
     </section>
 
     <section class="card actions">
