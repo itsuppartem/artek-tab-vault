@@ -30,11 +30,11 @@ Requires explicit, unambiguous approval in the current message, e.g. "го в п
    git checkout master && git merge prod && git push
    git checkout develop
    ```
-4. Sign and submit as **listed** (requires full metadata — license, categories, summary):
+4. The push to `prod` triggers `.github/workflows/release.yml`, which runs tests + lint and signs/submits the listed AMO version automatically using the `WEB_EXT_API_KEY`/`WEB_EXT_API_SECRET` repository secrets and the committed `amo-metadata.json`. Watch the Actions run (`gh run watch` or the Actions tab) instead of signing locally.
+5. Fallback (CI unavailable): sign manually with the same metadata file used by CI:
    ```bash
    source ~/.config/web-ext-keys/artek-tab-vault-amo.env
-   npx web-ext sign --source-dir=. --channel=listed \
-     --amo-metadata=$HOME/.config/web-ext-keys/artek-tab-vault-amo-metadata.json
+   npx web-ext sign --source-dir=. --channel=listed --amo-metadata=amo-metadata.json
    ```
-5. Tell the user: listed submissions go through **manual AMO review** (hours to days), not instant — do not imply it's live yet.
-6. Return to `develop` for further work.
+6. Tell the user: listed submissions go through **manual AMO review** (hours to days), not instant — do not imply it's live yet.
+7. Return to `develop` for further work.

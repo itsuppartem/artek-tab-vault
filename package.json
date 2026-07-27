@@ -10,7 +10,7 @@
     "start": "web-ext run --source-dir=.",
     "build": "web-ext build --source-dir=. --overwrite-dest",
     "sign": "web-ext sign --source-dir=. --channel=unlisted",
-    "sign:listed": "web-ext sign --source-dir=. --channel=listed"
+    "sign:listed": "web-ext sign --source-dir=. --channel=listed --amo-metadata=amo-metadata.json"
   },
   "devDependencies": {
     "jest": "^29.7.0",
