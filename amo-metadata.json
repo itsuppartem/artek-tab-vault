@@ -8,6 +8,9 @@
     "en-US": "Crash-proof tab session backup and idle tab memory guardian for Firefox."
   },
   "version": {
+    "release_notes": {
+      "en-US": "0.1.2: Added MIT license and prepared metadata (category, summary, license) required for listed AMO distribution."
+    },
     "custom_license": {
       "name": {
         "en-US": "MIT License"
