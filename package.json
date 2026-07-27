@@ -1,6 +1,6 @@
 {
   "name": "artek-tab-vault",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Crash-proof tab session backup and idle tab memory guardian for Firefox.",
   "private": true,
   "scripts": {
@@ -9,7 +9,8 @@
     "lint": "web-ext lint --source-dir=.",
     "start": "web-ext run --source-dir=.",
     "build": "web-ext build --source-dir=. --overwrite-dest",
-    "sign": "web-ext sign --source-dir=. --channel=unlisted"
+    "sign": "web-ext sign --source-dir=. --channel=unlisted",
+    "sign:listed": "web-ext sign --source-dir=. --channel=listed"
   },
   "devDependencies": {
     "jest": "^29.7.0",
