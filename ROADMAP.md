@@ -6,7 +6,7 @@ All work happens on `develop` (see `.cursor/rules/release-policy.mdc`). Update t
 
 | # | Feature | Why (pain point observed) | Status |
 |---|---------|---------------------------|--------|
-| 1 | **Snapshot integrity guard** | Tab Session Manager silently wiped years of sessions on update; has a "self-defense" bug that deletes saves above 10 tabs. Never persist an empty/corrupted snapshot over a good one; keep rolling history, not a single last-known-good file. | Planned |
+| 1 | **Snapshot integrity guard** | Tab Session Manager silently wiped years of sessions on update; has a "self-defense" bug that deletes saves above 10 tabs. Never persist an empty/corrupted snapshot over a good one; keep rolling history, not a single last-known-good file. | Done (unreleased) |
 | 2 | **Smart tab activation on close** | #1 complaint across all discard-based suspenders: closing a tab jumps focus to a discarded neighbor, forcing an unwanted reload. Activate the next *non-discarded* tab instead. | Planned |
 | 3 | **Native Tab Groups support** | Competing tools lose Firefox's built-in tab group name/color on restore. Capture and restore `tabGroups` metadata in snapshots. | Planned |
 | 4 | **Unsaved-form protection** | Auto Tab Discard's most-requested safety feature: don't discard a tab with an unsubmitted form. Needs a content-script check. | Planned |

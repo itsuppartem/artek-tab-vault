@@ -63,7 +63,7 @@ async function takeSnapshot() {
   let snapshots = stored[STORAGE_KEYS.SNAPSHOTS] || [];
 
   const prev = snapshots[snapshots.length - 1];
-  if (Core.isDuplicateSnapshot(prev, snapshot)) return;
+  if (!Core.shouldPersistSnapshot(prev, snapshot)) return;
 
   snapshots.push(snapshot);
   snapshots = Core.pruneSnapshots(snapshots, settings.maxSnapshots);

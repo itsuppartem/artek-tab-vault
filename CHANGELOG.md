@@ -4,7 +4,8 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 
 ## [Unreleased]
 
-- Nothing yet.
+### Fixed
+- Snapshot integrity guard: the backup engine no longer persists a fully-empty (zero-tab) snapshot. Firefox can't have a window with zero tabs, so this state only occurs during a startup/shutdown race - previously it could still get saved and evict good history from the rolling backup.
 
 ## [0.1.2] - 2026-07-27
 

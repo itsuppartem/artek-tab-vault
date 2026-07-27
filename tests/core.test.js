@@ -120,6 +120,59 @@ describe('snapshot helpers', () => {
     expect(Core.isDuplicateSnapshot(null, b)).toBe(false);
   });
 
+  test('isSnapshotEmpty is true for a snapshot with zero tabs', () => {
+    const empty = Core.buildSnapshotFromWindows([], 1);
+    expect(Core.isSnapshotEmpty(empty)).toBe(true);
+  });
+
+  test('isSnapshotEmpty is true for windows with no tabs', () => {
+    const empty = Core.buildSnapshotFromWindows([{ id: 1, tabs: [] }], 1);
+    expect(Core.isSnapshotEmpty(empty)).toBe(true);
+  });
+
+  test('isSnapshotEmpty is false when at least one tab exists', () => {
+    const notEmpty = Core.buildSnapshotFromWindows(windows, 1);
+    expect(Core.isSnapshotEmpty(notEmpty)).toBe(false);
+  });
+
+  test('isSnapshotEmpty is true for null/undefined', () => {
+    expect(Core.isSnapshotEmpty(null)).toBe(true);
+    expect(Core.isSnapshotEmpty(undefined)).toBe(true);
+  });
+
+  describe('shouldPersistSnapshot', () => {
+    test('rejects an empty snapshot even with no history yet', () => {
+      const empty = Core.buildSnapshotFromWindows([], 1);
+      expect(Core.shouldPersistSnapshot(null, empty)).toBe(false);
+    });
+
+    test('rejects an empty snapshot even if previous had tabs (crash/quit guard)', () => {
+      const prev = Core.buildSnapshotFromWindows(windows, 1);
+      const empty = Core.buildSnapshotFromWindows([], 2);
+      expect(Core.shouldPersistSnapshot(prev, empty)).toBe(false);
+    });
+
+    test('rejects a duplicate of the previous snapshot', () => {
+      const prev = Core.buildSnapshotFromWindows(windows, 1);
+      const same = Core.buildSnapshotFromWindows(windows, 2);
+      expect(Core.shouldPersistSnapshot(prev, same)).toBe(false);
+    });
+
+    test('accepts a healthy, changed snapshot', () => {
+      const prev = Core.buildSnapshotFromWindows(windows, 1);
+      const changed = Core.buildSnapshotFromWindows(
+        [{ id: 1, tabs: [{ url: 'https://c.com', title: 'C' }] }],
+        2
+      );
+      expect(Core.shouldPersistSnapshot(prev, changed)).toBe(true);
+    });
+
+    test('accepts the very first snapshot when there is no history', () => {
+      const first = Core.buildSnapshotFromWindows(windows, 1);
+      expect(Core.shouldPersistSnapshot(null, first)).toBe(true);
+    });
+  });
+
   test('pruneSnapshots keeps only the most recent N entries', () => {
     const snapshots = [1, 2, 3, 4, 5].map((n) => ({ timestamp: n, windows: [] }));
     const pruned = Core.pruneSnapshots(snapshots, 2);

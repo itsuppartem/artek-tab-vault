@@ -77,6 +77,23 @@
     return snapshotSignature(prevSnapshot) === snapshotSignature(nextSnapshot);
   }
 
+  function isSnapshotEmpty(snapshot) {
+    if (!snapshot) return true;
+    return countTabsInSnapshot(snapshot) === 0;
+  }
+
+  // A snapshot with zero tabs is almost never a real "the user closed
+  // everything" moment worth remembering - Firefox can't have a window with
+  // no tabs, so this only happens during a startup/shutdown race. Persisting
+  // it would let a crash/restart artifact evict good history from the
+  // rolling backup, which is exactly the failure mode that wiped years of
+  // sessions in competing tools (see ROADMAP.md #1).
+  function shouldPersistSnapshot(prevSnapshot, nextSnapshot) {
+    if (isSnapshotEmpty(nextSnapshot)) return false;
+    if (isDuplicateSnapshot(prevSnapshot, nextSnapshot)) return false;
+    return true;
+  }
+
   function pruneSnapshots(snapshots, maxSnapshots) {
     if (!Array.isArray(snapshots)) return [];
     if (snapshots.length <= maxSnapshots) return snapshots;
@@ -112,6 +129,8 @@
     buildSnapshotFromWindows,
     snapshotSignature,
     isDuplicateSnapshot,
+    isSnapshotEmpty,
+    shouldPersistSnapshot,
     pruneSnapshots,
     countTabsInSnapshot,
     sanitizeSettings,
