@@ -25,6 +25,27 @@
         <input type="number" id="idleMinutes" min="1" max="720" />
       </label>
 
+      <label class="row">
+        <span>Не выгружать вкладки с незаполненной формой</span>
+        <input type="checkbox" id="protectUnsavedForms" />
+      </label>
+
+      <label class="row">
+        <span>Умная активация при закрытии вкладки</span>
+        <input type="checkbox" id="smartTabActivation" />
+      </label>
+      <small>При закрытии активной вкладки Firefox иногда переключает фокус на уже выгруженную соседнюю - она тут же начинает перезагружаться. Эта опция сразу переключает фокус на другую, уже загруженную вкладку.</small>
+
+      <label class="row">
+        <span>Помечать выгруженные вкладки префиксом в заголовке</span>
+        <input type="checkbox" id="markDiscardedInTitle" />
+      </label>
+      <label class="row">
+        <span>Текст префикса</span>
+        <input type="text" id="discardedTitlePrefix" maxlength="20" placeholder="💤 " />
+      </label>
+      <small>Заголовок выгруженной вкладки становится, например, «💤 Название страницы» - видно прямо в списке вкладок Firefox, а не только в попапе. Можно заменить на свой текст или другой эмодзи. Работает не на всех страницах (например, на about: и странице AMO скрипт не пускают).</small>
+
       <label class="block">
         <span>Никогда не выгружать эти домены (по одному в строке)</span>
         <textarea id="whitelist" rows="5" placeholder="example.com&#10;mail.google.com"></textarea>
@@ -35,26 +56,54 @@
     <section class="card">
       <h2>Бэкап сессий</h2>
 
+      <div class="row">
+        <span>Готовые профили хранения</span>
+        <div class="btn-group">
+          <button type="button" class="btn secondary preset-btn" data-preset="compact">Компактный</button>
+          <button type="button" class="btn secondary preset-btn" data-preset="balanced">Сбалансированный</button>
+          <button type="button" class="btn secondary preset-btn" data-preset="archivist">Архивариус</button>
+        </div>
+      </div>
+      <small>Профиль просто заполняет поля ниже - после выбора всё ещё можно поправить руками и нажать «Сохранить».</small>
+
       <label class="row">
         <span>Интервал автобэкапа, мин</span>
         <input type="number" id="backupIntervalMinutes" min="0.5" max="60" step="0.5" />
       </label>
 
       <label class="row">
-        <span>Сколько снимков хранить</span>
+        <span>Сколько снимков хранить (по количеству)</span>
         <input type="number" id="maxSnapshots" min="1" max="200" />
       </label>
+
+      <label class="row">
+        <span>Лимит размера истории, МБ (0 = без доп. лимита)</span>
+        <input type="number" id="maxBackupMB" min="0" max="500" />
+      </label>
+      <small>Когда снимков накапливается больше лимита по количеству или размеру, самые старые обрезаются первыми - но последний снимок не удалится никогда, даже если он один превышает лимит.</small>
+
+      <div class="row">
+        <span>Сейчас занято снимками</span>
+        <span id="storageUsage">-</span>
+      </div>
 
       <div class="row">
         <span>Резервная копия снимков в файл</span>
         <div class="btn-group">
           <button id="exportBtn" class="btn secondary">Экспорт .json</button>
-          <label class="btn secondary file-btn">
-            Импорт .json
-            <input type="file" id="importInput" accept="application/json" hidden />
+          <label class="btn secondary file-btn" id="importLabel">
+            Импорт файла
+            <input type="file" id="importInput" accept="application/json,.txt" hidden />
           </label>
         </div>
       </div>
+      <small>Импорт понимает наш формат, а также похожие форматы других менеджеров вкладок (список URL, объект с <code>tabs</code>/<code>windows</code>/<code>sessions</code>) и обычный текстовый список ссылок - некорректные строки просто пропускаются, а не ломают весь импорт.</small>
+    </section>
+
+    <section class="card">
+      <h2>История обрезки бэкапов</h2>
+      <small>Здесь видно, если старые снимки когда-либо обрезались по лимиту, или снимок пропускался как пустой/повреждённый - вместо тихой потери истории, как бывает в других расширениях.</small>
+      <ul id="pruneLogList" class="prune-log"></ul>
     </section>
 
     <section class="card actions">
@@ -65,6 +114,7 @@
   </div>
 
   <script src="../core.js"></script>
+  <script src="../ui-feedback.js"></script>
   <script src="options.js"></script>
 </body>
 </html>

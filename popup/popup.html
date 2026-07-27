@@ -37,13 +37,25 @@
     <button id="discardNowBtn" class="btn">Выгрузить все, кроме текущей</button>
     <button id="backupNowBtn" class="btn secondary">Сделать бэкап сейчас</button>
     <button id="openOptionsBtn" class="btn secondary">Все настройки и исключения…</button>
+    <span id="popupStatus" class="status"></span>
   </section>
 
   <section class="snapshots">
     <h2>Снимки сессий</h2>
+    <label class="row restore-mode-row">
+      <span>Восстанавливать в текущее окно</span>
+      <input type="checkbox" id="restoreIntoCurrentWindow" />
+    </label>
     <ul id="snapshotList"></ul>
   </section>
 
+  <section class="tabs-state">
+    <h2>Вкладки этого окна</h2>
+    <ul id="tabList"></ul>
+  </section>
+
+  <script src="../core.js"></script>
+  <script src="../ui-feedback.js"></script>
   <script src="popup.js"></script>
 </body>
 </html>

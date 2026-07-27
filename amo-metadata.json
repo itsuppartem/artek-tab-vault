@@ -1,0 +1,23 @@
+{
+  "categories": {
+    "firefox": [
+      "tabs"
+    ]
+  },
+  "summary": {
+    "en-US": "Crash-proof tab session backup and idle tab memory guardian for Firefox."
+  },
+  "version": {
+    "release_notes": {
+      "en-US": "0.2.0\n\nAdded:\n- \"Sleeping\" title marker on discarded tabs, visible right in Firefox's tab strip/sidebar (configurable prefix/emoji, can be turned off)\n- Configurable backup retention: optional size cap on top of the snapshot-count cap, three ready-made presets, and a visible prune-history log so retention is never silent\n- Native Firefox tab group support: backups capture and restore group name/color\n- Unsaved-form protection: skips discarding tabs with an unsubmitted form\n- Proactive crash-restore prompt after an unclean shutdown/restart\n- Restore-into-current-window option\n- Tolerant snapshot import: accepts plain URL lists and a few common external export formats\n- Popup now lists every tab in the current window with an active/loaded/discarded indicator\n\nChanged:\n- Smart tab activation on close: focus now moves to an already-loaded tab instead of a freshly-discarded neighbor\n- Buttons in the popup and settings page now show a press animation and a success confirmation after an action completes\n\nFixed:\n- Snapshot integrity guard: the backup engine no longer persists a fully-empty snapshot"
+    },
+    "custom_license": {
+      "name": {
+        "en-US": "MIT License"
+      },
+      "text": {
+        "en-US": "MIT License\n\nCopyright (c) 2026 Artem Guliaev\n\nPermission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the \"Software\"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED \"AS IS\", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.\n"
+      }
+    }
+  }
+}

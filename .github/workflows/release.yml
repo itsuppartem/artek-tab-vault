@@ -1,0 +1,42 @@
+name: Release to AMO (listed)
+
+# Fires only on pushes to prod - the branch that requires explicit human
+# go-ahead before anything lands on it (see .cursor/rules/release-policy.mdc
+# and .cursor/skills/release-prod/SKILL.md). CI itself never merges to prod;
+# it only publishes what a human already approved and merged.
+on:
+  push:
+    branches: [prod]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    environment: production
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: Unit tests
+        run: npm test
+
+      - name: web-ext lint
+        run: npx web-ext lint --source-dir=.
+
+      - name: Sign and submit to AMO (listed channel)
+        env:
+          WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
+          WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
+        run: npx web-ext sign --source-dir=. --channel=listed --amo-metadata=amo-metadata.json
+
+      - name: Upload signed xpi
+        uses: actions/upload-artifact@v4
+        with:
+          name: signed-xpi
+          path: web-ext-artifacts/*.xpi
+          retention-days: 90
