@@ -325,8 +325,8 @@
     return 'loaded';
   }
 
-  // --- Roadmap #10: "zzzz" title marker on discarded tabs (Auto Tab Discard
-  // parity) -------------------------------------------------------------
+  // --- Roadmap #10: sleep-emoji title marker on discarded tabs (Auto Tab
+  // Discard parity) -------------------------------------------------------
   // Firefox's WebExtension APIs have no way to set a tab's title directly
   // (`tabs.update({title})` was proposed and rejected upstream - see
   // bugzilla 1333943/1340633). The trick every discard-based suspender uses:
@@ -334,7 +334,7 @@
   // `tabs.discard()`. Once discarded, the page is unloaded and nothing can
   // overwrite the cached title again until the tab reloads for real, at
   // which point the page's own title naturally replaces it.
-  const DEFAULT_DISCARDED_TITLE_PREFIX = 'zzzz ';
+  const DEFAULT_DISCARDED_TITLE_PREFIX = '💤 ';
 
   function withDiscardedTitlePrefix(title, prefix) {
     const p = typeof prefix === 'string' && prefix.length ? prefix : DEFAULT_DISCARDED_TITLE_PREFIX;

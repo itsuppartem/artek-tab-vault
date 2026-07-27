@@ -13,7 +13,7 @@
  * declared as a persistent content script - it only ever needs to run once.
  */
 (async function () {
-  const DEFAULT_PREFIX = 'zzzz ';
+  const DEFAULT_PREFIX = '💤 ';
   try {
     const stored = await browser.storage.local.get('tabvault_settings');
     const settings = stored.tabvault_settings || {};

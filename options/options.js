@@ -15,7 +15,7 @@ const DEFAULT_SETTINGS = {
   smartTabActivation: true,
   protectUnsavedForms: true,
   markDiscardedInTitle: true,
-  discardedTitlePrefix: 'zzzz ',
+  discardedTitlePrefix: '💤 ',
 };
 
 const PRUNE_REASON_LABELS = {

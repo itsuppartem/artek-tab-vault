@@ -30,7 +30,7 @@ const DEFAULT_SETTINGS = {
   smartTabActivation: true,
   protectUnsavedForms: true,
   markDiscardedInTitle: true,
-  discardedTitlePrefix: 'zzzz ',
+  discardedTitlePrefix: '💤 ',
 };
 
 const MAX_PRUNE_LOG_ENTRIES = 50;
@@ -145,7 +145,7 @@ async function tabHasUnsavedForm(tabId) {
   }
 }
 
-// Roadmap #10: mark the tab's title (e.g. "zzzz Original Title") right
+// Roadmap #10: mark the tab's title (e.g. "💤 Original Title") right
 // before discarding it, so it's visible at a glance in Firefox's own tab
 // strip/sidebar, not just in our popup. Best-effort: some pages (about:,
 // addons.mozilla.org, PDF viewer, etc.) refuse script injection - the tab

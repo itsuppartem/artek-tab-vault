@@ -51,7 +51,7 @@ Guardian: automatic memory relief
   focus to the nearest already-loaded tab instead of leaving you staring at
   a discarded neighbor reloading itself.
 - Marks discarded tabs right in Firefox's own tab strip/sidebar with a
-  configurable title prefix (default "zzzz "), the same trick used by Auto
+  configurable title prefix (default "💤 "), the same trick used by Auto
   Tab Discard - so you can tell at a glance without opening the popup.
 - "Discard all except current" one-click button and keyboard shortcut.
 - Popup shows every tab in the current window with a clear
@@ -79,7 +79,7 @@ PERMISSIONS
   script that detects whether a page has an unsubmitted form, so that tab
   can be skipped by the memory guardian (only a true/false flag is kept, the
   form's contents are never read, stored, or sent anywhere); (2) rewriting a
-  tab's own title (e.g. adding "zzzz ") right before discarding it, since
+  tab's own title (e.g. adding "💤 ") right before discarding it, since
   Firefox has no dedicated API for that. Neither use ever transmits data off
   your machine.
 - No browsing data ever leaves your machine.

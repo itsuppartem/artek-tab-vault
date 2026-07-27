@@ -221,7 +221,7 @@ describe('sanitizeSettings', () => {
     smartTabActivation: true,
     protectUnsavedForms: true,
     markDiscardedInTitle: true,
-    discardedTitlePrefix: 'zzzz ',
+    discardedTitlePrefix: '💤 ',
   };
 
   test('fills in missing fields with defaults', () => {
@@ -284,7 +284,7 @@ describe('sanitizeSettings', () => {
 
 describe('discarded-tab title prefix (roadmap #10)', () => {
   test('withDiscardedTitlePrefix prepends the default prefix', () => {
-    expect(Core.withDiscardedTitlePrefix('My Page')).toBe('zzzz My Page');
+    expect(Core.withDiscardedTitlePrefix('My Page')).toBe('💤 My Page');
   });
 
   test('withDiscardedTitlePrefix supports a custom prefix', () => {
@@ -297,12 +297,12 @@ describe('discarded-tab title prefix (roadmap #10)', () => {
   });
 
   test('withDiscardedTitlePrefix handles an empty/missing title', () => {
-    expect(Core.withDiscardedTitlePrefix('')).toBe('zzzz ');
-    expect(Core.withDiscardedTitlePrefix(undefined)).toBe('zzzz ');
+    expect(Core.withDiscardedTitlePrefix('')).toBe('💤 ');
+    expect(Core.withDiscardedTitlePrefix(undefined)).toBe('💤 ');
   });
 
   test('stripDiscardedTitlePrefix removes a known prefix', () => {
-    expect(Core.stripDiscardedTitlePrefix('zzzz My Page')).toBe('My Page');
+    expect(Core.stripDiscardedTitlePrefix('💤 My Page')).toBe('My Page');
   });
 
   test('stripDiscardedTitlePrefix is a no-op when the prefix is absent', () => {
@@ -415,7 +415,7 @@ describe('retention presets', () => {
       smartTabActivation: true,
       protectUnsavedForms: true,
       markDiscardedInTitle: true,
-      discardedTitlePrefix: 'zzzz ',
+      discardedTitlePrefix: '💤 ',
     };
     for (const name of Object.keys(Core.RETENTION_PRESETS)) {
       const preset = Core.applyRetentionPreset(name);
