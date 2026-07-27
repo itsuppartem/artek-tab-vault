@@ -29,6 +29,8 @@ const DEFAULT_SETTINGS = {
   neverDiscardDomains: [],
   smartTabActivation: true,
   protectUnsavedForms: true,
+  markDiscardedInTitle: true,
+  discardedTitlePrefix: 'zzzz ',
 };
 
 const MAX_PRUNE_LOG_ENTRIES = 50;
@@ -88,9 +90,19 @@ async function appendPruneLog(entry) {
   await browser.storage.local.set({ [STORAGE_KEYS.PRUNE_LOG]: log });
 }
 
+function stripDiscardedTitlesInPlace(windows) {
+  for (const win of windows) {
+    for (const tab of win.tabs || []) {
+      if (tab.discarded) tab.title = Core.stripDiscardedTitlePrefix(tab.title, settings.discardedTitlePrefix);
+    }
+  }
+  return windows;
+}
+
 async function takeSnapshot() {
   const windows = await browser.windows.getAll({ populate: true });
   await attachTabGroups(windows);
+  stripDiscardedTitlesInPlace(windows);
   const snapshot = Core.buildSnapshotFromWindows(windows);
 
   const stored = await browser.storage.local.get(STORAGE_KEYS.SNAPSHOTS);
@@ -133,6 +145,22 @@ async function tabHasUnsavedForm(tabId) {
   }
 }
 
+// Roadmap #10: mark the tab's title (e.g. "zzzz Original Title") right
+// before discarding it, so it's visible at a glance in Firefox's own tab
+// strip/sidebar, not just in our popup. Best-effort: some pages (about:,
+// addons.mozilla.org, PDF viewer, etc.) refuse script injection - the tab
+// still gets discarded either way, it just won't carry the visual marker.
+async function markThenDiscard(tabId) {
+  if (settings.markDiscardedInTitle) {
+    try {
+      await browser.tabs.executeScript(tabId, { file: 'content-scripts/mark-discarded.js' });
+    } catch (err) {
+      // ignore - see comment above.
+    }
+  }
+  await browser.tabs.discard(tabId);
+}
+
 async function runGuardian() {
   if (!settings.guardianEnabled) return;
 
@@ -158,7 +186,7 @@ async function runGuardian() {
     if (settings.protectUnsavedForms && (await tabHasUnsavedForm(tab.id))) continue;
 
     try {
-      await browser.tabs.discard(tab.id);
+      await markThenDiscard(tab.id);
     } catch (err) {
       // Some tabs (e.g. about: pages) cannot be discarded; ignore.
     }
@@ -183,7 +211,7 @@ async function discardAllExceptCurrent() {
     if (tab.pinned || tab.audible || tab.discarded) continue;
     if (settings.protectUnsavedForms && (await tabHasUnsavedForm(tab.id))) continue;
     try {
-      await browser.tabs.discard(tab.id);
+      await markThenDiscard(tab.id);
     } catch (err) {
       // ignore tabs that refuse to be discarded
     }
@@ -247,7 +275,7 @@ browser.runtime.onMessage.addListener(async (message) => {
           .sort((a, b) => a.index - b.index)
           .map((t) => ({
             id: t.id,
-            title: t.title,
+            title: t.discarded ? Core.stripDiscardedTitlePrefix(t.title, settings.discardedTitlePrefix) : t.title,
             favIconUrl: t.favIconUrl,
             pinned: t.pinned,
             state: Core.tabDisplayState(t),

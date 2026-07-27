@@ -50,6 +50,9 @@ Guardian: automatic memory relief
 - Smart tab activation: when the active tab is closed, immediately hands
   focus to the nearest already-loaded tab instead of leaving you staring at
   a discarded neighbor reloading itself.
+- Marks discarded tabs right in Firefox's own tab strip/sidebar with a
+  configurable title prefix (default "zzzz "), the same trick used by Auto
+  Tab Discard - so you can tell at a glance without opening the popup.
 - "Discard all except current" one-click button and keyboard shortcut.
 - Popup shows every tab in the current window with a clear
   active/loaded/discarded indicator, plus a toolbar badge with the total
@@ -72,11 +75,13 @@ PERMISSIONS
 - unlimitedStorage - lets the local backup history grow past the browser's
   default ~5-10MB local-storage quota when you raise the size limit above the
   default; still fully local, nothing is uploaded anywhere.
-- Access to all sites (a content script running on every page) - used only
-  to detect, on-device, whether a page has an unsubmitted form so that tab
-  can be skipped by the memory guardian. It never reads, stores, or sends
-  the form's contents anywhere - only a true/false "was something typed"
-  flag stays in memory for that tab.
+- Access to all sites - used for two on-device-only things: (1) a content
+  script that detects whether a page has an unsubmitted form, so that tab
+  can be skipped by the memory guardian (only a true/false flag is kept, the
+  form's contents are never read, stored, or sent anywhere); (2) rewriting a
+  tab's own title (e.g. adding "zzzz ") right before discarding it, since
+  Firefox has no dedicated API for that. Neither use ever transmits data off
+  your machine.
 - No browsing data ever leaves your machine.
 
 Feedback and bug reports are welcome via the support site/homepage link on

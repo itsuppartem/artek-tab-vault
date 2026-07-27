@@ -19,7 +19,8 @@
     "idle",
     "notifications",
     "tabGroups",
-    "unlimitedStorage"
+    "unlimitedStorage",
+    "<all_urls>"
   ],
   "icons": {
     "48": "icons/icon.svg",

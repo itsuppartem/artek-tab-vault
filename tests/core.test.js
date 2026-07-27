@@ -220,6 +220,8 @@ describe('sanitizeSettings', () => {
     neverDiscardDomains: [],
     smartTabActivation: true,
     protectUnsavedForms: true,
+    markDiscardedInTitle: true,
+    discardedTitlePrefix: 'zzzz ',
   };
 
   test('fills in missing fields with defaults', () => {
@@ -261,6 +263,59 @@ describe('sanitizeSettings', () => {
     expect(Core.sanitizeSettings({ maxBackupMB: 9999 }, defaults).maxBackupMB).toBe(500);
     expect(Core.sanitizeSettings({ maxBackupMB: -5 }, defaults).maxBackupMB).toBe(1);
     expect(Core.sanitizeSettings({ maxBackupMB: 'nope' }, defaults).maxBackupMB).toBe(defaults.maxBackupMB);
+  });
+
+  test('coerces markDiscardedInTitle to boolean, defaulting from defaults', () => {
+    expect(Core.sanitizeSettings({}, defaults).markDiscardedInTitle).toBe(true);
+    expect(Core.sanitizeSettings({ markDiscardedInTitle: false }, defaults).markDiscardedInTitle).toBe(false);
+  });
+
+  test('discardedTitlePrefix: keeps a valid custom prefix, truncated to 20 chars', () => {
+    expect(Core.sanitizeSettings({ discardedTitlePrefix: 'zzz ' }, defaults).discardedTitlePrefix).toBe('zzz ');
+    const long = 'x'.repeat(50);
+    expect(Core.sanitizeSettings({ discardedTitlePrefix: long }, defaults).discardedTitlePrefix).toHaveLength(20);
+  });
+
+  test('discardedTitlePrefix: falls back to default for empty or non-string input', () => {
+    expect(Core.sanitizeSettings({ discardedTitlePrefix: '' }, defaults).discardedTitlePrefix).toBe(defaults.discardedTitlePrefix);
+    expect(Core.sanitizeSettings({ discardedTitlePrefix: 42 }, defaults).discardedTitlePrefix).toBe(defaults.discardedTitlePrefix);
+  });
+});
+
+describe('discarded-tab title prefix (roadmap #10)', () => {
+  test('withDiscardedTitlePrefix prepends the default prefix', () => {
+    expect(Core.withDiscardedTitlePrefix('My Page')).toBe('zzzz My Page');
+  });
+
+  test('withDiscardedTitlePrefix supports a custom prefix', () => {
+    expect(Core.withDiscardedTitlePrefix('My Page', '[sleep] ')).toBe('[sleep] My Page');
+  });
+
+  test('withDiscardedTitlePrefix is idempotent - does not double up', () => {
+    const once = Core.withDiscardedTitlePrefix('My Page');
+    expect(Core.withDiscardedTitlePrefix(once)).toBe(once);
+  });
+
+  test('withDiscardedTitlePrefix handles an empty/missing title', () => {
+    expect(Core.withDiscardedTitlePrefix('')).toBe('zzzz ');
+    expect(Core.withDiscardedTitlePrefix(undefined)).toBe('zzzz ');
+  });
+
+  test('stripDiscardedTitlePrefix removes a known prefix', () => {
+    expect(Core.stripDiscardedTitlePrefix('zzzz My Page')).toBe('My Page');
+  });
+
+  test('stripDiscardedTitlePrefix is a no-op when the prefix is absent', () => {
+    expect(Core.stripDiscardedTitlePrefix('My Page')).toBe('My Page');
+  });
+
+  test('stripDiscardedTitlePrefix supports a custom prefix', () => {
+    expect(Core.stripDiscardedTitlePrefix('[sleep] My Page', '[sleep] ')).toBe('My Page');
+  });
+
+  test('with + strip round-trip back to the original title', () => {
+    const original = 'Some Page Title';
+    expect(Core.stripDiscardedTitlePrefix(Core.withDiscardedTitlePrefix(original))).toBe(original);
   });
 });
 
@@ -359,6 +414,8 @@ describe('retention presets', () => {
       neverDiscardDomains: [],
       smartTabActivation: true,
       protectUnsavedForms: true,
+      markDiscardedInTitle: true,
+      discardedTitlePrefix: 'zzzz ',
     };
     for (const name of Object.keys(Core.RETENTION_PRESETS)) {
       const preset = Core.applyRetentionPreset(name);

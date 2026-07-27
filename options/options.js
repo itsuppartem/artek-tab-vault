@@ -14,6 +14,8 @@ const DEFAULT_SETTINGS = {
   neverDiscardDomains: [],
   smartTabActivation: true,
   protectUnsavedForms: true,
+  markDiscardedInTitle: true,
+  discardedTitlePrefix: 'zzzz ',
 };
 
 const PRUNE_REASON_LABELS = {
@@ -27,6 +29,8 @@ const els = {
   idleMinutes: document.getElementById('idleMinutes'),
   protectUnsavedForms: document.getElementById('protectUnsavedForms'),
   smartTabActivation: document.getElementById('smartTabActivation'),
+  markDiscardedInTitle: document.getElementById('markDiscardedInTitle'),
+  discardedTitlePrefix: document.getElementById('discardedTitlePrefix'),
   whitelist: document.getElementById('whitelist'),
   backupIntervalMinutes: document.getElementById('backupIntervalMinutes'),
   maxSnapshots: document.getElementById('maxSnapshots'),
@@ -51,6 +55,8 @@ function fillForm(settings) {
   els.idleMinutes.value = settings.idleMinutes;
   els.protectUnsavedForms.checked = settings.protectUnsavedForms;
   els.smartTabActivation.checked = settings.smartTabActivation;
+  els.markDiscardedInTitle.checked = settings.markDiscardedInTitle;
+  els.discardedTitlePrefix.value = settings.discardedTitlePrefix;
   els.backupIntervalMinutes.value = settings.backupIntervalMinutes;
   els.maxSnapshots.value = settings.maxSnapshots;
   els.maxBackupMB.value = settings.maxBackupMB;
@@ -64,6 +70,8 @@ function readForm() {
       idleMinutes: els.idleMinutes.value,
       protectUnsavedForms: els.protectUnsavedForms.checked,
       smartTabActivation: els.smartTabActivation.checked,
+      markDiscardedInTitle: els.markDiscardedInTitle.checked,
+      discardedTitlePrefix: els.discardedTitlePrefix.value,
       backupIntervalMinutes: els.backupIntervalMinutes.value,
       maxSnapshots: els.maxSnapshots.value,
       maxBackupMB: els.maxBackupMB.value,

@@ -129,7 +129,15 @@
       neverDiscardDomains: Array.isArray(merged.neverDiscardDomains) ? merged.neverDiscardDomains : [],
       smartTabActivation: merged.smartTabActivation !== undefined ? !!merged.smartTabActivation : !!defaults.smartTabActivation,
       protectUnsavedForms: merged.protectUnsavedForms !== undefined ? !!merged.protectUnsavedForms : !!defaults.protectUnsavedForms,
+      markDiscardedInTitle: merged.markDiscardedInTitle !== undefined ? !!merged.markDiscardedInTitle : !!defaults.markDiscardedInTitle,
+      discardedTitlePrefix: sanitizeTitlePrefix(merged.discardedTitlePrefix, defaults.discardedTitlePrefix),
     };
+  }
+
+  function sanitizeTitlePrefix(value, fallback) {
+    if (typeof value !== 'string') return fallback;
+    const trimmed = value.slice(0, 20); // keep tab titles from becoming unreadable
+    return trimmed.length ? trimmed : fallback;
   }
 
   function clampNumber(value, min, max, fallback) {
@@ -317,6 +325,29 @@
     return 'loaded';
   }
 
+  // --- Roadmap #10: "zzzz" title marker on discarded tabs (Auto Tab Discard
+  // parity) -------------------------------------------------------------
+  // Firefox's WebExtension APIs have no way to set a tab's title directly
+  // (`tabs.update({title})` was proposed and rejected upstream - see
+  // bugzilla 1333943/1340633). The trick every discard-based suspender uses:
+  // rewrite `document.title` via a content script *right before* calling
+  // `tabs.discard()`. Once discarded, the page is unloaded and nothing can
+  // overwrite the cached title again until the tab reloads for real, at
+  // which point the page's own title naturally replaces it.
+  const DEFAULT_DISCARDED_TITLE_PREFIX = 'zzzz ';
+
+  function withDiscardedTitlePrefix(title, prefix) {
+    const p = typeof prefix === 'string' && prefix.length ? prefix : DEFAULT_DISCARDED_TITLE_PREFIX;
+    const safeTitle = title || '';
+    return safeTitle.startsWith(p) ? safeTitle : p + safeTitle;
+  }
+
+  function stripDiscardedTitlePrefix(title, prefix) {
+    const p = typeof prefix === 'string' && prefix.length ? prefix : DEFAULT_DISCARDED_TITLE_PREFIX;
+    const safeTitle = title || '';
+    return safeTitle.startsWith(p) ? safeTitle.slice(p.length) : safeTitle;
+  }
+
   // --- Roadmap #9: configurable backup size/retention + transparency log ---
   function estimateSnapshotBytes(snapshot) {
     const json = JSON.stringify(snapshot) || '';
@@ -411,5 +442,8 @@
     RETENTION_PRESETS,
     applyRetentionPreset,
     buildPruneLogEntry,
+    DEFAULT_DISCARDED_TITLE_PREFIX,
+    withDiscardedTitlePrefix,
+    stripDiscardedTitlePrefix,
   };
 });

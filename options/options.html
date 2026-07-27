@@ -36,6 +36,16 @@
       </label>
       <small>При закрытии активной вкладки Firefox иногда переключает фокус на уже выгруженную соседнюю - она тут же начинает перезагружаться. Эта опция сразу переключает фокус на другую, уже загруженную вкладку.</small>
 
+      <label class="row">
+        <span>Помечать выгруженные вкладки префиксом в заголовке</span>
+        <input type="checkbox" id="markDiscardedInTitle" />
+      </label>
+      <label class="row">
+        <span>Текст префикса</span>
+        <input type="text" id="discardedTitlePrefix" maxlength="20" placeholder="zzzz " />
+      </label>
+      <small>Как в Auto Tab Discard: заголовок выгруженной вкладки становится, например, «zzzz Название страницы» - видно прямо в списке вкладок Firefox, а не только в попапе. Работает не на всех страницах (например, на about: и странице AMO скрипт не пускают).</small>
+
       <label class="block">
         <span>Никогда не выгружать эти домены (по одному в строке)</span>
         <textarea id="whitelist" rows="5" placeholder="example.com&#10;mail.google.com"></textarea>

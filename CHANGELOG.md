@@ -5,6 +5,7 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 ## [Unreleased]
 
 ### Added
+- "zzzz" title marker on discarded tabs (Auto Tab Discard parity): the guardian now rewrites a tab's title (e.g. `zzzz Original Title`) right before discarding it, so it's visible directly in Firefox's tab strip/sidebar - not only in the popup. Prefix text is configurable, feature can be turned off. Doesn't work on pages that block script injection (about:, addons.mozilla.org, PDF viewer).
 - Configurable backup retention: an optional size cap (MB, on top of the existing snapshot-count cap) with three ready-made presets (Компактный/Сбалансированный/Архивариус) in settings, plus a visible "История обрезки бэкапов" log showing exactly when and why old snapshots were trimmed or a snapshot was skipped - no more silent history loss.
 - Native Firefox tab group support: backups now capture group name/color, and restoring a snapshot recreates the groups (requires Firefox's `tabGroups` API; tabs still restore fine without it).
 - Unsaved-form protection: the guardian now skips discarding a tab that has an unsubmitted form, so you don't silently lose typed input. Can be turned off in settings.
