@@ -91,7 +91,7 @@
         <span>Резервная копия снимков в файл</span>
         <div class="btn-group">
           <button id="exportBtn" class="btn secondary">Экспорт .json</button>
-          <label class="btn secondary file-btn">
+          <label class="btn secondary file-btn" id="importLabel">
             Импорт файла
             <input type="file" id="importInput" accept="application/json,.txt" hidden />
           </label>
@@ -114,6 +114,7 @@
   </div>
 
   <script src="../core.js"></script>
+  <script src="../ui-feedback.js"></script>
   <script src="options.js"></script>
 </body>
 </html>

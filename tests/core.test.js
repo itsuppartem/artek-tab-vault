@@ -319,6 +319,43 @@ describe('discarded-tab title prefix (roadmap #10)', () => {
   });
 });
 
+describe('pluralizeRu', () => {
+  const forms = ['вкладка', 'вкладки', 'вкладок'];
+
+  test('uses the "one" form for 1, 21, 31...', () => {
+    expect(Core.pluralizeRu(1, forms)).toBe('вкладка');
+    expect(Core.pluralizeRu(21, forms)).toBe('вкладка');
+    expect(Core.pluralizeRu(101, forms)).toBe('вкладка');
+  });
+
+  test('uses the "few" form for 2-4, 22-24...', () => {
+    expect(Core.pluralizeRu(2, forms)).toBe('вкладки');
+    expect(Core.pluralizeRu(3, forms)).toBe('вкладки');
+    expect(Core.pluralizeRu(4, forms)).toBe('вкладки');
+    expect(Core.pluralizeRu(22, forms)).toBe('вкладки');
+  });
+
+  test('uses the "many" form for 0, 5-20, 25...', () => {
+    expect(Core.pluralizeRu(0, forms)).toBe('вкладок');
+    expect(Core.pluralizeRu(5, forms)).toBe('вкладок');
+    expect(Core.pluralizeRu(11, forms)).toBe('вкладок');
+    expect(Core.pluralizeRu(12, forms)).toBe('вкладок');
+    expect(Core.pluralizeRu(14, forms)).toBe('вкладок');
+    expect(Core.pluralizeRu(20, forms)).toBe('вкладок');
+    expect(Core.pluralizeRu(25, forms)).toBe('вкладок');
+  });
+
+  test('11-14 always take the "many" form even though they end in 1-4', () => {
+    expect(Core.pluralizeRu(111, forms)).toBe('вкладок');
+    expect(Core.pluralizeRu(112, forms)).toBe('вкладок');
+  });
+
+  test('handles non-numeric input as 0', () => {
+    expect(Core.pluralizeRu('nope', forms)).toBe('вкладок');
+    expect(Core.pluralizeRu(undefined, forms)).toBe('вкладок');
+  });
+});
+
 describe('trimToLast', () => {
   test('keeps only the last N items', () => {
     expect(Core.trimToLast([1, 2, 3, 4, 5], 2)).toEqual([4, 5]);

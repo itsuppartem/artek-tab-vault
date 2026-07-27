@@ -16,6 +16,7 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 
 ### Changed
 - Smart tab activation on close: when the active tab is closed, focus now jumps to the nearest already-loaded tab instead of a freshly-discarded neighbor. Firefox has no API to cancel the reload it starts internally, so this mitigates rather than fully eliminates the jump-and-reload annoyance. Can be turned off in settings.
+- Visual confirmation for actions: buttons in the popup and settings page now show a brief press animation and a green "✓ done" flash after an action actually completes (discard, backup, restore, save, reset, export, import, preset), plus a short text confirmation (with correct counts, e.g. "Выгружено 3 вкладки") - previously a click gave no feedback beyond the data quietly changing.
 
 ### Fixed
 - Snapshot integrity guard: the backup engine no longer persists a fully-empty (zero-tab) snapshot. Firefox can't have a window with zero tabs, so this state only occurs during a startup/shutdown race - previously it could still get saved and evict good history from the rolling backup.

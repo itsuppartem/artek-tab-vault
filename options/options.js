@@ -41,8 +41,11 @@ const els = {
   resetBtn: document.getElementById('resetBtn'),
   exportBtn: document.getElementById('exportBtn'),
   importInput: document.getElementById('importInput'),
+  importLabel: document.getElementById('importLabel'),
   status: document.getElementById('status'),
 };
+
+const SNAPSHOT_WORD_FORMS = ['снимок', 'снимка', 'снимков'];
 
 function showStatus(text) {
   els.status.textContent = text;
@@ -138,6 +141,7 @@ document.querySelectorAll('.preset-btn').forEach((btn) => {
     els.maxSnapshots.value = preset.maxSnapshots;
     els.maxBackupMB.value = preset.maxBackupMB;
     els.idleMinutes.value = preset.idleMinutes;
+    TabVaultUI.flashButton(btn, 'Применён', 1000);
     showStatus('Профиль применён - не забудьте «Сохранить»');
   });
 });
@@ -146,12 +150,14 @@ els.saveBtn.addEventListener('click', async () => {
   const settings = readForm();
   await browser.storage.local.set({ [SETTINGS_KEY]: settings });
   fillForm(settings);
+  TabVaultUI.flashButton(els.saveBtn, 'Сохранено');
   showStatus('Сохранено');
 });
 
 els.resetBtn.addEventListener('click', async () => {
   await browser.storage.local.set({ [SETTINGS_KEY]: DEFAULT_SETTINGS });
   fillForm(DEFAULT_SETTINGS);
+  TabVaultUI.flashButton(els.resetBtn, 'Сброшено');
   showStatus('Сброшено к значениям по умолчанию');
 });
 
@@ -165,7 +171,8 @@ els.exportBtn.addEventListener('click', async () => {
   a.download = `tab-vault-snapshots-${Date.now()}.json`;
   a.click();
   URL.revokeObjectURL(url);
-  showStatus('Снимки экспортированы');
+  TabVaultUI.flashButton(els.exportBtn, 'Экспортировано');
+  showStatus(`Экспортировано ${snapshots.length} ${Core.pluralizeRu(snapshots.length, SNAPSHOT_WORD_FORMS)}`);
 });
 
 els.importInput.addEventListener('change', async () => {
@@ -186,10 +193,12 @@ els.importInput.addEventListener('change', async () => {
       DEFAULT_SETTINGS.maxSnapshots
     );
     await browser.storage.local.set({ [SNAPSHOTS_KEY]: merged });
+    TabVaultUI.flashElement(els.importLabel, 1000);
+    const snapWord = Core.pluralizeRu(imported.length, SNAPSHOT_WORD_FORMS);
     showStatus(
       skippedEntries > 0
-        ? `Импортировано ${imported.length} снимков, пропущено ${skippedEntries} некорректных вкладок`
-        : `Импортировано ${imported.length} снимков`
+        ? `Импортировано ${imported.length} ${snapWord}, пропущено ${skippedEntries} ${Core.pluralizeRu(skippedEntries, ['некорректная вкладка', 'некорректные вкладки', 'некорректных вкладок'])}`
+        : `Импортировано ${imported.length} ${snapWord}`
     );
     await loadStorageAndLog();
   } catch (err) {

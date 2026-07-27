@@ -11,6 +11,7 @@
 artek-tab-vault/
   manifest.json
   core.js               # чистая логика (discard-решения, снапшоты, настройки, импорт) - без browser.* API
+  ui-feedback.js         # общие DOM-хелперы для popup/options: анимация кнопок + флеш успеха
   background.js         # фоновый скрипт: alarms, tabs API, storage, tabGroups, notifications
   content-scripts/      # dirty-form.js - детектор незасабмиченной формы на странице
   popup/                 # быстрый попап на тулбаре (статус вкладок, снимки)
@@ -38,7 +39,7 @@ npm test          # jest, юнит-тесты на core.js (discard-логика
 npm run lint      # web-ext lint — проверка манифеста и кода на соответствие требованиям AMO
 ```
 
-Сейчас: 92 теста, 0 ошибок и предупреждений линтера.
+Сейчас: 97 тестов, 0 ошибок и предупреждений линтера.
 
 ## Настройки (options page)
 

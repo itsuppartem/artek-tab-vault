@@ -57,6 +57,10 @@ Guardian: automatic memory relief
 - Popup shows every tab in the current window with a clear
   active/loaded/discarded indicator, plus a toolbar badge with the total
   discarded count.
+- Every button (discard, backup, restore, save, reset, export/import,
+  presets) gives instant visual confirmation - a press animation plus a
+  brief "✓ done" flash and a text summary - so you always know an action
+  actually went through.
 
 WHAT IT DOESN'T DO (known limitations)
 - Firefox's extension APIs don't expose real per-tab RAM usage, so discarding

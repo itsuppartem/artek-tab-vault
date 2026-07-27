@@ -92,6 +92,7 @@ header .subtitle {
   padding: 8px 10px;
   font-size: 12px;
   cursor: pointer;
+  transition: transform 0.12s ease, background-color 0.2s ease, color 0.2s ease, opacity 0.15s ease;
 }
 
 .btn.secondary {
@@ -100,6 +101,50 @@ header .subtitle {
 
 .btn:hover {
   opacity: 0.9;
+}
+
+.btn:active {
+  transform: scale(0.94);
+}
+
+.btn.is-success,
+.btn.secondary.is-success {
+  background: #3ddc84;
+  color: #0b2e1a;
+  opacity: 1;
+}
+
+.btn:disabled {
+  cursor: default;
+}
+
+.status {
+  min-height: 13px;
+  font-size: 11px;
+  color: #3ddc84;
+  text-align: center;
+  opacity: 0;
+  transform: translateY(-4px);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.status.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.tv-flash {
+  animation: tv-row-flash 0.6s ease;
+  border-radius: 6px;
+}
+
+@keyframes tv-row-flash {
+  0% {
+    background-color: rgba(61, 220, 132, 0.35);
+  }
+  100% {
+    background-color: transparent;
+  }
 }
 
 .snapshots {
@@ -142,11 +187,22 @@ header .subtitle {
   padding: 3px 8px;
   font-size: 10px;
   cursor: pointer;
+  transition: transform 0.12s ease, background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
 }
 
 .snapshot-item button:hover {
   background: #ff9500;
   color: #1e1f22;
+}
+
+.snapshot-item button:active {
+  transform: scale(0.92);
+}
+
+.snapshot-item button.is-success {
+  background: #3ddc84;
+  border-color: #3ddc84;
+  color: #0b2e1a;
 }
 
 .empty {
@@ -191,10 +247,15 @@ header .subtitle {
   border-radius: 4px;
   font-size: 11px;
   cursor: pointer;
+  transition: transform 0.1s ease;
 }
 
 .tab-item:hover {
   background: #2a2b2e;
+}
+
+.tab-item:active {
+  transform: scale(0.98);
 }
 
 .tab-dot {

@@ -348,6 +348,19 @@
     return safeTitle.startsWith(p) ? safeTitle.slice(p.length) : safeTitle;
   }
 
+  // --- UI polish: correct Russian pluralization for count-based success
+  // messages ("1 снимок" / "2 снимка" / "5 снимков") in the popup/options
+  // confirmation toasts, instead of always picking one fixed word form.
+  function pluralizeRu(count, forms) {
+    const n = Math.abs(Math.trunc(Number(count) || 0));
+    const mod10 = n % 10;
+    const mod100 = n % 100;
+    if (mod100 >= 11 && mod100 <= 14) return forms[2];
+    if (mod10 === 1) return forms[0];
+    if (mod10 >= 2 && mod10 <= 4) return forms[1];
+    return forms[2];
+  }
+
   // --- Roadmap #9: configurable backup size/retention + transparency log ---
   function estimateSnapshotBytes(snapshot) {
     const json = JSON.stringify(snapshot) || '';
@@ -445,5 +458,6 @@
     DEFAULT_DISCARDED_TITLE_PREFIX,
     withDiscardedTitlePrefix,
     stripDiscardedTitlePrefix,
+    pluralizeRu,
   };
 });

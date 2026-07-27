@@ -205,6 +205,7 @@ async function updateBadge() {
 async function discardAllExceptCurrent() {
   const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
   const tabs = await browser.tabs.query({ currentWindow: true });
+  let discardedCount = 0;
   for (const tab of tabs) {
     if (tab.id === activeTab?.id) continue;
     if (Core.isWhitelisted(tab.url, settings.neverDiscardDomains)) continue;
@@ -212,11 +213,13 @@ async function discardAllExceptCurrent() {
     if (settings.protectUnsavedForms && (await tabHasUnsavedForm(tab.id))) continue;
     try {
       await markThenDiscard(tab.id);
+      discardedCount++;
     } catch (err) {
       // ignore tabs that refuse to be discarded
     }
   }
   await updateBadge();
+  return discardedCount;
 }
 
 async function applyGroupPlan(plan, createdTabIds) {
@@ -283,8 +286,7 @@ browser.runtime.onMessage.addListener(async (message) => {
       };
     }
     case 'DISCARD_ALL_EXCEPT_CURRENT':
-      await discardAllExceptCurrent();
-      return true;
+      return { discardedCount: await discardAllExceptCurrent() };
     case 'RESTORE_SNAPSHOT':
       return restoreSnapshot(message.timestamp, { intoCurrentWindow: !!message.intoCurrentWindow });
     case 'BACKUP_NOW':

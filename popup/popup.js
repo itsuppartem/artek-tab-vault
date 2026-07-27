@@ -1,5 +1,7 @@
 'use strict';
 
+const Core = window.TabVaultCore;
+
 const totalTabsEl = document.getElementById('totalTabs');
 const discardedTabsEl = document.getElementById('discardedTabs');
 const guardianEnabledEl = document.getElementById('guardianEnabled');
@@ -10,6 +12,7 @@ const openOptionsBtn = document.getElementById('openOptionsBtn');
 const snapshotListEl = document.getElementById('snapshotList');
 const restoreIntoCurrentWindowEl = document.getElementById('restoreIntoCurrentWindow');
 const tabListEl = document.getElementById('tabList');
+const popupStatusEl = document.getElementById('popupStatus');
 
 const TAB_STATE_LABELS = {
   active: 'активна',
@@ -18,6 +21,15 @@ const TAB_STATE_LABELS = {
 };
 
 const SETTINGS_KEY = 'tabvault_settings';
+const TAB_WORD_FORMS = ['вкладка', 'вкладки', 'вкладок'];
+
+let popupStatusTimer = null;
+function showPopupStatus(text) {
+  popupStatusEl.textContent = text;
+  popupStatusEl.classList.add('visible');
+  clearTimeout(popupStatusTimer);
+  popupStatusTimer = setTimeout(() => popupStatusEl.classList.remove('visible'), 1800);
+}
 
 function formatTime(ts) {
   const d = new Date(ts);
@@ -57,6 +69,9 @@ function renderSnapshots(snapshots) {
         timestamp: snap.timestamp,
         intoCurrentWindow: restoreIntoCurrentWindowEl.checked,
       });
+      const count = tabCount(snap);
+      TabVaultUI.flashButton(button, 'Открыто', 1300);
+      showPopupStatus(`Восстановлено ${count} ${Core.pluralizeRu(count, TAB_WORD_FORMS)}`);
     });
 
     li.appendChild(span);
@@ -88,6 +103,7 @@ function renderTabList(tabs) {
     li.appendChild(title);
     li.appendChild(state);
     li.addEventListener('click', () => {
+      TabVaultUI.flashElement(li, 400);
       browser.runtime.sendMessage({ type: 'ACTIVATE_TAB', tabId: tab.id });
     });
     tabListEl.appendChild(li);
@@ -112,12 +128,16 @@ async function patchSettings(partial) {
 
 guardianEnabledEl.addEventListener('change', () => {
   patchSettings({ guardianEnabled: guardianEnabledEl.checked });
+  TabVaultUI.flashElement(guardianEnabledEl.closest('.row'));
+  showPopupStatus(guardianEnabledEl.checked ? 'Guardian включён' : 'Guardian выключен');
 });
 
 idleMinutesEl.addEventListener('change', () => {
   const value = Math.max(1, Number(idleMinutesEl.value) || 15);
   idleMinutesEl.value = value;
   patchSettings({ idleMinutes: value });
+  TabVaultUI.flashElement(idleMinutesEl.closest('.row'));
+  showPopupStatus('Порог простоя сохранён');
 });
 
 openOptionsBtn.addEventListener('click', () => {
@@ -125,13 +145,21 @@ openOptionsBtn.addEventListener('click', () => {
 });
 
 discardNowBtn.addEventListener('click', async () => {
-  await browser.runtime.sendMessage({ type: 'DISCARD_ALL_EXCEPT_CURRENT' });
+  const { discardedCount } = await browser.runtime.sendMessage({ type: 'DISCARD_ALL_EXCEPT_CURRENT' });
   await refresh();
+  TabVaultUI.flashButton(discardNowBtn, 'Готово');
+  showPopupStatus(
+    discardedCount > 0
+      ? `Выгружено ${discardedCount} ${Core.pluralizeRu(discardedCount, TAB_WORD_FORMS)}`
+      : 'Нечего выгружать - всё уже свободно'
+  );
 });
 
 backupNowBtn.addEventListener('click', async () => {
   await browser.runtime.sendMessage({ type: 'BACKUP_NOW' });
   await refresh();
+  TabVaultUI.flashButton(backupNowBtn, 'Сохранено');
+  showPopupStatus('Снимок сессии сохранён');
 });
 
 refresh();
