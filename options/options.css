@@ -142,3 +142,27 @@ code {
 .status.visible {
   opacity: 1;
 }
+
+.prune-log {
+  list-style: none;
+  margin: 10px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 180px;
+  overflow-y: auto;
+}
+
+.prune-log li {
+  background: #2a2b2e;
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
+.prune-log li.empty {
+  opacity: 0.6;
+  background: none;
+  padding: 6px 0;
+}

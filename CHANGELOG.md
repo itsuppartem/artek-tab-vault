@@ -5,6 +5,7 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 ## [Unreleased]
 
 ### Added
+- Configurable backup retention: an optional size cap (MB, on top of the existing snapshot-count cap) with three ready-made presets (Компактный/Сбалансированный/Архивариус) in settings, plus a visible "История обрезки бэкапов" log showing exactly when and why old snapshots were trimmed or a snapshot was skipped - no more silent history loss.
 - Native Firefox tab group support: backups now capture group name/color, and restoring a snapshot recreates the groups (requires Firefox's `tabGroups` API; tabs still restore fine without it).
 - Unsaved-form protection: the guardian now skips discarding a tab that has an unsubmitted form, so you don't silently lose typed input. Can be turned off in settings.
 - Proactive crash-restore prompt: on the next Firefox launch after a likely crash/unclean shutdown, a notification offers to open the last backup.

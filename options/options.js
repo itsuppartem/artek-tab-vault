@@ -3,15 +3,23 @@
 const Core = window.TabVaultCore;
 const SETTINGS_KEY = 'tabvault_settings';
 const SNAPSHOTS_KEY = 'tabvault_snapshots';
+const PRUNE_LOG_KEY = 'tabvault_prune_log';
 
 const DEFAULT_SETTINGS = {
   guardianEnabled: true,
   idleMinutes: 15,
   backupIntervalMinutes: 1,
   maxSnapshots: 20,
+  maxBackupMB: 15,
   neverDiscardDomains: [],
   smartTabActivation: true,
   protectUnsavedForms: true,
+};
+
+const PRUNE_REASON_LABELS = {
+  'max-snapshots-limit': 'обрезано по лимиту количества снимков',
+  'max-size-limit': 'обрезано по лимиту размера истории',
+  'skipped-empty-snapshot': 'пропущен пустой/повреждённый снимок (защита от гонки при крэше)',
 };
 
 const els = {
@@ -22,6 +30,9 @@ const els = {
   whitelist: document.getElementById('whitelist'),
   backupIntervalMinutes: document.getElementById('backupIntervalMinutes'),
   maxSnapshots: document.getElementById('maxSnapshots'),
+  maxBackupMB: document.getElementById('maxBackupMB'),
+  storageUsage: document.getElementById('storageUsage'),
+  pruneLogList: document.getElementById('pruneLogList'),
   saveBtn: document.getElementById('saveBtn'),
   resetBtn: document.getElementById('resetBtn'),
   exportBtn: document.getElementById('exportBtn'),
@@ -42,6 +53,7 @@ function fillForm(settings) {
   els.smartTabActivation.checked = settings.smartTabActivation;
   els.backupIntervalMinutes.value = settings.backupIntervalMinutes;
   els.maxSnapshots.value = settings.maxSnapshots;
+  els.maxBackupMB.value = settings.maxBackupMB;
   els.whitelist.value = (settings.neverDiscardDomains || []).join('\n');
 }
 
@@ -54,17 +66,73 @@ function readForm() {
       smartTabActivation: els.smartTabActivation.checked,
       backupIntervalMinutes: els.backupIntervalMinutes.value,
       maxSnapshots: els.maxSnapshots.value,
+      maxBackupMB: els.maxBackupMB.value,
       neverDiscardDomains: Core.parseDomainList(els.whitelist.value),
     },
     DEFAULT_SETTINGS
   );
 }
 
+function formatBytes(bytes) {
+  if (!bytes) return '0 КБ';
+  const mb = bytes / (1024 * 1024);
+  if (mb >= 1) return `${mb.toFixed(1)} МБ`;
+  return `${Math.ceil(bytes / 1024)} КБ`;
+}
+
+function formatLogTime(ts) {
+  return new Date(ts).toLocaleString('ru-RU', {
+    day: '2-digit',
+    month: '2-digit',
+    year: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
+async function loadStorageAndLog() {
+  const stored = await browser.storage.local.get([SNAPSHOTS_KEY, PRUNE_LOG_KEY]);
+  const snapshots = stored[SNAPSHOTS_KEY] || [];
+  const log = (stored[PRUNE_LOG_KEY] || []).slice().reverse();
+
+  const bytes = Core.totalSnapshotsBytes(snapshots);
+  els.storageUsage.textContent = `${formatBytes(bytes)} · ${snapshots.length} снимков`;
+
+  els.pruneLogList.textContent = '';
+  if (!log.length) {
+    const empty = document.createElement('li');
+    empty.className = 'empty';
+    empty.textContent = 'Пока пусто - лимиты ни разу не срабатывали';
+    els.pruneLogList.appendChild(empty);
+    return;
+  }
+  for (const entry of log) {
+    const li = document.createElement('li');
+    const label = PRUNE_REASON_LABELS[entry.reason] || entry.reason;
+    const countText = entry.droppedCount > 0 ? ` (${entry.droppedCount} шт.)` : '';
+    li.textContent = `${formatLogTime(entry.timestamp)} · ${label}${countText}`;
+    els.pruneLogList.appendChild(li);
+  }
+}
+
 async function load() {
   const stored = await browser.storage.local.get(SETTINGS_KEY);
   const settings = Core.sanitizeSettings(stored[SETTINGS_KEY], DEFAULT_SETTINGS);
   fillForm(settings);
+  await loadStorageAndLog();
 }
+
+document.querySelectorAll('.preset-btn').forEach((btn) => {
+  btn.addEventListener('click', () => {
+    const preset = Core.applyRetentionPreset(btn.dataset.preset);
+    if (!preset) return;
+    els.backupIntervalMinutes.value = preset.backupIntervalMinutes;
+    els.maxSnapshots.value = preset.maxSnapshots;
+    els.maxBackupMB.value = preset.maxBackupMB;
+    els.idleMinutes.value = preset.idleMinutes;
+    showStatus('Профиль применён - не забудьте «Сохранить»');
+  });
+});
 
 els.saveBtn.addEventListener('click', async () => {
   const settings = readForm();
@@ -115,6 +183,7 @@ els.importInput.addEventListener('change', async () => {
         ? `Импортировано ${imported.length} снимков, пропущено ${skippedEntries} некорректных вкладок`
         : `Импортировано ${imported.length} снимков`
     );
+    await loadStorageAndLog();
   } catch (err) {
     showStatus('Ошибка импорта: неверный файл');
   } finally {

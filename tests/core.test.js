@@ -216,6 +216,7 @@ describe('sanitizeSettings', () => {
     idleMinutes: 15,
     backupIntervalMinutes: 1,
     maxSnapshots: 20,
+    maxBackupMB: 15,
     neverDiscardDomains: [],
     smartTabActivation: true,
     protectUnsavedForms: true,
@@ -250,6 +251,137 @@ describe('sanitizeSettings', () => {
     expect(Core.sanitizeSettings({}, defaults).smartTabActivation).toBe(true);
     expect(Core.sanitizeSettings({ smartTabActivation: false }, defaults).smartTabActivation).toBe(false);
     expect(Core.sanitizeSettings({ protectUnsavedForms: 0 }, defaults).protectUnsavedForms).toBe(false);
+  });
+
+  test('maxBackupMB: 0 is preserved as "no extra size cap"', () => {
+    expect(Core.sanitizeSettings({ maxBackupMB: 0 }, defaults).maxBackupMB).toBe(0);
+  });
+
+  test('maxBackupMB: clamps out-of-range values and falls back for garbage input', () => {
+    expect(Core.sanitizeSettings({ maxBackupMB: 9999 }, defaults).maxBackupMB).toBe(500);
+    expect(Core.sanitizeSettings({ maxBackupMB: -5 }, defaults).maxBackupMB).toBe(1);
+    expect(Core.sanitizeSettings({ maxBackupMB: 'nope' }, defaults).maxBackupMB).toBe(defaults.maxBackupMB);
+  });
+});
+
+describe('trimToLast', () => {
+  test('keeps only the last N items', () => {
+    expect(Core.trimToLast([1, 2, 3, 4, 5], 2)).toEqual([4, 5]);
+  });
+
+  test('is a no-op when already under the limit', () => {
+    expect(Core.trimToLast([1, 2], 10)).toEqual([1, 2]);
+  });
+
+  test('returns an empty array for non-array input', () => {
+    expect(Core.trimToLast(null, 5)).toEqual([]);
+  });
+});
+
+describe('backup size estimation and byte-based pruning', () => {
+  const small = { timestamp: 1, windows: [{ tabs: [{ url: 'https://a.com' }] }] };
+  const bigTabs = Array.from({ length: 50 }, (_, i) => ({ url: `https://example.com/page-${i}`, title: 'x'.repeat(200) }));
+  const big = { timestamp: 2, windows: [{ tabs: bigTabs }] };
+
+  test('estimateSnapshotBytes returns a positive number that grows with content', () => {
+    expect(Core.estimateSnapshotBytes(small)).toBeGreaterThan(0);
+    expect(Core.estimateSnapshotBytes(big)).toBeGreaterThan(Core.estimateSnapshotBytes(small));
+  });
+
+  test('totalSnapshotsBytes sums estimates across snapshots', () => {
+    const total = Core.totalSnapshotsBytes([small, big]);
+    expect(total).toBe(Core.estimateSnapshotBytes(small) + Core.estimateSnapshotBytes(big));
+  });
+
+  test('pruneSnapshotsBySize drops oldest snapshots until under budget', () => {
+    const snapshots = [small, big];
+    const budget = Core.estimateSnapshotBytes(big); // only room for the newest one
+    const pruned = Core.pruneSnapshotsBySize(snapshots, budget);
+    expect(pruned).toEqual([big]);
+  });
+
+  test('pruneSnapshotsBySize always keeps at least the most recent snapshot', () => {
+    const pruned = Core.pruneSnapshotsBySize([small, big], 1); // impossibly tiny budget
+    expect(pruned).toEqual([big]);
+  });
+
+  test('pruneSnapshotsBySize is a no-op when maxBytes is falsy', () => {
+    expect(Core.pruneSnapshotsBySize([small, big], 0)).toEqual([small, big]);
+    expect(Core.pruneSnapshotsBySize([small, big], null)).toEqual([small, big]);
+  });
+});
+
+describe('enforceRetentionLimits', () => {
+  const snapshots = [1, 2, 3, 4, 5].map((n) => ({ timestamp: n, windows: [{ tabs: [{ url: `https://a.com/${n}` }] }] }));
+
+  test('applies only the count limit when no byte budget is given', () => {
+    const result = Core.enforceRetentionLimits(snapshots, { maxSnapshots: 3 });
+    expect(result.snapshots.map((s) => s.timestamp)).toEqual([3, 4, 5]);
+    expect(result.droppedByCount).toBe(2);
+    expect(result.droppedBySize).toBe(0);
+  });
+
+  test('applies the byte budget on top of the count limit', () => {
+    const perSnapshotBytes = Core.estimateSnapshotBytes(snapshots[0]);
+    const result = Core.enforceRetentionLimits(snapshots, { maxSnapshots: 5, maxBytes: perSnapshotBytes * 2 });
+    expect(result.snapshots).toHaveLength(2);
+    expect(result.droppedByCount).toBe(0);
+    expect(result.droppedBySize).toBe(3);
+  });
+
+  test('is a no-op when nothing exceeds either limit', () => {
+    const result = Core.enforceRetentionLimits(snapshots, { maxSnapshots: 100 });
+    expect(result.snapshots).toHaveLength(5);
+    expect(result.droppedByCount).toBe(0);
+    expect(result.droppedBySize).toBe(0);
+  });
+});
+
+describe('retention presets', () => {
+  test('applyRetentionPreset returns a copy of a known preset', () => {
+    const preset = Core.applyRetentionPreset('balanced');
+    expect(preset).toEqual(Core.RETENTION_PRESETS.balanced);
+    preset.maxSnapshots = 999;
+    expect(Core.RETENTION_PRESETS.balanced.maxSnapshots).not.toBe(999);
+  });
+
+  test('applyRetentionPreset returns null for an unknown name', () => {
+    expect(Core.applyRetentionPreset('does-not-exist')).toBeNull();
+  });
+
+  test('every preset produces settings that survive sanitizeSettings unchanged', () => {
+    const defaults = {
+      guardianEnabled: true,
+      idleMinutes: 15,
+      backupIntervalMinutes: 1,
+      maxSnapshots: 20,
+      maxBackupMB: 15,
+      neverDiscardDomains: [],
+      smartTabActivation: true,
+      protectUnsavedForms: true,
+    };
+    for (const name of Object.keys(Core.RETENTION_PRESETS)) {
+      const preset = Core.applyRetentionPreset(name);
+      const sanitized = Core.sanitizeSettings(preset, defaults);
+      expect(sanitized.idleMinutes).toBe(preset.idleMinutes);
+      expect(sanitized.backupIntervalMinutes).toBe(preset.backupIntervalMinutes);
+      expect(sanitized.maxSnapshots).toBe(preset.maxSnapshots);
+      expect(sanitized.maxBackupMB).toBe(preset.maxBackupMB);
+    }
+  });
+});
+
+describe('buildPruneLogEntry', () => {
+  test('fills in a timestamp when none is given', () => {
+    const entry = Core.buildPruneLogEntry({ reason: 'max-snapshots-limit', droppedCount: 3 });
+    expect(entry.reason).toBe('max-snapshots-limit');
+    expect(entry.droppedCount).toBe(3);
+    expect(typeof entry.timestamp).toBe('number');
+  });
+
+  test('defaults droppedCount to 0 when not a finite number', () => {
+    const entry = Core.buildPruneLogEntry({ timestamp: 5, reason: 'skipped-empty-snapshot' });
+    expect(entry).toEqual({ timestamp: 5, reason: 'skipped-empty-snapshot', droppedCount: 0 });
   });
 });
 

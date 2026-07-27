@@ -17,6 +17,7 @@ const Core = self.TabVaultCore;
 const STORAGE_KEYS = {
   SETTINGS: 'tabvault_settings',
   SNAPSHOTS: 'tabvault_snapshots',
+  PRUNE_LOG: 'tabvault_prune_log',
 };
 
 const DEFAULT_SETTINGS = {
@@ -24,10 +25,13 @@ const DEFAULT_SETTINGS = {
   idleMinutes: 15,
   backupIntervalMinutes: 1,
   maxSnapshots: 20,
+  maxBackupMB: 15,
   neverDiscardDomains: [],
   smartTabActivation: true,
   protectUnsavedForms: true,
 };
+
+const MAX_PRUNE_LOG_ENTRIES = 50;
 
 const BACKUP_ALARM = 'tabvault-backup';
 const GUARDIAN_ALARM = 'tabvault-guardian';
@@ -71,6 +75,19 @@ async function attachTabGroups(windows) {
   return windows;
 }
 
+// Roadmap #9: append-only, capped log of every time the rolling backup lost
+// history - either because a limit evicted old snapshots, or because a
+// snapshot was rejected outright (e.g. the #1 empty-snapshot guard). Makes
+// retention behavior visible instead of the silent history loss competing
+// tools got burned by.
+async function appendPruneLog(entry) {
+  const stored = await browser.storage.local.get(STORAGE_KEYS.PRUNE_LOG);
+  let log = stored[STORAGE_KEYS.PRUNE_LOG] || [];
+  log.push(Core.buildPruneLogEntry(entry));
+  log = Core.trimToLast(log, MAX_PRUNE_LOG_ENTRIES);
+  await browser.storage.local.set({ [STORAGE_KEYS.PRUNE_LOG]: log });
+}
+
 async function takeSnapshot() {
   const windows = await browser.windows.getAll({ populate: true });
   await attachTabGroups(windows);
@@ -80,11 +97,27 @@ async function takeSnapshot() {
   let snapshots = stored[STORAGE_KEYS.SNAPSHOTS] || [];
 
   const prev = snapshots[snapshots.length - 1];
-  if (!Core.shouldPersistSnapshot(prev, snapshot)) return;
+  if (!Core.shouldPersistSnapshot(prev, snapshot)) {
+    if (Core.isSnapshotEmpty(snapshot)) {
+      await appendPruneLog({ reason: 'skipped-empty-snapshot', droppedCount: 0 });
+    }
+    return;
+  }
 
   snapshots.push(snapshot);
-  snapshots = Core.pruneSnapshots(snapshots, settings.maxSnapshots);
-  await browser.storage.local.set({ [STORAGE_KEYS.SNAPSHOTS]: snapshots });
+  const maxBytes = settings.maxBackupMB > 0 ? settings.maxBackupMB * 1024 * 1024 : null;
+  const { snapshots: retained, droppedByCount, droppedBySize } = Core.enforceRetentionLimits(snapshots, {
+    maxSnapshots: settings.maxSnapshots,
+    maxBytes,
+  });
+  await browser.storage.local.set({ [STORAGE_KEYS.SNAPSHOTS]: retained });
+
+  if (droppedByCount > 0) {
+    await appendPruneLog({ reason: 'max-snapshots-limit', droppedCount: droppedByCount });
+  }
+  if (droppedBySize > 0) {
+    await appendPruneLog({ reason: 'max-size-limit', droppedCount: droppedBySize });
+  }
 }
 
 // Content script (content-scripts/dirty-form.js) tracks whether a form on

@@ -24,6 +24,11 @@ Independent session backup
 - Keeps a configurable number of past snapshots, not just the last one, so a
   single bad save can't wipe your history. Never persists a corrupted/empty
   snapshot over a good one.
+- Optional size cap (MB) for the whole backup history on top of the snapshot
+  count limit, with three ready-made presets (compact/balanced/archivist).
+  Every time old snapshots actually get trimmed - or a snapshot gets skipped
+  as empty/corrupted - it's recorded in a visible log in settings, so
+  retention is never a silent surprise.
 - Captures and restores native Firefox tab groups (name, color) where the
   browser supports the tabGroups API.
 - One-click restore of any snapshot, plus manual "backup now".
@@ -64,6 +69,9 @@ WHAT IT DOESN'T DO (known limitations)
 PERMISSIONS
 - tabs / storage / alarms / idle / notifications / tabGroups - used strictly
   for the backup, guardian, and tab-group-restore features above.
+- unlimitedStorage - lets the local backup history grow past the browser's
+  default ~5-10MB local-storage quota when you raise the size limit above the
+  default; still fully local, nothing is uploaded anywhere.
 - Access to all sites (a content script running on every page) - used only
   to detect, on-device, whether a page has an unsubmitted form so that tab
   can be skipped by the memory guardian. It never reads, stores, or sends

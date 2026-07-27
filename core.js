@@ -101,10 +101,17 @@
     return true;
   }
 
+  // Generic "keep only the most recent N entries" trim, shared by snapshot
+  // retention and the prune-log itself so the log doesn't grow forever.
+  function trimToLast(items, max) {
+    if (!Array.isArray(items)) return [];
+    if (!Number.isFinite(max) || max < 0) return items;
+    if (items.length <= max) return items;
+    return items.slice(items.length - max);
+  }
+
   function pruneSnapshots(snapshots, maxSnapshots) {
-    if (!Array.isArray(snapshots)) return [];
-    if (snapshots.length <= maxSnapshots) return snapshots;
-    return snapshots.slice(snapshots.length - maxSnapshots);
+    return trimToLast(snapshots, maxSnapshots);
   }
 
   function countTabsInSnapshot(snapshot) {
@@ -118,6 +125,7 @@
       idleMinutes: clampNumber(merged.idleMinutes, 1, 720, defaults.idleMinutes),
       backupIntervalMinutes: clampNumber(merged.backupIntervalMinutes, 0.5, 60, defaults.backupIntervalMinutes),
       maxSnapshots: clampNumber(merged.maxSnapshots, 1, 200, defaults.maxSnapshots),
+      maxBackupMB: clampBackupSizeMB(merged.maxBackupMB, defaults.maxBackupMB),
       neverDiscardDomains: Array.isArray(merged.neverDiscardDomains) ? merged.neverDiscardDomains : [],
       smartTabActivation: merged.smartTabActivation !== undefined ? !!merged.smartTabActivation : !!defaults.smartTabActivation,
       protectUnsavedForms: merged.protectUnsavedForms !== undefined ? !!merged.protectUnsavedForms : !!defaults.protectUnsavedForms,
@@ -128,6 +136,15 @@
     const n = Number(value);
     if (!Number.isFinite(n)) return fallback;
     return Math.min(max, Math.max(min, n));
+  }
+
+  // 0 is a valid, meaningful value here ("no extra size cap beyond the
+  // snapshot-count limit and the browser's own storage quota").
+  function clampBackupSizeMB(value, fallback) {
+    const n = Number(value);
+    if (n === 0) return 0;
+    if (!Number.isFinite(n)) return fallback;
+    return Math.min(500, Math.max(1, n));
   }
 
   // --- Roadmap #2: smart tab activation on close ---------------------------
@@ -300,6 +317,71 @@
     return 'loaded';
   }
 
+  // --- Roadmap #9: configurable backup size/retention + transparency log ---
+  function estimateSnapshotBytes(snapshot) {
+    const json = JSON.stringify(snapshot) || '';
+    if (typeof TextEncoder !== 'undefined') return new TextEncoder().encode(json).length;
+    return json.length;
+  }
+
+  function totalSnapshotsBytes(snapshots) {
+    return (snapshots || []).reduce((sum, s) => sum + estimateSnapshotBytes(s), 0);
+  }
+
+  // Drops the oldest snapshots until the rolling backup fits the byte
+  // budget, but always keeps at least the single most recent snapshot even
+  // if it alone exceeds the budget - a bad limit shouldn't be able to wipe
+  // the only backup a user has (same philosophy as the #1 integrity guard).
+  function pruneSnapshotsBySize(snapshots, maxBytes) {
+    if (!Array.isArray(snapshots)) return [];
+    if (!maxBytes || maxBytes <= 0) return snapshots;
+    const kept = snapshots.slice();
+    while (kept.length > 1 && totalSnapshotsBytes(kept) > maxBytes) {
+      kept.shift();
+    }
+    return kept;
+  }
+
+  // Applies the count limit first, then the byte-size limit on top, and
+  // reports how many snapshots each step actually dropped so the caller can
+  // log *why* history got shorter instead of silently discarding it.
+  function enforceRetentionLimits(snapshots, limits = {}) {
+    const before = Array.isArray(snapshots) ? snapshots : [];
+    const afterCount = Number.isFinite(limits.maxSnapshots) ? pruneSnapshots(before, limits.maxSnapshots) : before;
+    const droppedByCount = before.length - afterCount.length;
+
+    let afterSize = afterCount;
+    let droppedBySize = 0;
+    if (limits.maxBytes) {
+      afterSize = pruneSnapshotsBySize(afterCount, limits.maxBytes);
+      droppedBySize = afterCount.length - afterSize.length;
+    }
+
+    return { snapshots: afterSize, droppedByCount, droppedBySize };
+  }
+
+  // Predefined retention/idle combinations so users don't have to reason
+  // about interacting knobs from scratch; still just fills the form, every
+  // field stays editable afterwards.
+  const RETENTION_PRESETS = {
+    compact: { idleMinutes: 10, backupIntervalMinutes: 2, maxSnapshots: 10, maxBackupMB: 5 },
+    balanced: { idleMinutes: 15, backupIntervalMinutes: 1, maxSnapshots: 20, maxBackupMB: 15 },
+    archivist: { idleMinutes: 30, backupIntervalMinutes: 1, maxSnapshots: 100, maxBackupMB: 60 },
+  };
+
+  function applyRetentionPreset(name) {
+    const preset = RETENTION_PRESETS[name];
+    return preset ? { ...preset } : null;
+  }
+
+  function buildPruneLogEntry({ timestamp, reason, droppedCount }) {
+    return {
+      timestamp: typeof timestamp === 'number' ? timestamp : Date.now(),
+      reason,
+      droppedCount: Number.isFinite(droppedCount) ? droppedCount : 0,
+    };
+  }
+
   return {
     getHostname,
     isWhitelisted,
@@ -320,5 +402,14 @@
     shouldShowCrashPrompt,
     parseImportedSnapshots,
     tabDisplayState,
+    trimToLast,
+    clampBackupSizeMB,
+    estimateSnapshotBytes,
+    totalSnapshotsBytes,
+    pruneSnapshotsBySize,
+    enforceRetentionLimits,
+    RETENTION_PRESETS,
+    applyRetentionPreset,
+    buildPruneLogEntry,
   };
 });

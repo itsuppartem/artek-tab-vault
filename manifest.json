@@ -18,7 +18,8 @@
     "alarms",
     "idle",
     "notifications",
-    "tabGroups"
+    "tabGroups",
+    "unlimitedStorage"
   ],
   "icons": {
     "48": "icons/icon.svg",
