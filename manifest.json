@@ -1,12 +1,12 @@
 {
   "manifest_version": 2,
   "name": "Artek Tab Vault",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Crash-proof tab session backup and idle tab memory guardian for Firefox.",
   "browser_specific_settings": {
     "gecko": {
       "id": "artek-tab-vault@artek.local",
-      "strict_min_version": "109.0",
+      "strict_min_version": "140.0",
       "data_collection_permissions": {
         "required": ["none"]
       }
