@@ -51,8 +51,8 @@ Guardian: automatic memory relief
   focus to the nearest already-loaded tab instead of leaving you staring at
   a discarded neighbor reloading itself.
 - Marks discarded tabs right in Firefox's own tab strip/sidebar with a
-  configurable title prefix (default "💤 "), the same trick used by Auto
-  Tab Discard - so you can tell at a glance without opening the popup.
+  configurable title prefix (default "💤 ") - so you can tell at a glance
+  without opening the popup.
 - "Discard all except current" one-click button and keyboard shortcut.
 - Popup shows every tab in the current window with a clear
   active/loaded/discarded indicator, plus a toolbar badge with the total
