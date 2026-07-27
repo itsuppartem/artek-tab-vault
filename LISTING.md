@@ -56,5 +56,5 @@ Every listed version submitted to AMO must carry release notes describing **user
 
 ## User feedback loop
 
-- Check AMO reviews after every release (Developer Hub → Ratings & Reviews) and reply to at least critical/1-3 star reviews — most are fixable misunderstandings (permissions, expected behavior) and a reply closes the loop publicly.
-- If a review reports a real bug, add it to `ROADMAP.md` before replying so the fix is tracked, not just promised.
+- Reviews are **not** replied to automatically or right after a release. They're triaged in a dedicated manual pass: run the `review-triage` skill (`.cursor/skills/review-triage/SKILL.md`) whenever the user explicitly asks to check reviews.
+- That skill fetches unresolved reviews, proposes a diagnosis/fix per review, waits for the user's decision (add to roadmap or not), and only then posts a reply reflecting that decision.

@@ -38,5 +38,4 @@ Requires explicit, unambiguous approval in the current message, e.g. "го в п
    npx web-ext sign --source-dir=. --channel=listed --amo-metadata=amo-metadata.json
    ```
 7. Tell the user: listed submissions go through **manual AMO review** (hours to days), not instant — do not imply it's live yet.
-8. After the review is approved, check AMO Ratings & Reviews and reply to critical reviews (`LISTING.md` → User feedback loop).
-9. Return to `develop` for further work.
+8. Return to `develop` for further work. Do not touch AMO reviews here — that's a separate, user-invoked `review-triage` skill, never part of a release.

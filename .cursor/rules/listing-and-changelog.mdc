@@ -9,4 +9,4 @@ alwaysApply: true
 - Every user-facing change gets an entry in `CHANGELOG.md` under `[Unreleased]` at the time it's made — not retroactively before a release.
 - Before any listed release (`release-prod` skill), move the `[Unreleased]` entries into a new version section in `CHANGELOG.md`, and copy that section's text into `amo-metadata.json` → `version.release_notes.en-US`. A listed version must never ship with empty or stale release notes.
 - Only document **user-visible** behavior in `CHANGELOG.md`/release notes — skip internal refactors, CI/tooling changes, and test-only work unless they affect what the user experiences.
-- After a listed release goes live, check AMO Ratings & Reviews and reply to critical reviews (see `LISTING.md` → User feedback loop). Real bugs reported in reviews go into `ROADMAP.md` before replying.
+- Never reply to AMO reviews automatically or as part of a release. Reviews are only handled through the manual `review-triage` skill (`.cursor/skills/review-triage/SKILL.md`), invoked by the user when they want to check reviews — it presents unresolved reviews with suggested fixes and waits for the user's decision before replying to anything.
