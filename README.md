@@ -28,6 +28,8 @@ npm start        # web-ext run — поднимет Firefox с загружен�
 
 Либо руками: `about:debugging` → **This Firefox** → **Load Temporary Add-on…** → выбрать `manifest.json`.
 
+**Snap Firefox (Ubuntu по умолчанию)**: если `npm start` падает с "Profile Missing", это из-за sandbox-изоляции snap — Firefox не видит временный профиль, который `web-ext` создаёт в системном `/tmp`. Скрипт `start` уже фиксит это, выставляя `TMPDIR` внутри `$HOME` (snap имеет туда доступ через интерфейс `home`). Если запускаешь `web-ext` напрямую (не через `npm start`), не забудь `TMPDIR="$HOME/firefox-webext-tmp"` перед командой.
+
 ## Тесты и линт
 
 ```bash
