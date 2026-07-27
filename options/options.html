@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Настройки Artek Tab Vault</title>
+  <link rel="stylesheet" href="options.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <img src="../icons/icon.svg" alt="" class="logo" />
+      <h1>Artek Tab Vault — настройки</h1>
+    </header>
+
+    <section class="card">
+      <h2>Guardian (авто-выгрузка памяти)</h2>
+
+      <label class="row">
+        <span>Включить Guardian</span>
+        <input type="checkbox" id="guardianEnabled" />
+      </label>
+
+      <label class="row">
+        <span>Выгружать вкладку после простоя, мин</span>
+        <input type="number" id="idleMinutes" min="1" max="720" />
+      </label>
+
+      <label class="block">
+        <span>Никогда не выгружать эти домены (по одному в строке)</span>
+        <textarea id="whitelist" rows="5" placeholder="example.com&#10;mail.google.com"></textarea>
+        <small>Поддомены учитываются автоматически: <code>example.com</code> закроет и <code>www.example.com</code>.</small>
+      </label>
+    </section>
+
+    <section class="card">
+      <h2>Бэкап сессий</h2>
+
+      <label class="row">
+        <span>Интервал автобэкапа, мин</span>
+        <input type="number" id="backupIntervalMinutes" min="0.5" max="60" step="0.5" />
+      </label>
+
+      <label class="row">
+        <span>Сколько снимков хранить</span>
+        <input type="number" id="maxSnapshots" min="1" max="200" />
+      </label>
+
+      <div class="row">
+        <span>Резервная копия снимков в файл</span>
+        <div class="btn-group">
+          <button id="exportBtn" class="btn secondary">Экспорт .json</button>
+          <label class="btn secondary file-btn">
+            Импорт .json
+            <input type="file" id="importInput" accept="application/json" hidden />
+          </label>
+        </div>
+      </div>
+    </section>
+
+    <section class="card actions">
+      <button id="saveBtn" class="btn">Сохранить</button>
+      <button id="resetBtn" class="btn secondary">Сбросить по умолчанию</button>
+      <span id="status" class="status"></span>
+    </section>
+  </div>
+
+  <script src="../core.js"></script>
+  <script src="options.js"></script>
+</body>
+</html>

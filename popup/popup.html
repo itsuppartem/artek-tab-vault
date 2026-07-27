@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <title>Artek Tab Vault</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <header>
+    <img src="../icons/icon.svg" alt="" class="logo" />
+    <div>
+      <h1>Artek Tab Vault</h1>
+      <p class="subtitle">Бэкап сессий + защита от прожорливых вкладок</p>
+    </div>
+  </header>
+
+  <section class="stats">
+    <div class="stat">
+      <span class="stat-value" id="totalTabs">-</span>
+      <span class="stat-label">вкладок открыто</span>
+    </div>
+    <div class="stat">
+      <span class="stat-value" id="discardedTabs">-</span>
+      <span class="stat-label">выгружено (память свободна)</span>
+    </div>
+  </section>
+
+  <section class="controls">
+    <label class="row">
+      <span>Guardian (авто-выгрузка неактивных)</span>
+      <input type="checkbox" id="guardianEnabled" />
+    </label>
+    <label class="row">
+      <span>Порог простоя, мин</span>
+      <input type="number" id="idleMinutes" min="1" max="180" />
+    </label>
+    <button id="discardNowBtn" class="btn">Выгрузить все, кроме текущей</button>
+    <button id="backupNowBtn" class="btn secondary">Сделать бэкап сейчас</button>
+    <button id="openOptionsBtn" class="btn secondary">Все настройки и исключения…</button>
+  </section>
+
+  <section class="snapshots">
+    <h2>Снимки сессий</h2>
+    <ul id="snapshotList"></ul>
+  </section>
+
+  <script src="popup.js"></script>
+</body>
+</html>

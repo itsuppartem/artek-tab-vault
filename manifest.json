@@ -1,0 +1,47 @@
+{
+  "manifest_version": 2,
+  "name": "Artek Tab Vault",
+  "version": "0.1.0",
+  "description": "Crash-proof tab session backup and idle tab memory guardian for Firefox.",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "artek-tab-vault@artek.local",
+      "strict_min_version": "109.0",
+      "data_collection_permissions": {
+        "required": ["none"]
+      }
+    }
+  },
+  "permissions": [
+    "tabs",
+    "storage",
+    "alarms",
+    "idle",
+    "notifications"
+  ],
+  "icons": {
+    "48": "icons/icon.svg",
+    "96": "icons/icon.svg"
+  },
+  "background": {
+    "scripts": ["core.js", "background.js"],
+    "persistent": true
+  },
+  "options_ui": {
+    "page": "options/options.html",
+    "open_in_tabs": true
+  },
+  "browser_action": {
+    "default_popup": "popup/popup.html",
+    "default_icon": "icons/icon.svg",
+    "default_title": "Artek Tab Vault"
+  },
+  "commands": {
+    "discard-all-except-current": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+D"
+      },
+      "description": "Discard all tabs except current"
+    }
+  }
+}
