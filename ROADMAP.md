@@ -13,6 +13,7 @@ All work happens on `develop` (see `.cursor/rules/release-policy.mdc`). Update t
 | 5 | **Proactive crash-restore prompt** | Users currently must remember to open the popup after a crash. Detect an unclean shutdown/restart and proactively offer to restore the last snapshot. | Planned |
 | 6 | **Restore-into-current-window option** | Restoring always opens new windows, doubling memory if old ones are still around. Add an option to restore into the current window or close existing tabs first. | Planned |
 | 7 | **Tolerant snapshot import** | Competitor import (e.g. Session Buddy JSON) frequently fails with cryptic errors. Accept at least one common external export format in our importer. | Planned |
+| 8 | **Visible discarded/loaded state per tab** | Users can't currently tell which tabs are unloaded vs active just by looking at the tab strip - the toolbar badge only shows a total count. Mark discarded tabs distinctly (dim favicon / icon overlay / title prefix) so it's visible at a glance, and show per-tab memory usage where the browser actually exposes it. Note: Firefox's WebExtension API has no per-tab RAM number - `browser.tabs` never reports memory, so exact "N MB" per tab isn't achievable without a native API that doesn't exist. Deliver via `about:unloads`-style breakdown in the popup instead (tab list with discarded/active state per row), and only show real byte counts if/when Mozilla ships such an API. | Planned |
 
 ## Process
 
