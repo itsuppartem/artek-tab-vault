@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "name": "Artek Tab Vault",
-  "version": "0.1.2",
+  "version": "0.2.0",
   "description": "Crash-proof tab session backup and idle tab memory guardian for Firefox.",
   "browser_specific_settings": {
     "gecko": {

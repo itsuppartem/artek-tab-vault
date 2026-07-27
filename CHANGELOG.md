@@ -4,6 +4,8 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-07-27
+
 ### Added
 - "💤" title marker on discarded tabs: the guardian now rewrites a tab's title (e.g. `💤 Original Title`) right before discarding it, so it's visible directly in Firefox's tab strip/sidebar - not only in the popup. Prefix text/emoji is configurable, feature can be turned off. Doesn't work on pages that block script injection (about:, addons.mozilla.org, PDF viewer).
 - Configurable backup retention: an optional size cap (MB, on top of the existing snapshot-count cap) with three ready-made presets (Компактный/Сбалансированный/Архивариус) in settings, plus a visible "История обрезки бэкапов" log showing exactly when and why old snapshots were trimmed or a snapshot was skipped - no more silent history loss.
