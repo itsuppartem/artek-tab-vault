@@ -1,0 +1,11 @@
+---
+description: Release policy for Artek Tab Vault - prod branch and listed AMO release require explicit user approval
+alwaysApply: true
+---
+
+# Release Policy: Artek Tab Vault
+
+- `develop` branch is free-for-all: commit, push, run experiments, sign unlisted AMO builds for testing — no approval needed.
+- `prod` branch is protected: never push to it, merge into it, or run a `--channel=listed` AMO submission from it without an explicit, unambiguous go-ahead from the user in the current message (e.g. "го в прод", "пушь в прод", "подтверждаю релиз"). A generic "deploy this" / "ship it" / "release" is NOT sufficient — use `AskQuestion` to confirm first.
+- All new features, refactors, and hypotheses land on `develop` first. Never commit directly to `prod`.
+- Once approved, follow the exact steps in `.cursor/skills/release-prod/SKILL.md`. For everyday work, follow `.cursor/skills/release-develop/SKILL.md`.
