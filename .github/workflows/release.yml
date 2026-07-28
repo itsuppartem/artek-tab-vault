@@ -32,11 +32,17 @@ jobs:
         env:
           WEB_EXT_API_KEY: ${{ secrets.WEB_EXT_API_KEY }}
           WEB_EXT_API_SECRET: ${{ secrets.WEB_EXT_API_SECRET }}
-        run: npx web-ext sign --source-dir=. --channel=listed --amo-metadata=amo-metadata.json
+        # --approval-timeout=0: listed versions need manual human review on
+        # AMO (hours to days), so don't make the job wait/poll for that and
+        # fail with a false-negative timeout once the upload itself already
+        # succeeded. The version still gets submitted; just no signed XPI to
+        # download yet - it becomes available on AMO once a reviewer approves.
+        run: npx web-ext sign --source-dir=. --channel=listed --amo-metadata=amo-metadata.json --approval-timeout=0
 
-      - name: Upload signed xpi
+      - name: Upload signed xpi (only if approval already finished)
         uses: actions/upload-artifact@v4
         with:
           name: signed-xpi
           path: web-ext-artifacts/*.xpi
           retention-days: 90
+          if-no-files-found: ignore

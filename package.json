@@ -10,7 +10,7 @@
     "start": "mkdir -p \"$HOME/firefox-webext-tmp\" && TMPDIR=\"$HOME/firefox-webext-tmp\" web-ext run --source-dir=.",
     "build": "web-ext build --source-dir=. --overwrite-dest",
     "sign": "web-ext sign --source-dir=. --channel=unlisted",
-    "sign:listed": "web-ext sign --source-dir=. --channel=listed --amo-metadata=amo-metadata.json"
+    "sign:listed": "web-ext sign --source-dir=. --channel=listed --amo-metadata=amo-metadata.json --approval-timeout=0"
   },
   "devDependencies": {
     "jest": "^29.7.0",

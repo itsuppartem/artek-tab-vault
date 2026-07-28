@@ -31,11 +31,11 @@ Requires explicit, unambiguous approval in the current message, e.g. "го в п
    git checkout master && git merge prod && git push
    git checkout develop
    ```
-5. The push to `prod` triggers `.github/workflows/release.yml`, which runs tests + lint and signs/submits the listed AMO version automatically using the `WEB_EXT_API_KEY`/`WEB_EXT_API_SECRET` repository secrets and the committed `amo-metadata.json`. Watch the Actions run (`gh run watch` or the Actions tab) instead of signing locally.
+5. The push to `prod` triggers `.github/workflows/release.yml`, which runs tests + lint and signs/submits the listed AMO version automatically using the `WEB_EXT_API_KEY`/`WEB_EXT_API_SECRET` repository secrets and the committed `amo-metadata.json`. Watch the Actions run (`gh run watch` or the Actions tab) instead of signing locally. The sign step uses `--approval-timeout=0`, so the job succeeds as soon as the version is submitted/validated — it does **not** wait for the manual AMO review to finish, and there's no signed XPI artifact until that review completes. A green run means "submitted", not "published".
 6. Fallback (CI unavailable): sign manually with the same metadata file used by CI:
    ```bash
    source ~/.config/web-ext-keys/artek-tab-vault-amo.env
-   npx web-ext sign --source-dir=. --channel=listed --amo-metadata=amo-metadata.json
+   npx web-ext sign --source-dir=. --channel=listed --amo-metadata=amo-metadata.json --approval-timeout=0
    ```
-7. Tell the user: listed submissions go through **manual AMO review** (hours to days), not instant — do not imply it's live yet.
+7. Tell the user: listed submissions go through **manual AMO review** (hours to days), not instant — do not imply it's live yet. Check status at Developer Hub → Manage Status & Versions.
 8. Return to `develop` for further work. Do not touch AMO reviews here — that's a separate, user-invoked `review-triage` skill, never part of a release.
