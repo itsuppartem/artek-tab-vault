@@ -1,0 +1,284 @@
+{
+  "extensionName": {
+    "message": "Artek Tab Vault"
+  },
+  "extensionDescription": {
+    "message": "Pouzdan rezervni snimak sesija kartica i čuvar memorije za Firefox."
+  },
+  "cmd_discard_all": {
+    "message": "Odbaci sve kartice osim trenutne"
+  },
+  "notif_crash_title": {
+    "message": "Artek Tab Vault"
+  },
+  "notif_crash_message": {
+    "message": "Izgleda da je prethodna Firefox sesija neregularno završena. Kliknite da otvorite poslednji rezervni snimak."
+  },
+  "popup_subtitle": {
+    "message": "Rezerva sesije + čuvar memorije neaktivnih kartica"
+  },
+  "stat_tabs_open": {
+    "message": "otvorenih kartica"
+  },
+  "stat_discarded": {
+    "message": "odbaceno (memorija slobodna)"
+  },
+  "label_guardian": {
+    "message": "Guardian (auto-odbacivanje neaktivnih)"
+  },
+  "label_idle_minutes": {
+    "message": "Prag mirovanja, min"
+  },
+  "btn_discard_now": {
+    "message": "Odbaci sve osim trenutne"
+  },
+  "btn_backup_now": {
+    "message": "Napravi rezervu sada"
+  },
+  "btn_open_options": {
+    "message": "Sva podešavanja i izuzeci…"
+  },
+  "heading_snapshots": {
+    "message": "Snimci sesija"
+  },
+  "label_restore_current_window": {
+    "message": "Vrati u trenutni prozor"
+  },
+  "heading_window_tabs": {
+    "message": "Kartice ovog prozora"
+  },
+  "tab_state_active": {
+    "message": "aktivna"
+  },
+  "tab_state_discarded": {
+    "message": "odbačena"
+  },
+  "tab_state_loaded": {
+    "message": "učitana"
+  },
+  "tab_untitled": {
+    "message": "(bez naslova)"
+  },
+  "empty_snapshots": {
+    "message": "Još nema snimaka"
+  },
+  "snapshot_tabs_short": {
+    "message": "kart."
+  },
+  "btn_restore": {
+    "message": "Vrati"
+  },
+  "flash_opened": {
+    "message": "Otvoreno"
+  },
+  "status_restored": {
+    "message": "Vraćeno $1 $2"
+  },
+  "status_guardian_on": {
+    "message": "Guardian uključen"
+  },
+  "status_guardian_off": {
+    "message": "Guardian isključen"
+  },
+  "status_idle_saved": {
+    "message": "Prag mirovanja sačuvan"
+  },
+  "flash_done": {
+    "message": "Gotovo"
+  },
+  "status_discarded": {
+    "message": "Odbačeno $1 $2"
+  },
+  "status_nothing_to_discard": {
+    "message": "Nema šta da se odbaci - sve je već slobodno"
+  },
+  "flash_saved": {
+    "message": "Sačuvano"
+  },
+  "status_snapshot_saved": {
+    "message": "Snimak sesije sačuvan"
+  },
+  "word_tab_one": {
+    "message": "kartica"
+  },
+  "word_tab_few": {
+    "message": "kartice"
+  },
+  "word_tab_many": {
+    "message": "kartica"
+  },
+  "options_page_title": {
+    "message": "Podešavanja Artek Tab Vault"
+  },
+  "options_heading": {
+    "message": "Artek Tab Vault — podešavanja"
+  },
+  "heading_guardian": {
+    "message": "Guardian (auto-odbacivanje memorije)"
+  },
+  "label_enable_guardian": {
+    "message": "Uključi Guardian"
+  },
+  "label_discard_after_idle": {
+    "message": "Odbaci karticu posle mirovanja, min"
+  },
+  "label_protect_forms": {
+    "message": "Ne odbacuj kartice sa nesačuvanom formom"
+  },
+  "label_smart_activation": {
+    "message": "Pametna aktivacija pri zatvaranju kartice"
+  },
+  "help_smart_activation": {
+    "message": "Kad zatvorite aktivnu karticu, Firefox ponekad fokusira već odbačenog suseda - koji odmah počinje da se učitava. Ova opcija odmah prebacuje fokus na drugu već učitanu karticu."
+  },
+  "label_mark_discarded": {
+    "message": "Označi odbačene kartice prefiksom u naslovu"
+  },
+  "label_prefix_text": {
+    "message": "Tekst prefiksa"
+  },
+  "help_mark_discarded": {
+    "message": "Naslov odbačene kartice postaje npr. «💤 Naslov stranice» - vidljivo u traci kartica Firefox-a, ne samo u iskačućem prozoru. Možete staviti svoj tekst ili emoji. Ne radi na svim stranicama (about: i AMO blokiraju skripte)."
+  },
+  "label_whitelist": {
+    "message": "Nikad ne odbacuj ove domene (jedan po liniji)"
+  },
+  "help_whitelist": {
+    "message": "Poddomeni se poklapaju automatski: example.com pokriva i www.example.com."
+  },
+  "heading_backup": {
+    "message": "Rezerva sesija"
+  },
+  "label_presets": {
+    "message": "Gotovi profili čuvanja"
+  },
+  "preset_compact": {
+    "message": "Kompaktan"
+  },
+  "preset_balanced": {
+    "message": "Balansiran"
+  },
+  "preset_archivist": {
+    "message": "Arhivar"
+  },
+  "help_presets": {
+    "message": "Profil samo popunjava polja ispod - i dalje ih možete izmeniti i pritisnuti Sačuvaj."
+  },
+  "label_backup_interval": {
+    "message": "Interval auto-rezerve, min"
+  },
+  "label_max_snapshots": {
+    "message": "Koliko snimaka čuvati (po broju)"
+  },
+  "label_max_backup_mb": {
+    "message": "Limit veličine istorije, MB (0 = bez dodatnog limita)"
+  },
+  "help_retention": {
+    "message": "Kad snimci pređu limit broja ili veličine, najstariji se prvo skraćuju - ali poslednji snimak se nikad ne briše."
+  },
+  "label_storage_used": {
+    "message": "Trenutno zauzeto snimcima"
+  },
+  "label_file_backup": {
+    "message": "Rezervna kopija snimaka u fajl"
+  },
+  "btn_export": {
+    "message": "Izvoz .json"
+  },
+  "btn_import": {
+    "message": "Uvoz fajla"
+  },
+  "help_import": {
+    "message": "Uvoz razume naš format i slične formate drugih menadžera kartica - neispravni redovi se preskaču umesto da pokvare ceo uvoz."
+  },
+  "heading_prune_log": {
+    "message": "Istorija skraćivanja rezervi"
+  },
+  "help_prune_log": {
+    "message": "Ovde se vidi ako su stari snimci ikad skraćeni zbog limita, ili je snimak preskočen kao prazan/oštećen."
+  },
+  "btn_save": {
+    "message": "Sačuvaj"
+  },
+  "btn_reset": {
+    "message": "Vrati na podrazumevano"
+  },
+  "prune_reason_max_snapshots": {
+    "message": "skraćeno zbog limita broja snimaka"
+  },
+  "prune_reason_max_size": {
+    "message": "skraćeno zbog limita veličine istorije"
+  },
+  "prune_reason_skipped_empty": {
+    "message": "preskočen prazan/oštećen snimak (zaštita od trke pri padu)"
+  },
+  "empty_prune_log": {
+    "message": "Još prazno - limiti nikad nisu okidali"
+  },
+  "storage_usage_line": {
+    "message": "$1 · $2 $3"
+  },
+  "prune_dropped_suffix": {
+    "message": " ($1 kom.)"
+  },
+  "unit_kb": {
+    "message": "KB"
+  },
+  "unit_mb": {
+    "message": "MB"
+  },
+  "flash_preset_applied": {
+    "message": "Primenjeno"
+  },
+  "status_preset_applied": {
+    "message": "Profil primenjen - ne zaboravite Sačuvaj"
+  },
+  "status_saved": {
+    "message": "Sačuvano"
+  },
+  "flash_reset": {
+    "message": "Resetovano"
+  },
+  "status_reset": {
+    "message": "Vraćeno na podrazumevane vrednosti"
+  },
+  "flash_exported": {
+    "message": "Izvezeno"
+  },
+  "status_exported": {
+    "message": "Izvezeno $1 $2"
+  },
+  "status_import_empty": {
+    "message": "Ništa nije pronađeno za uvoz - proverite fajl"
+  },
+  "status_imported": {
+    "message": "Uvezeno $1 $2"
+  },
+  "status_imported_with_skips": {
+    "message": "Uvezeno $1 $2, preskočeno $3 $4"
+  },
+  "status_import_error": {
+    "message": "Greška uvoza: neispravan fajl"
+  },
+  "word_snapshot_one": {
+    "message": "snimak"
+  },
+  "word_snapshot_few": {
+    "message": "snimka"
+  },
+  "word_snapshot_many": {
+    "message": "snimaka"
+  },
+  "word_bad_tab_one": {
+    "message": "neispravna kartica"
+  },
+  "word_bad_tab_few": {
+    "message": "neispravne kartice"
+  },
+  "word_bad_tab_many": {
+    "message": "neispravnih kartica"
+  },
+  "locale_tag": {
+    "message": "sr-RS"
+  }
+}

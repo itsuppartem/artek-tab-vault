@@ -1,0 +1,284 @@
+{
+  "extensionName": {
+    "message": "Artek Tab Vault"
+  },
+  "extensionDescription": {
+    "message": "Crash-proof tab session backup and idle tab memory guardian for Firefox."
+  },
+  "cmd_discard_all": {
+    "message": "Discard all tabs except current"
+  },
+  "notif_crash_title": {
+    "message": "Artek Tab Vault"
+  },
+  "notif_crash_message": {
+    "message": "It looks like the previous Firefox session ended uncleanly. Click to open the last tab backup."
+  },
+  "popup_subtitle": {
+    "message": "Session backup + idle tab memory guardian"
+  },
+  "stat_tabs_open": {
+    "message": "tabs open"
+  },
+  "stat_discarded": {
+    "message": "discarded (RAM free)"
+  },
+  "label_guardian": {
+    "message": "Guardian (auto-discard idle tabs)"
+  },
+  "label_idle_minutes": {
+    "message": "Idle threshold, min"
+  },
+  "btn_discard_now": {
+    "message": "Discard all except current"
+  },
+  "btn_backup_now": {
+    "message": "Backup now"
+  },
+  "btn_open_options": {
+    "message": "All settings and exclusions…"
+  },
+  "heading_snapshots": {
+    "message": "Session snapshots"
+  },
+  "label_restore_current_window": {
+    "message": "Restore into current window"
+  },
+  "heading_window_tabs": {
+    "message": "Tabs in this window"
+  },
+  "tab_state_active": {
+    "message": "active"
+  },
+  "tab_state_discarded": {
+    "message": "discarded"
+  },
+  "tab_state_loaded": {
+    "message": "loaded"
+  },
+  "tab_untitled": {
+    "message": "(untitled)"
+  },
+  "empty_snapshots": {
+    "message": "No snapshots yet"
+  },
+  "snapshot_tabs_short": {
+    "message": "tabs"
+  },
+  "btn_restore": {
+    "message": "Restore"
+  },
+  "flash_opened": {
+    "message": "Opened"
+  },
+  "status_restored": {
+    "message": "Restored $1 $2"
+  },
+  "status_guardian_on": {
+    "message": "Guardian enabled"
+  },
+  "status_guardian_off": {
+    "message": "Guardian disabled"
+  },
+  "status_idle_saved": {
+    "message": "Idle threshold saved"
+  },
+  "flash_done": {
+    "message": "Done"
+  },
+  "status_discarded": {
+    "message": "Discarded $1 $2"
+  },
+  "status_nothing_to_discard": {
+    "message": "Nothing to discard - everything is already free"
+  },
+  "flash_saved": {
+    "message": "Saved"
+  },
+  "status_snapshot_saved": {
+    "message": "Session snapshot saved"
+  },
+  "word_tab_one": {
+    "message": "tab"
+  },
+  "word_tab_few": {
+    "message": "tabs"
+  },
+  "word_tab_many": {
+    "message": "tabs"
+  },
+  "options_page_title": {
+    "message": "Artek Tab Vault settings"
+  },
+  "options_heading": {
+    "message": "Artek Tab Vault — settings"
+  },
+  "heading_guardian": {
+    "message": "Guardian (auto memory discard)"
+  },
+  "label_enable_guardian": {
+    "message": "Enable Guardian"
+  },
+  "label_discard_after_idle": {
+    "message": "Discard tab after idle, min"
+  },
+  "label_protect_forms": {
+    "message": "Do not discard tabs with unsaved forms"
+  },
+  "label_smart_activation": {
+    "message": "Smart activation when closing a tab"
+  },
+  "help_smart_activation": {
+    "message": "When you close the active tab, Firefox sometimes focuses an already-discarded neighbor - which then starts reloading. This option immediately moves focus to another already-loaded tab."
+  },
+  "label_mark_discarded": {
+    "message": "Mark discarded tabs with a title prefix"
+  },
+  "label_prefix_text": {
+    "message": "Prefix text"
+  },
+  "help_mark_discarded": {
+    "message": "A discarded tab title becomes e.g. «💤 Page title» - visible in Firefox's tab strip, not only in the popup. You can use your own text or emoji. Does not work on every page (about: and AMO block scripts)."
+  },
+  "label_whitelist": {
+    "message": "Never discard these domains (one per line)"
+  },
+  "help_whitelist": {
+    "message": "Subdomains are matched automatically: example.com also covers www.example.com."
+  },
+  "heading_backup": {
+    "message": "Session backup"
+  },
+  "label_presets": {
+    "message": "Ready-made retention profiles"
+  },
+  "preset_compact": {
+    "message": "Compact"
+  },
+  "preset_balanced": {
+    "message": "Balanced"
+  },
+  "preset_archivist": {
+    "message": "Archivist"
+  },
+  "help_presets": {
+    "message": "A profile only fills the fields below - you can still edit them and press Save."
+  },
+  "label_backup_interval": {
+    "message": "Auto-backup interval, min"
+  },
+  "label_max_snapshots": {
+    "message": "How many snapshots to keep (by count)"
+  },
+  "label_max_backup_mb": {
+    "message": "History size limit, MB (0 = no extra limit)"
+  },
+  "help_retention": {
+    "message": "When snapshots exceed the count or size limit, the oldest are trimmed first - but the latest snapshot is never deleted, even if it alone exceeds the limit."
+  },
+  "label_storage_used": {
+    "message": "Currently used by snapshots"
+  },
+  "label_file_backup": {
+    "message": "File backup of snapshots"
+  },
+  "btn_export": {
+    "message": "Export .json"
+  },
+  "btn_import": {
+    "message": "Import file"
+  },
+  "help_import": {
+    "message": "Import understands our format, plus common shapes from other tab managers (URL lists, objects with tabs/windows/sessions) and plain-text link lists - bad rows are skipped instead of failing the whole import."
+  },
+  "heading_prune_log": {
+    "message": "Backup prune history"
+  },
+  "help_prune_log": {
+    "message": "Shows when older snapshots were trimmed by a limit, or a snapshot was skipped as empty/corrupt - instead of silent history loss."
+  },
+  "btn_save": {
+    "message": "Save"
+  },
+  "btn_reset": {
+    "message": "Reset to defaults"
+  },
+  "prune_reason_max_snapshots": {
+    "message": "trimmed by snapshot count limit"
+  },
+  "prune_reason_max_size": {
+    "message": "trimmed by history size limit"
+  },
+  "prune_reason_skipped_empty": {
+    "message": "skipped empty/corrupt snapshot (crash race guard)"
+  },
+  "empty_prune_log": {
+    "message": "Empty so far - limits have never fired"
+  },
+  "storage_usage_line": {
+    "message": "$1 · $2 $3"
+  },
+  "prune_dropped_suffix": {
+    "message": " ($1 pcs.)"
+  },
+  "unit_kb": {
+    "message": "KB"
+  },
+  "unit_mb": {
+    "message": "MB"
+  },
+  "flash_preset_applied": {
+    "message": "Applied"
+  },
+  "status_preset_applied": {
+    "message": "Profile applied - don't forget to Save"
+  },
+  "status_saved": {
+    "message": "Saved"
+  },
+  "flash_reset": {
+    "message": "Reset"
+  },
+  "status_reset": {
+    "message": "Reset to defaults"
+  },
+  "flash_exported": {
+    "message": "Exported"
+  },
+  "status_exported": {
+    "message": "Exported $1 $2"
+  },
+  "status_import_empty": {
+    "message": "Nothing found to import - check the file"
+  },
+  "status_imported": {
+    "message": "Imported $1 $2"
+  },
+  "status_imported_with_skips": {
+    "message": "Imported $1 $2, skipped $3 $4"
+  },
+  "status_import_error": {
+    "message": "Import error: invalid file"
+  },
+  "word_snapshot_one": {
+    "message": "snapshot"
+  },
+  "word_snapshot_few": {
+    "message": "snapshots"
+  },
+  "word_snapshot_many": {
+    "message": "snapshots"
+  },
+  "word_bad_tab_one": {
+    "message": "bad tab"
+  },
+  "word_bad_tab_few": {
+    "message": "bad tabs"
+  },
+  "word_bad_tab_many": {
+    "message": "bad tabs"
+  },
+  "locale_tag": {
+    "message": "en"
+  }
+}

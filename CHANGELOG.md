@@ -4,6 +4,16 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 
 ## [Unreleased]
 
+## [0.3.0] - 2026-07-29
+
+### Added
+- UI localization for English, Russian, Kazakh, Ukrainian, Belarusian, and Serbian (follows Firefox's locale). Popup, settings, notifications, and status toasts are translated.
+
+### Fixed
+- Real extension icon in the toolbar, the add-ons manager and on the store page: the manifest previously pointed only at an SVG, which Firefox's add-on listing doesn't render, so the extension showed a generic placeholder puzzle piece. Ships proper 48/96/128px PNG icons instead (vault-dial mark).
+- Settings page: the prefix text field was an unstyled white box on the dark settings page - it now matches the other inputs.
+- Release CI no longer fails after a successful AMO upload while waiting for manual review (approval timeout), and treats an already-uploaded version as success on re-run.
+
 ## [0.2.0] - 2026-07-27
 
 ### Added

@@ -1,6 +1,9 @@
 'use strict';
 
 const Core = window.TabVaultCore;
+const I18n = window.TabVaultI18n;
+
+I18n.apply();
 
 const totalTabsEl = document.getElementById('totalTabs');
 const discardedTabsEl = document.getElementById('discardedTabs');
@@ -15,13 +18,13 @@ const tabListEl = document.getElementById('tabList');
 const popupStatusEl = document.getElementById('popupStatus');
 
 const TAB_STATE_LABELS = {
-  active: 'активна',
-  discarded: 'выгружена',
-  loaded: 'загружена',
+  active: I18n.t('tab_state_active'),
+  discarded: I18n.t('tab_state_discarded'),
+  loaded: I18n.t('tab_state_loaded'),
 };
 
 const SETTINGS_KEY = 'tabvault_settings';
-const TAB_WORD_FORMS = ['вкладка', 'вкладки', 'вкладок'];
+const TAB_WORD_FORMS = I18n.wordForms('word_tab');
 
 let popupStatusTimer = null;
 function showPopupStatus(text) {
@@ -33,7 +36,7 @@ function showPopupStatus(text) {
 
 function formatTime(ts) {
   const d = new Date(ts);
-  return d.toLocaleString('ru-RU', {
+  return d.toLocaleString(I18n.localeTag(), {
     day: '2-digit',
     month: '2-digit',
     hour: '2-digit',
@@ -50,7 +53,7 @@ function renderSnapshots(snapshots) {
   if (!snapshots.length) {
     const empty = document.createElement('li');
     empty.className = 'empty';
-    empty.textContent = 'Пока нет снимков';
+    empty.textContent = I18n.t('empty_snapshots');
     snapshotListEl.appendChild(empty);
     return;
   }
@@ -59,10 +62,10 @@ function renderSnapshots(snapshots) {
     li.className = 'snapshot-item';
 
     const span = document.createElement('span');
-    span.textContent = `${formatTime(snap.timestamp)} · ${tabCount(snap)} вкл.`;
+    span.textContent = `${formatTime(snap.timestamp)} · ${tabCount(snap)} ${I18n.t('snapshot_tabs_short')}`;
 
     const button = document.createElement('button');
-    button.textContent = 'Восстановить';
+    button.textContent = I18n.t('btn_restore');
     button.addEventListener('click', async () => {
       await browser.runtime.sendMessage({
         type: 'RESTORE_SNAPSHOT',
@@ -70,8 +73,8 @@ function renderSnapshots(snapshots) {
         intoCurrentWindow: restoreIntoCurrentWindowEl.checked,
       });
       const count = tabCount(snap);
-      TabVaultUI.flashButton(button, 'Открыто', 1300);
-      showPopupStatus(`Восстановлено ${count} ${Core.pluralizeRu(count, TAB_WORD_FORMS)}`);
+      TabVaultUI.flashButton(button, I18n.t('flash_opened'), 1300);
+      showPopupStatus(I18n.t('status_restored', [String(count), Core.pluralizeRu(count, TAB_WORD_FORMS)]));
     });
 
     li.appendChild(span);
@@ -93,7 +96,7 @@ function renderTabList(tabs) {
 
     const title = document.createElement('span');
     title.className = 'tab-title';
-    title.textContent = tab.title || '(без названия)';
+    title.textContent = tab.title || I18n.t('tab_untitled');
 
     const state = document.createElement('span');
     state.className = 'tab-state-label';
@@ -129,7 +132,7 @@ async function patchSettings(partial) {
 guardianEnabledEl.addEventListener('change', () => {
   patchSettings({ guardianEnabled: guardianEnabledEl.checked });
   TabVaultUI.flashElement(guardianEnabledEl.closest('.row'));
-  showPopupStatus(guardianEnabledEl.checked ? 'Guardian включён' : 'Guardian выключен');
+  showPopupStatus(guardianEnabledEl.checked ? I18n.t('status_guardian_on') : I18n.t('status_guardian_off'));
 });
 
 idleMinutesEl.addEventListener('change', () => {
@@ -137,7 +140,7 @@ idleMinutesEl.addEventListener('change', () => {
   idleMinutesEl.value = value;
   patchSettings({ idleMinutes: value });
   TabVaultUI.flashElement(idleMinutesEl.closest('.row'));
-  showPopupStatus('Порог простоя сохранён');
+  showPopupStatus(I18n.t('status_idle_saved'));
 });
 
 openOptionsBtn.addEventListener('click', () => {
@@ -147,19 +150,19 @@ openOptionsBtn.addEventListener('click', () => {
 discardNowBtn.addEventListener('click', async () => {
   const { discardedCount } = await browser.runtime.sendMessage({ type: 'DISCARD_ALL_EXCEPT_CURRENT' });
   await refresh();
-  TabVaultUI.flashButton(discardNowBtn, 'Готово');
+  TabVaultUI.flashButton(discardNowBtn, I18n.t('flash_done'));
   showPopupStatus(
     discardedCount > 0
-      ? `Выгружено ${discardedCount} ${Core.pluralizeRu(discardedCount, TAB_WORD_FORMS)}`
-      : 'Нечего выгружать - всё уже свободно'
+      ? I18n.t('status_discarded', [String(discardedCount), Core.pluralizeRu(discardedCount, TAB_WORD_FORMS)])
+      : I18n.t('status_nothing_to_discard')
   );
 });
 
 backupNowBtn.addEventListener('click', async () => {
   await browser.runtime.sendMessage({ type: 'BACKUP_NOW' });
   await refresh();
-  TabVaultUI.flashButton(backupNowBtn, 'Сохранено');
-  showPopupStatus('Снимок сессии сохранён');
+  TabVaultUI.flashButton(backupNowBtn, I18n.t('flash_saved'));
+  showPopupStatus(I18n.t('status_snapshot_saved'));
 });
 
 refresh();

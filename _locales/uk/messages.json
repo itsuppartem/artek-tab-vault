@@ -1,0 +1,284 @@
+{
+  "extensionName": {
+    "message": "Artek Tab Vault"
+  },
+  "extensionDescription": {
+    "message": "Надійний бекап сесій вкладок і guardian памʼяті для Firefox."
+  },
+  "cmd_discard_all": {
+    "message": "Вивантажити всі вкладки, крім поточної"
+  },
+  "notif_crash_title": {
+    "message": "Artek Tab Vault"
+  },
+  "notif_crash_message": {
+    "message": "Схоже, попередня сесія Firefox завершилася некоректно. Натисніть, щоб відкрити останній бекап вкладок."
+  },
+  "popup_subtitle": {
+    "message": "Бекап сесій + захист від прожерливих вкладок"
+  },
+  "stat_tabs_open": {
+    "message": "вкладок відкрито"
+  },
+  "stat_discarded": {
+    "message": "вивантажено (памʼять вільна)"
+  },
+  "label_guardian": {
+    "message": "Guardian (авто-вивантаження неактивних)"
+  },
+  "label_idle_minutes": {
+    "message": "Поріг простою, хв"
+  },
+  "btn_discard_now": {
+    "message": "Вивантажити всі, крім поточної"
+  },
+  "btn_backup_now": {
+    "message": "Зробити бекап зараз"
+  },
+  "btn_open_options": {
+    "message": "Усі налаштування та винятки…"
+  },
+  "heading_snapshots": {
+    "message": "Знімки сесій"
+  },
+  "label_restore_current_window": {
+    "message": "Відновлювати в поточне вікно"
+  },
+  "heading_window_tabs": {
+    "message": "Вкладки цього вікна"
+  },
+  "tab_state_active": {
+    "message": "активна"
+  },
+  "tab_state_discarded": {
+    "message": "вивантажена"
+  },
+  "tab_state_loaded": {
+    "message": "завантажена"
+  },
+  "tab_untitled": {
+    "message": "(без назви)"
+  },
+  "empty_snapshots": {
+    "message": "Поки немає знімків"
+  },
+  "snapshot_tabs_short": {
+    "message": "вкл."
+  },
+  "btn_restore": {
+    "message": "Відновити"
+  },
+  "flash_opened": {
+    "message": "Відкрито"
+  },
+  "status_restored": {
+    "message": "Відновлено $1 $2"
+  },
+  "status_guardian_on": {
+    "message": "Guardian увімкнено"
+  },
+  "status_guardian_off": {
+    "message": "Guardian вимкнено"
+  },
+  "status_idle_saved": {
+    "message": "Поріг простою збережено"
+  },
+  "flash_done": {
+    "message": "Готово"
+  },
+  "status_discarded": {
+    "message": "Вивантажено $1 $2"
+  },
+  "status_nothing_to_discard": {
+    "message": "Нічого вивантажувати - усе вже вільно"
+  },
+  "flash_saved": {
+    "message": "Збережено"
+  },
+  "status_snapshot_saved": {
+    "message": "Знімок сесії збережено"
+  },
+  "word_tab_one": {
+    "message": "вкладка"
+  },
+  "word_tab_few": {
+    "message": "вкладки"
+  },
+  "word_tab_many": {
+    "message": "вкладок"
+  },
+  "options_page_title": {
+    "message": "Налаштування Artek Tab Vault"
+  },
+  "options_heading": {
+    "message": "Artek Tab Vault — налаштування"
+  },
+  "heading_guardian": {
+    "message": "Guardian (авто-вивантаження памʼяті)"
+  },
+  "label_enable_guardian": {
+    "message": "Увімкнути Guardian"
+  },
+  "label_discard_after_idle": {
+    "message": "Вивантажувати вкладку після простою, хв"
+  },
+  "label_protect_forms": {
+    "message": "Не вивантажувати вкладки з незаповненою формою"
+  },
+  "label_smart_activation": {
+    "message": "Розумна активація при закритті вкладки"
+  },
+  "help_smart_activation": {
+    "message": "При закритті активної вкладки Firefox іноді перемикає фокус на вже вивантажену сусідню - вона одразу починає перезавантажуватися. Ця опція одразу перемикає фокус на іншу, вже завантажену вкладку."
+  },
+  "label_mark_discarded": {
+    "message": "Позначати вивантажені вкладки префіксом у заголовку"
+  },
+  "label_prefix_text": {
+    "message": "Текст префікса"
+  },
+  "help_mark_discarded": {
+    "message": "Заголовок вивантаженої вкладки стає, наприклад, «💤 Назва сторінки» - видно прямо в списку вкладок Firefox, а не лише в попапі. Можна замінити на свій текст або інший емодзі. Працює не на всіх сторінках (на about: і сторінці AMO скрипт не пускають)."
+  },
+  "label_whitelist": {
+    "message": "Ніколи не вивантажувати ці домени (по одному в рядку)"
+  },
+  "help_whitelist": {
+    "message": "Піддомени враховуються автоматично: example.com покриє і www.example.com."
+  },
+  "heading_backup": {
+    "message": "Бекап сесій"
+  },
+  "label_presets": {
+    "message": "Готові профілі зберігання"
+  },
+  "preset_compact": {
+    "message": "Компактний"
+  },
+  "preset_balanced": {
+    "message": "Збалансований"
+  },
+  "preset_archivist": {
+    "message": "Архіваріус"
+  },
+  "help_presets": {
+    "message": "Профіль лише заповнює поля нижче - після вибору їх можна підправити й натиснути «Зберегти»."
+  },
+  "label_backup_interval": {
+    "message": "Інтервал автобекапу, хв"
+  },
+  "label_max_snapshots": {
+    "message": "Скільки знімків зберігати (за кількістю)"
+  },
+  "label_max_backup_mb": {
+    "message": "Ліміт розміру історії, МБ (0 = без додаткового ліміту)"
+  },
+  "help_retention": {
+    "message": "Коли знімків стає більше ліміту за кількістю чи розміром, найстаріші обрізаються першими - але останній знімок ніколи не видалиться."
+  },
+  "label_storage_used": {
+    "message": "Зараз зайнято знімками"
+  },
+  "label_file_backup": {
+    "message": "Резервна копія знімків у файл"
+  },
+  "btn_export": {
+    "message": "Експорт .json"
+  },
+  "btn_import": {
+    "message": "Імпорт файлу"
+  },
+  "help_import": {
+    "message": "Імпорт розуміє наш формат і схожі формати інших менеджерів вкладок (список URL, обʼєкт з tabs/windows/sessions) і звичайний текстовий список посилань - некоректні рядки пропускаються."
+  },
+  "heading_prune_log": {
+    "message": "Історія обрізання бекапів"
+  },
+  "help_prune_log": {
+    "message": "Тут видно, якщо старі знімки коли-небудь обрізалися за лімітом, або знімок пропускався як порожній/пошкоджений."
+  },
+  "btn_save": {
+    "message": "Зберегти"
+  },
+  "btn_reset": {
+    "message": "Скинути за замовчуванням"
+  },
+  "prune_reason_max_snapshots": {
+    "message": "обрізано за лімітом кількості знімків"
+  },
+  "prune_reason_max_size": {
+    "message": "обрізано за лімітом розміру історії"
+  },
+  "prune_reason_skipped_empty": {
+    "message": "пропущено порожній/пошкоджений знімок (захист від гонки при краші)"
+  },
+  "empty_prune_log": {
+    "message": "Поки порожньо - ліміти жодного разу не спрацьовували"
+  },
+  "storage_usage_line": {
+    "message": "$1 · $2 $3"
+  },
+  "prune_dropped_suffix": {
+    "message": " ($1 шт.)"
+  },
+  "unit_kb": {
+    "message": "КБ"
+  },
+  "unit_mb": {
+    "message": "МБ"
+  },
+  "flash_preset_applied": {
+    "message": "Застосовано"
+  },
+  "status_preset_applied": {
+    "message": "Профіль застосовано - не забудьте «Зберегти»"
+  },
+  "status_saved": {
+    "message": "Збережено"
+  },
+  "flash_reset": {
+    "message": "Скинуто"
+  },
+  "status_reset": {
+    "message": "Скинуто до значень за замовчуванням"
+  },
+  "flash_exported": {
+    "message": "Експортовано"
+  },
+  "status_exported": {
+    "message": "Експортовано $1 $2"
+  },
+  "status_import_empty": {
+    "message": "Нічого не знайдено для імпорту - перевірте файл"
+  },
+  "status_imported": {
+    "message": "Імпортовано $1 $2"
+  },
+  "status_imported_with_skips": {
+    "message": "Імпортовано $1 $2, пропущено $3 $4"
+  },
+  "status_import_error": {
+    "message": "Помилка імпорту: невірний файл"
+  },
+  "word_snapshot_one": {
+    "message": "знімок"
+  },
+  "word_snapshot_few": {
+    "message": "знімки"
+  },
+  "word_snapshot_many": {
+    "message": "знімків"
+  },
+  "word_bad_tab_one": {
+    "message": "некоректна вкладка"
+  },
+  "word_bad_tab_few": {
+    "message": "некоректні вкладки"
+  },
+  "word_bad_tab_many": {
+    "message": "некоректних вкладок"
+  },
+  "locale_tag": {
+    "message": "uk-UA"
+  }
+}

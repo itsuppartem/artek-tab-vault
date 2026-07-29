@@ -1,0 +1,284 @@
+{
+  "extensionName": {
+    "message": "Artek Tab Vault"
+  },
+  "extensionDescription": {
+    "message": "Firefox үшін сенімді сессия сақтық көшірмесі және жады қорғаушысы."
+  },
+  "cmd_discard_all": {
+    "message": "Ағымдағыдан басқа барлық қойындыларды түсіру"
+  },
+  "notif_crash_title": {
+    "message": "Artek Tab Vault"
+  },
+  "notif_crash_message": {
+    "message": "Алдыңғы Firefox сессиясы дұрыс жабылмаған сияқты. Соңғы сақтық көшірмені ашу үшін басыңыз."
+  },
+  "popup_subtitle": {
+    "message": "Сессия сақтық көшірмесі + жады қорғаушысы"
+  },
+  "stat_tabs_open": {
+    "message": "қойынды ашық"
+  },
+  "stat_discarded": {
+    "message": "түсірілген (жады бос)"
+  },
+  "label_guardian": {
+    "message": "Guardian (белсенді емес қойындыларды авто-түсіру)"
+  },
+  "label_idle_minutes": {
+    "message": "Бос тұру шегі, мин"
+  },
+  "btn_discard_now": {
+    "message": "Ағымдағыдан басқасын түсіру"
+  },
+  "btn_backup_now": {
+    "message": "Қазір сақтық көшірме жасау"
+  },
+  "btn_open_options": {
+    "message": "Барлық баптаулар мен ерекшеліктер…"
+  },
+  "heading_snapshots": {
+    "message": "Сессия суреттері"
+  },
+  "label_restore_current_window": {
+    "message": "Ағымдағы терезеге қалпына келтіру"
+  },
+  "heading_window_tabs": {
+    "message": "Осы терезенің қойындылары"
+  },
+  "tab_state_active": {
+    "message": "белсенді"
+  },
+  "tab_state_discarded": {
+    "message": "түсірілген"
+  },
+  "tab_state_loaded": {
+    "message": "жүктелген"
+  },
+  "tab_untitled": {
+    "message": "(атаусыз)"
+  },
+  "empty_snapshots": {
+    "message": "Әзірге суреттер жоқ"
+  },
+  "snapshot_tabs_short": {
+    "message": "қой."
+  },
+  "btn_restore": {
+    "message": "Қалпына келтіру"
+  },
+  "flash_opened": {
+    "message": "Ашылды"
+  },
+  "status_restored": {
+    "message": "Қалпына келтірілді: $1 $2"
+  },
+  "status_guardian_on": {
+    "message": "Guardian қосылған"
+  },
+  "status_guardian_off": {
+    "message": "Guardian өшірілген"
+  },
+  "status_idle_saved": {
+    "message": "Бос тұру шегі сақталды"
+  },
+  "flash_done": {
+    "message": "Дайын"
+  },
+  "status_discarded": {
+    "message": "Түсірілді: $1 $2"
+  },
+  "status_nothing_to_discard": {
+    "message": "Түсіретін ештеңе жоқ - бәрі бос"
+  },
+  "flash_saved": {
+    "message": "Сақталды"
+  },
+  "status_snapshot_saved": {
+    "message": "Сессия суреті сақталды"
+  },
+  "word_tab_one": {
+    "message": "қойынды"
+  },
+  "word_tab_few": {
+    "message": "қойынды"
+  },
+  "word_tab_many": {
+    "message": "қойынды"
+  },
+  "options_page_title": {
+    "message": "Artek Tab Vault баптаулары"
+  },
+  "options_heading": {
+    "message": "Artek Tab Vault — баптаулар"
+  },
+  "heading_guardian": {
+    "message": "Guardian (жадыны авто-түсіру)"
+  },
+  "label_enable_guardian": {
+    "message": "Guardian қосу"
+  },
+  "label_discard_after_idle": {
+    "message": "Бос тұрғаннан кейін түсіру, мин"
+  },
+  "label_protect_forms": {
+    "message": "Сақталмаған пішіндері бар қойындыларды түсірмеу"
+  },
+  "label_smart_activation": {
+    "message": "Қойындыны жапқанда ақылды белсендіру"
+  },
+  "help_smart_activation": {
+    "message": "Белсенді қойындыны жапқанда Firefox кейде түсірілген көршіге ауысады - ол бірден қайта жүктеледі. Бұл опция фокусты басқа жүктелген қойындыға бірден ауыстырады."
+  },
+  "label_mark_discarded": {
+    "message": "Түсірілген қойындыларды тақырып префиксімен белгілеу"
+  },
+  "label_prefix_text": {
+    "message": "Префикс мәтіні"
+  },
+  "help_mark_discarded": {
+    "message": "Түсірілген қойынды тақырыбы, мысалы, «💤 Бет атауы» болады - Firefox қойынды жолағында көрінеді. Өз мәтініңізді немесе эмодзиді қоюға болады. Барлық бетте жұмыс істемейді (about: және AMO скриптіні блоктайды)."
+  },
+  "label_whitelist": {
+    "message": "Бұл домендерді ешқашан түсірмеу (әр жолда бір)"
+  },
+  "help_whitelist": {
+    "message": "Ішкі домендер автоматты есептеледі: example.com www.example.com-ды да қамтиды."
+  },
+  "heading_backup": {
+    "message": "Сессия сақтық көшірмесі"
+  },
+  "label_presets": {
+    "message": "Дайын сақтау профильдері"
+  },
+  "preset_compact": {
+    "message": "Ықшам"
+  },
+  "preset_balanced": {
+    "message": "Теңгерімді"
+  },
+  "preset_archivist": {
+    "message": "Мұрағатшы"
+  },
+  "help_presets": {
+    "message": "Профиль төмендегі өрістерді толтырады - кейін қолмен өзгертіп, «Сақтау» басуға болады."
+  },
+  "label_backup_interval": {
+    "message": "Авто-сақтық көшірме аралығы, мин"
+  },
+  "label_max_snapshots": {
+    "message": "Қанша сурет сақтау (саны бойынша)"
+  },
+  "label_max_backup_mb": {
+    "message": "Тарих өлшемі шегі, МБ (0 = қосымша шек жоқ)"
+  },
+  "help_retention": {
+    "message": "Суреттер саны немесе өлшемі шектен асқанда ескілері алдымен қысқарады - бірақ соңғы сурет ешқашан жойылмайды."
+  },
+  "label_storage_used": {
+    "message": "Қазір суреттер алып тұр"
+  },
+  "label_file_backup": {
+    "message": "Суреттердің файлдық сақтық көшірмесі"
+  },
+  "btn_export": {
+    "message": "Экспорт .json"
+  },
+  "btn_import": {
+    "message": "Файл импорттау"
+  },
+  "help_import": {
+    "message": "Импорт біздің форматты және басқа қойынды менеджерлерінің ұқсас пішіндерін түсінеді - қате жолдар өткізіледі, бүкіл импорт бұзылмайды."
+  },
+  "heading_prune_log": {
+    "message": "Сақтық көшірме қысқарту тарихы"
+  },
+  "help_prune_log": {
+    "message": "Ескі суреттер шек бойынша қысқартылса немесе бос/бүлінген сурет өткізілсе - мұнда көрінеді."
+  },
+  "btn_save": {
+    "message": "Сақтау"
+  },
+  "btn_reset": {
+    "message": "Әдепкіге қайтару"
+  },
+  "prune_reason_max_snapshots": {
+    "message": "сурет саны шегі бойынша қысқартылды"
+  },
+  "prune_reason_max_size": {
+    "message": "тарих өлшемі шегі бойынша қысқартылды"
+  },
+  "prune_reason_skipped_empty": {
+    "message": "бос/бүлінген сурет өткізілді (краш қорғанысы)"
+  },
+  "empty_prune_log": {
+    "message": "Әзірге бос - шектер ешқашан іске қосылмаған"
+  },
+  "storage_usage_line": {
+    "message": "$1 · $2 $3"
+  },
+  "prune_dropped_suffix": {
+    "message": " ($1 дана)"
+  },
+  "unit_kb": {
+    "message": "КБ"
+  },
+  "unit_mb": {
+    "message": "МБ"
+  },
+  "flash_preset_applied": {
+    "message": "Қолданылды"
+  },
+  "status_preset_applied": {
+    "message": "Профиль қолданылды - «Сақтау»-ды ұмытпаңыз"
+  },
+  "status_saved": {
+    "message": "Сақталды"
+  },
+  "flash_reset": {
+    "message": "Қайтарылды"
+  },
+  "status_reset": {
+    "message": "Әдепкі мәндерге қайтарылды"
+  },
+  "flash_exported": {
+    "message": "Экспортталды"
+  },
+  "status_exported": {
+    "message": "Экспортталды: $1 $2"
+  },
+  "status_import_empty": {
+    "message": "Импорттайтын ештеңе табылмады - файлды тексеріңіз"
+  },
+  "status_imported": {
+    "message": "Импортталды: $1 $2"
+  },
+  "status_imported_with_skips": {
+    "message": "Импортталды: $1 $2, өткізілді: $3 $4"
+  },
+  "status_import_error": {
+    "message": "Импорт қатесі: жарамсыз файл"
+  },
+  "word_snapshot_one": {
+    "message": "сурет"
+  },
+  "word_snapshot_few": {
+    "message": "сурет"
+  },
+  "word_snapshot_many": {
+    "message": "сурет"
+  },
+  "word_bad_tab_one": {
+    "message": "қате қойынды"
+  },
+  "word_bad_tab_few": {
+    "message": "қате қойынды"
+  },
+  "word_bad_tab_many": {
+    "message": "қате қойынды"
+  },
+  "locale_tag": {
+    "message": "kk-KZ"
+  }
+}
