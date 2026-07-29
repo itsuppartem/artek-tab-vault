@@ -4,6 +4,17 @@ Developer Hub → **Edit Product Page**. Файлы иконок/скриншо�
 
 Канонический полный текст описания: `../LISTING.md`. Ниже — готовые куски под каждое поле формы.
 
+## Автозаливка через AMO API
+
+```bash
+source ~/.config/web-ext-keys/artek-tab-vault-amo.env
+node scripts/fill-amo-listing.js          # meta + icon + previews
+node scripts/fill-amo-listing.js meta     # только текст/теги/иконка
+node scripts/fill-amo-listing.js previews # добить скриншоты (если throttle)
+```
+
+Email (Support Email) API не заполняет — его нет в репо; поставь руками в Hub.
+
 ---
 
 ## Describe Add-on
