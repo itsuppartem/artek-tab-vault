@@ -13,6 +13,7 @@ module.exports = {
     'reviews-state.json',
     'web-ext-config.js',
     'scripts/**/*',
+    'store-assets/**/*',
     'tests/**/*',
     '.github/**/*',
   ],

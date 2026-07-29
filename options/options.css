@@ -64,7 +64,8 @@ header h1 {
   font-size: 13px;
 }
 
-input[type="number"] {
+input[type="number"],
+input[type="text"] {
   width: 80px;
   background: #2a2b2e;
   border: 1px solid #444;
@@ -72,6 +73,10 @@ input[type="number"] {
   border-radius: 6px;
   padding: 6px 8px;
   font-size: 13px;
+}
+
+input[type="text"] {
+  width: 140px;
 }
 
 textarea {

@@ -4,6 +4,10 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 
 ## [Unreleased]
 
+### Fixed
+- Real extension icon in the toolbar, the add-ons manager and on the store page: the manifest previously pointed only at an SVG, which Firefox's add-on listing doesn't render, so the extension showed a generic placeholder puzzle piece. Ships proper 48/96/128px PNG icons instead.
+- Settings page: the "Текст префикса" field was an unstyled white box on the dark settings page - it now matches the other inputs.
+
 ## [0.2.0] - 2026-07-27
 
 ### Added

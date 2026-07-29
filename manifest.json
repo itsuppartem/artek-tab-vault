@@ -23,8 +23,9 @@
     "<all_urls>"
   ],
   "icons": {
-    "48": "icons/icon.svg",
-    "96": "icons/icon.svg"
+    "48": "icons/icon-48.png",
+    "96": "icons/icon-96.png",
+    "128": "icons/icon-128.png"
   },
   "background": {
     "scripts": ["core.js", "background.js"],
@@ -44,7 +45,10 @@
   },
   "browser_action": {
     "default_popup": "popup/popup.html",
-    "default_icon": "icons/icon.svg",
+    "default_icon": {
+      "48": "icons/icon-48.png",
+      "96": "icons/icon-96.png"
+    },
     "default_title": "Artek Tab Vault"
   },
   "commands": {
