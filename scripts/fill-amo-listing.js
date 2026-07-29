@@ -106,20 +106,16 @@ function addonPath(suffix = '') {
 }
 
 async function patchMetadata(descriptionEn, descriptionRu, developerComments) {
-  const homepage = 'https://github.com/itsuppartem/artek-tab-vault';
+  // Repo is private — never publish the GitHub URL as Homepage/Support.
+  // Leave those null until there is a public page; clear explicitly so a
+  // re-run doesn't leave a stale private link on the listing.
   const payload = {
     description: {
       'en-US': descriptionEn,
       'ru': descriptionRu,
     },
-    homepage: {
-      'en-US': homepage,
-      'ru': homepage,
-    },
-    support_url: {
-      'en-US': `${homepage}/issues`,
-      'ru': `${homepage}/issues`,
-    },
+    homepage: null,
+    support_url: null,
     developer_comments: {
       'en-US': developerComments,
     },
@@ -265,8 +261,8 @@ async function main() {
     '- No remote code, no analytics, no third-party servers. Data never leaves',
     "  the user's machine.",
     '',
-    'Source and tests: the GitHub repository linked as Homepage. Jest unit tests',
-    'cover pure logic in core.js; CI runs on every push.',
+    'Source is private for now; Jest unit tests cover pure logic in core.js',
+    'and CI runs on every push. Happy to share a reviewer build/zip on request.',
   ].join('\n');
 
   if (mode === 'all' || mode === 'meta') {

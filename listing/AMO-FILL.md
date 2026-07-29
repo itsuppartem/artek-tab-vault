@@ -107,10 +107,8 @@ crash recovery
 `English (US)` — ок.
 
 ### Homepage / Website
-```
-https://github.com/itsuppartem/artek-tab-vault
-```
-(репозиторий приватный — если AMO/юзеры не смогут открыть Issues, либо сделай публичным README-only, либо поставь публичную страницу / Issues позже. Пока GitHub URL — лучший вариант из имеющихся.)
+Оставь **пустым**. Репозиторий приватный — публичный GitHub URL на listing нельзя.
+Когда появится публичная страница / публичные Issues — вставь сюда и в `scripts/fill-amo-listing.js`.
 
 ---
 
