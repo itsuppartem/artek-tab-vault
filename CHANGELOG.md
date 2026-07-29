@@ -4,6 +4,11 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 
 ## [Unreleased]
 
+## [0.3.1] - 2026-07-29
+
+### Changed
+- Minimum Firefox version raised to 142.0 (required by `data_collection_permissions` on Android; clears the AMO validation warning on upload).
+
 ## [0.3.0] - 2026-07-29
 
 ### Added

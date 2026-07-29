@@ -1,6 +1,6 @@
 {
   "name": "artek-tab-vault",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Crash-proof tab session backup and idle tab memory guardian for Firefox.",
   "private": true,
   "scripts": {
