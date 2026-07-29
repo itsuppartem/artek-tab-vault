@@ -2,6 +2,8 @@
 
 Canonical text for the addon's product page on addons.mozilla.org. Paste the relevant section into the corresponding field in Developer Hub → Edit Product Page whenever it drifts from what's below. This file is the source of truth — the live AMO listing must always match it.
 
+**How to fill every Hub field (icons, screenshots, tags, developer comments):** see [`listing/AMO-FILL.md`](listing/AMO-FILL.md). Assets live in [`listing/`](listing/).
+
 ## Summary (short, ~250 chars max)
 
 > Crash-proof tab session backup and idle tab memory guardian for Firefox.
