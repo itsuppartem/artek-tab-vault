@@ -9,7 +9,7 @@
   },
   "version": {
     "release_notes": {
-      "en-US": "0.2.0\n\nAdded:\n- \"Sleeping\" title marker on discarded tabs, visible right in Firefox's tab strip/sidebar (configurable prefix/emoji, can be turned off)\n- Configurable backup retention: optional size cap on top of the snapshot-count cap, three ready-made presets, and a visible prune-history log so retention is never silent\n- Native Firefox tab group support: backups capture and restore group name/color\n- Unsaved-form protection: skips discarding tabs with an unsubmitted form\n- Proactive crash-restore prompt after an unclean shutdown/restart\n- Restore-into-current-window option\n- Tolerant snapshot import: accepts plain URL lists and a few common external export formats\n- Popup now lists every tab in the current window with an active/loaded/discarded indicator\n\nChanged:\n- Smart tab activation on close: focus now moves to an already-loaded tab instead of a freshly-discarded neighbor\n- Buttons in the popup and settings page now show a press animation and a success confirmation after an action completes\n\nFixed:\n- Snapshot integrity guard: the backup engine no longer persists a fully-empty snapshot"
+      "en-US": "0.3.0\n\nAdded:\n- UI localization: English, Russian, Kazakh, Ukrainian, Belarusian, Serbian (follows Firefox locale)\n\nFixed:\n- Proper PNG toolbar/listing icons (vault-dial mark) instead of a generic puzzle placeholder\n- Prefix text field styling on the dark settings page\n- Release pipeline no longer false-fails while waiting for manual AMO review after a successful upload"
     },
     "custom_license": {
       "name": {

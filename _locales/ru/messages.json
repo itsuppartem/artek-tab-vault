@@ -1,0 +1,284 @@
+{
+  "extensionName": {
+    "message": "Artek Tab Vault"
+  },
+  "extensionDescription": {
+    "message": "Надёжный бэкап сессий вкладок и guardian памяти для Firefox."
+  },
+  "cmd_discard_all": {
+    "message": "Выгрузить все вкладки, кроме текущей"
+  },
+  "notif_crash_title": {
+    "message": "Artek Tab Vault"
+  },
+  "notif_crash_message": {
+    "message": "Похоже, прошлая сессия Firefox завершилась некорректно. Нажмите, чтобы открыть последний бэкап вкладок."
+  },
+  "popup_subtitle": {
+    "message": "Бэкап сессий + защита от прожорливых вкладок"
+  },
+  "stat_tabs_open": {
+    "message": "вкладок открыто"
+  },
+  "stat_discarded": {
+    "message": "выгружено (память свободна)"
+  },
+  "label_guardian": {
+    "message": "Guardian (авто-выгрузка неактивных)"
+  },
+  "label_idle_minutes": {
+    "message": "Порог простоя, мин"
+  },
+  "btn_discard_now": {
+    "message": "Выгрузить все, кроме текущей"
+  },
+  "btn_backup_now": {
+    "message": "Сделать бэкап сейчас"
+  },
+  "btn_open_options": {
+    "message": "Все настройки и исключения…"
+  },
+  "heading_snapshots": {
+    "message": "Снимки сессий"
+  },
+  "label_restore_current_window": {
+    "message": "Восстанавливать в текущее окно"
+  },
+  "heading_window_tabs": {
+    "message": "Вкладки этого окна"
+  },
+  "tab_state_active": {
+    "message": "активна"
+  },
+  "tab_state_discarded": {
+    "message": "выгружена"
+  },
+  "tab_state_loaded": {
+    "message": "загружена"
+  },
+  "tab_untitled": {
+    "message": "(без названия)"
+  },
+  "empty_snapshots": {
+    "message": "Пока нет снимков"
+  },
+  "snapshot_tabs_short": {
+    "message": "вкл."
+  },
+  "btn_restore": {
+    "message": "Восстановить"
+  },
+  "flash_opened": {
+    "message": "Открыто"
+  },
+  "status_restored": {
+    "message": "Восстановлено $1 $2"
+  },
+  "status_guardian_on": {
+    "message": "Guardian включён"
+  },
+  "status_guardian_off": {
+    "message": "Guardian выключен"
+  },
+  "status_idle_saved": {
+    "message": "Порог простоя сохранён"
+  },
+  "flash_done": {
+    "message": "Готово"
+  },
+  "status_discarded": {
+    "message": "Выгружено $1 $2"
+  },
+  "status_nothing_to_discard": {
+    "message": "Нечего выгружать - всё уже свободно"
+  },
+  "flash_saved": {
+    "message": "Сохранено"
+  },
+  "status_snapshot_saved": {
+    "message": "Снимок сессии сохранён"
+  },
+  "word_tab_one": {
+    "message": "вкладка"
+  },
+  "word_tab_few": {
+    "message": "вкладки"
+  },
+  "word_tab_many": {
+    "message": "вкладок"
+  },
+  "options_page_title": {
+    "message": "Настройки Artek Tab Vault"
+  },
+  "options_heading": {
+    "message": "Artek Tab Vault — настройки"
+  },
+  "heading_guardian": {
+    "message": "Guardian (авто-выгрузка памяти)"
+  },
+  "label_enable_guardian": {
+    "message": "Включить Guardian"
+  },
+  "label_discard_after_idle": {
+    "message": "Выгружать вкладку после простоя, мин"
+  },
+  "label_protect_forms": {
+    "message": "Не выгружать вкладки с незаполненной формой"
+  },
+  "label_smart_activation": {
+    "message": "Умная активация при закрытии вкладки"
+  },
+  "help_smart_activation": {
+    "message": "При закрытии активной вкладки Firefox иногда переключает фокус на уже выгруженную соседнюю - она тут же начинает перезагружаться. Эта опция сразу переключает фокус на другую, уже загруженную вкладку."
+  },
+  "label_mark_discarded": {
+    "message": "Помечать выгруженные вкладки префиксом в заголовке"
+  },
+  "label_prefix_text": {
+    "message": "Текст префикса"
+  },
+  "help_mark_discarded": {
+    "message": "Заголовок выгруженной вкладки становится, например, «💤 Название страницы» - видно прямо в списке вкладок Firefox, а не только в попапе. Можно заменить на свой текст или другой эмодзи. Работает не на всех страницах (например, на about: и странице AMO скрипт не пускают)."
+  },
+  "label_whitelist": {
+    "message": "Никогда не выгружать эти домены (по одному в строке)"
+  },
+  "help_whitelist": {
+    "message": "Поддомены учитываются автоматически: example.com закроет и www.example.com."
+  },
+  "heading_backup": {
+    "message": "Бэкап сессий"
+  },
+  "label_presets": {
+    "message": "Готовые профили хранения"
+  },
+  "preset_compact": {
+    "message": "Компактный"
+  },
+  "preset_balanced": {
+    "message": "Сбалансированный"
+  },
+  "preset_archivist": {
+    "message": "Архивариус"
+  },
+  "help_presets": {
+    "message": "Профиль просто заполняет поля ниже - после выбора всё ещё можно поправить руками и нажать «Сохранить»."
+  },
+  "label_backup_interval": {
+    "message": "Интервал автобэкапа, мин"
+  },
+  "label_max_snapshots": {
+    "message": "Сколько снимков хранить (по количеству)"
+  },
+  "label_max_backup_mb": {
+    "message": "Лимит размера истории, МБ (0 = без доп. лимита)"
+  },
+  "help_retention": {
+    "message": "Когда снимков накапливается больше лимита по количеству или размеру, самые старые обрезаются первыми - но последний снимок не удалится никогда, даже если он один превышает лимит."
+  },
+  "label_storage_used": {
+    "message": "Сейчас занято снимками"
+  },
+  "label_file_backup": {
+    "message": "Резервная копия снимков в файл"
+  },
+  "btn_export": {
+    "message": "Экспорт .json"
+  },
+  "btn_import": {
+    "message": "Импорт файла"
+  },
+  "help_import": {
+    "message": "Импорт понимает наш формат, а также похожие форматы других менеджеров вкладок (список URL, объект с tabs/windows/sessions) и обычный текстовый список ссылок - некорректные строки просто пропускаются, а не ломают весь импорт."
+  },
+  "heading_prune_log": {
+    "message": "История обрезки бэкапов"
+  },
+  "help_prune_log": {
+    "message": "Здесь видно, если старые снимки когда-либо обрезались по лимиту, или снимок пропускался как пустой/повреждённый - вместо тихой потери истории."
+  },
+  "btn_save": {
+    "message": "Сохранить"
+  },
+  "btn_reset": {
+    "message": "Сбросить по умолчанию"
+  },
+  "prune_reason_max_snapshots": {
+    "message": "обрезано по лимиту количества снимков"
+  },
+  "prune_reason_max_size": {
+    "message": "обрезано по лимиту размера истории"
+  },
+  "prune_reason_skipped_empty": {
+    "message": "пропущен пустой/повреждённый снимок (защита от гонки при крэше)"
+  },
+  "empty_prune_log": {
+    "message": "Пока пусто - лимиты ни разу не срабатывали"
+  },
+  "storage_usage_line": {
+    "message": "$1 · $2 $3"
+  },
+  "prune_dropped_suffix": {
+    "message": " ($1 шт.)"
+  },
+  "unit_kb": {
+    "message": "КБ"
+  },
+  "unit_mb": {
+    "message": "МБ"
+  },
+  "flash_preset_applied": {
+    "message": "Применён"
+  },
+  "status_preset_applied": {
+    "message": "Профиль применён - не забудьте «Сохранить»"
+  },
+  "status_saved": {
+    "message": "Сохранено"
+  },
+  "flash_reset": {
+    "message": "Сброшено"
+  },
+  "status_reset": {
+    "message": "Сброшено к значениям по умолчанию"
+  },
+  "flash_exported": {
+    "message": "Экспортировано"
+  },
+  "status_exported": {
+    "message": "Экспортировано $1 $2"
+  },
+  "status_import_empty": {
+    "message": "Ничего не найдено для импорта - проверьте файл"
+  },
+  "status_imported": {
+    "message": "Импортировано $1 $2"
+  },
+  "status_imported_with_skips": {
+    "message": "Импортировано $1 $2, пропущено $3 $4"
+  },
+  "status_import_error": {
+    "message": "Ошибка импорта: неверный файл"
+  },
+  "word_snapshot_one": {
+    "message": "снимок"
+  },
+  "word_snapshot_few": {
+    "message": "снимка"
+  },
+  "word_snapshot_many": {
+    "message": "снимков"
+  },
+  "word_bad_tab_one": {
+    "message": "некорректная вкладка"
+  },
+  "word_bad_tab_few": {
+    "message": "некорректные вкладки"
+  },
+  "word_bad_tab_many": {
+    "message": "некорректных вкладок"
+  },
+  "locale_tag": {
+    "message": "ru-RU"
+  }
+}

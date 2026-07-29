@@ -1,0 +1,284 @@
+{
+  "extensionName": {
+    "message": "Artek Tab Vault"
+  },
+  "extensionDescription": {
+    "message": "Надзейны бэкап сесій укладак і guardian памяці для Firefox."
+  },
+  "cmd_discard_all": {
+    "message": "Выгрузіць усе ўкладкі, акрамя бягучай"
+  },
+  "notif_crash_title": {
+    "message": "Artek Tab Vault"
+  },
+  "notif_crash_message": {
+    "message": "Падобна, мінулая сесія Firefox завяршылася некарэктна. Націсніце, каб адкрыць апошні бэкап укладак."
+  },
+  "popup_subtitle": {
+    "message": "Бэкап сесій + абарона ад пражэрлівых укладак"
+  },
+  "stat_tabs_open": {
+    "message": "укладак адкрыта"
+  },
+  "stat_discarded": {
+    "message": "выгружана (памяць вольная)"
+  },
+  "label_guardian": {
+    "message": "Guardian (аўта-выгрузка неактыўных)"
+  },
+  "label_idle_minutes": {
+    "message": "Парог прастою, хв"
+  },
+  "btn_discard_now": {
+    "message": "Выгрузіць усе, акрамя бягучай"
+  },
+  "btn_backup_now": {
+    "message": "Зрабіць бэкап зараз"
+  },
+  "btn_open_options": {
+    "message": "Усе налады і выключэнні…"
+  },
+  "heading_snapshots": {
+    "message": "Здымкі сесій"
+  },
+  "label_restore_current_window": {
+    "message": "Аднаўляць у бягучае акно"
+  },
+  "heading_window_tabs": {
+    "message": "Укладкі гэтага акна"
+  },
+  "tab_state_active": {
+    "message": "актыўная"
+  },
+  "tab_state_discarded": {
+    "message": "выгружаная"
+  },
+  "tab_state_loaded": {
+    "message": "загружаная"
+  },
+  "tab_untitled": {
+    "message": "(без назвы)"
+  },
+  "empty_snapshots": {
+    "message": "Пакуль няма здымкаў"
+  },
+  "snapshot_tabs_short": {
+    "message": "укл."
+  },
+  "btn_restore": {
+    "message": "Аднавіць"
+  },
+  "flash_opened": {
+    "message": "Адкрыта"
+  },
+  "status_restored": {
+    "message": "Адноўлена $1 $2"
+  },
+  "status_guardian_on": {
+    "message": "Guardian уключаны"
+  },
+  "status_guardian_off": {
+    "message": "Guardian выключаны"
+  },
+  "status_idle_saved": {
+    "message": "Парог прастою захаваны"
+  },
+  "flash_done": {
+    "message": "Гатова"
+  },
+  "status_discarded": {
+    "message": "Выгружана $1 $2"
+  },
+  "status_nothing_to_discard": {
+    "message": "Няма чаго выгружаць - усё ўжо вольна"
+  },
+  "flash_saved": {
+    "message": "Захавана"
+  },
+  "status_snapshot_saved": {
+    "message": "Здымак сесіі захаваны"
+  },
+  "word_tab_one": {
+    "message": "укладка"
+  },
+  "word_tab_few": {
+    "message": "укладкі"
+  },
+  "word_tab_many": {
+    "message": "укладак"
+  },
+  "options_page_title": {
+    "message": "Налады Artek Tab Vault"
+  },
+  "options_heading": {
+    "message": "Artek Tab Vault — налады"
+  },
+  "heading_guardian": {
+    "message": "Guardian (аўта-выгрузка памяці)"
+  },
+  "label_enable_guardian": {
+    "message": "Уключыць Guardian"
+  },
+  "label_discard_after_idle": {
+    "message": "Выгружаць укладку пасля прастою, хв"
+  },
+  "label_protect_forms": {
+    "message": "Не выгружаць укладкі з незапоўненай формай"
+  },
+  "label_smart_activation": {
+    "message": "Разумная актывацыя пры закрыцці ўкладкі"
+  },
+  "help_smart_activation": {
+    "message": "Пры закрыцці актыўнай укладкі Firefox часам пераключае фокус на ўжо выгружаную суседнюю - яна адразу пачынае перазагружацца. Гэтая опцыя адразу пераключае фокус на іншую, ужо загружаную ўкладку."
+  },
+  "label_mark_discarded": {
+    "message": "Пазначаць выгружаныя ўкладкі прэфіксам у загалоўку"
+  },
+  "label_prefix_text": {
+    "message": "Тэкст прэфікса"
+  },
+  "help_mark_discarded": {
+    "message": "Загаловак выгружанай укладкі становіцца, напрыклад, «💤 Назва старонкі» - відаць у спісе ўкладак Firefox, а не толькі ў попапе. Можна замяніць на свой тэкст або іншы эмодзі. Працуе не на ўсіх старонках (на about: і старонцы AMO скрыпт не пускаюць)."
+  },
+  "label_whitelist": {
+    "message": "Ніколі не выгружаць гэтыя дамены (па адным у радку)"
+  },
+  "help_whitelist": {
+    "message": "Паддамены ўлічваюцца аўтаматычна: example.com пакрые і www.example.com."
+  },
+  "heading_backup": {
+    "message": "Бэкап сесій"
+  },
+  "label_presets": {
+    "message": "Гатовыя профілі захоўвання"
+  },
+  "preset_compact": {
+    "message": "Кампактны"
+  },
+  "preset_balanced": {
+    "message": "Збалансаваны"
+  },
+  "preset_archivist": {
+    "message": "Архіварыус"
+  },
+  "help_presets": {
+    "message": "Профіль проста запаўняе палі ніжэй - пасля выбару іх можна паправіць і націснуць «Захаваць»."
+  },
+  "label_backup_interval": {
+    "message": "Інтэрвал аўтабэкапу, хв"
+  },
+  "label_max_snapshots": {
+    "message": "Колькі здымкаў захоўваць (па колькасці)"
+  },
+  "label_max_backup_mb": {
+    "message": "Ліміт памеру гісторыі, МБ (0 = без дад. ліміту)"
+  },
+  "help_retention": {
+    "message": "Калі здымкаў становіцца больш ліміту па колькасці ці памеры, найстарэйшыя абразаюцца першымі - але апошні здымак ніколі не выдаліцца."
+  },
+  "label_storage_used": {
+    "message": "Зараз занята здымкамі"
+  },
+  "label_file_backup": {
+    "message": "Рэзервовая копія здымкаў у файл"
+  },
+  "btn_export": {
+    "message": "Экспарт .json"
+  },
+  "btn_import": {
+    "message": "Імпарт файла"
+  },
+  "help_import": {
+    "message": "Імпарт разумее наш фармат і падобныя фарматы іншых менеджэраў укладак - няправільныя радкі проста прапускаюцца."
+  },
+  "heading_prune_log": {
+    "message": "Гісторыя абрэзкі бэкапаў"
+  },
+  "help_prune_log": {
+    "message": "Тут відаць, калі старыя здымкі калі-небудзь абразаліся па ліміце, або здымак прапускаўся як пусты/пашкоджаны."
+  },
+  "btn_save": {
+    "message": "Захаваць"
+  },
+  "btn_reset": {
+    "message": "Скінуць па змаўчанні"
+  },
+  "prune_reason_max_snapshots": {
+    "message": "абрэзана па ліміце колькасці здымкаў"
+  },
+  "prune_reason_max_size": {
+    "message": "абрэзана па ліміце памеру гісторыі"
+  },
+  "prune_reason_skipped_empty": {
+    "message": "прапушчаны пусты/пашкоджаны здымак (абарона ад гонкі пры крашы)"
+  },
+  "empty_prune_log": {
+    "message": "Пакуль пуста - ліміты ні разу не спрацоўвалі"
+  },
+  "storage_usage_line": {
+    "message": "$1 · $2 $3"
+  },
+  "prune_dropped_suffix": {
+    "message": " ($1 шт.)"
+  },
+  "unit_kb": {
+    "message": "КБ"
+  },
+  "unit_mb": {
+    "message": "МБ"
+  },
+  "flash_preset_applied": {
+    "message": "Ужыта"
+  },
+  "status_preset_applied": {
+    "message": "Профіль ужыты - не забудзьце «Захаваць»"
+  },
+  "status_saved": {
+    "message": "Захавана"
+  },
+  "flash_reset": {
+    "message": "Скінута"
+  },
+  "status_reset": {
+    "message": "Скінута да значэнняў па змаўчанні"
+  },
+  "flash_exported": {
+    "message": "Экспартавана"
+  },
+  "status_exported": {
+    "message": "Экспартавана $1 $2"
+  },
+  "status_import_empty": {
+    "message": "Нічога не знойдзена для імпарту - праверце файл"
+  },
+  "status_imported": {
+    "message": "Імпартавана $1 $2"
+  },
+  "status_imported_with_skips": {
+    "message": "Імпартавана $1 $2, прапушчана $3 $4"
+  },
+  "status_import_error": {
+    "message": "Памылка імпарту: няправільны файл"
+  },
+  "word_snapshot_one": {
+    "message": "здымак"
+  },
+  "word_snapshot_few": {
+    "message": "здымкі"
+  },
+  "word_snapshot_many": {
+    "message": "здымкаў"
+  },
+  "word_bad_tab_one": {
+    "message": "няправільная ўкладка"
+  },
+  "word_bad_tab_few": {
+    "message": "няправільныя ўкладкі"
+  },
+  "word_bad_tab_many": {
+    "message": "няправільных укладак"
+  },
+  "locale_tag": {
+    "message": "be-BY"
+  }
+}

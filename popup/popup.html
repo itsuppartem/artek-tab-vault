@@ -1,60 +1,61 @@
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <title>Artek Tab Vault</title>
+  <title data-i18n="extensionName">Artek Tab Vault</title>
   <link rel="stylesheet" href="popup.css" />
 </head>
 <body>
   <header>
     <img src="../icons/icon.svg" alt="" class="logo" />
     <div>
-      <h1>Artek Tab Vault</h1>
-      <p class="subtitle">Бэкап сессий + защита от прожорливых вкладок</p>
+      <h1 data-i18n="extensionName">Artek Tab Vault</h1>
+      <p class="subtitle" data-i18n="popup_subtitle">Session backup + idle tab memory guardian</p>
     </div>
   </header>
 
   <section class="stats">
     <div class="stat">
       <span class="stat-value" id="totalTabs">-</span>
-      <span class="stat-label">вкладок открыто</span>
+      <span class="stat-label" data-i18n="stat_tabs_open">tabs open</span>
     </div>
     <div class="stat">
       <span class="stat-value" id="discardedTabs">-</span>
-      <span class="stat-label">выгружено (память свободна)</span>
+      <span class="stat-label" data-i18n="stat_discarded">discarded (RAM free)</span>
     </div>
   </section>
 
   <section class="controls">
     <label class="row">
-      <span>Guardian (авто-выгрузка неактивных)</span>
+      <span data-i18n="label_guardian">Guardian (auto-discard idle tabs)</span>
       <input type="checkbox" id="guardianEnabled" />
     </label>
     <label class="row">
-      <span>Порог простоя, мин</span>
+      <span data-i18n="label_idle_minutes">Idle threshold, min</span>
       <input type="number" id="idleMinutes" min="1" max="180" />
     </label>
-    <button id="discardNowBtn" class="btn">Выгрузить все, кроме текущей</button>
-    <button id="backupNowBtn" class="btn secondary">Сделать бэкап сейчас</button>
-    <button id="openOptionsBtn" class="btn secondary">Все настройки и исключения…</button>
+    <button id="discardNowBtn" class="btn" data-i18n="btn_discard_now">Discard all except current</button>
+    <button id="backupNowBtn" class="btn secondary" data-i18n="btn_backup_now">Backup now</button>
+    <button id="openOptionsBtn" class="btn secondary" data-i18n="btn_open_options">All settings and exclusions…</button>
     <span id="popupStatus" class="status"></span>
   </section>
 
   <section class="snapshots">
-    <h2>Снимки сессий</h2>
+    <h2 data-i18n="heading_snapshots">Session snapshots</h2>
     <label class="row restore-mode-row">
-      <span>Восстанавливать в текущее окно</span>
+      <span data-i18n="label_restore_current_window">Restore into current window</span>
       <input type="checkbox" id="restoreIntoCurrentWindow" />
     </label>
     <ul id="snapshotList"></ul>
   </section>
 
   <section class="tabs-state">
-    <h2>Вкладки этого окна</h2>
+    <h2 data-i18n="heading_window_tabs">Tabs in this window</h2>
     <ul id="tabList"></ul>
   </section>
 
   <script src="../core.js"></script>
+  <script src="../i18n.js"></script>
   <script src="../ui-feedback.js"></script>
   <script src="popup.js"></script>
 </body>

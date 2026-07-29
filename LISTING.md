@@ -63,6 +63,8 @@ Guardian: automatic memory relief
   presets) gives instant visual confirmation - a press animation plus a
   brief "✓ done" flash and a text summary - so you always know an action
   actually went through.
+- Localized UI: English, Russian, Kazakh, Ukrainian, Belarusian, and
+  Serbian, following Firefox's language setting.
 
 WHAT IT DOESN'T DO (known limitations)
 - Firefox's extension APIs don't expose real per-tab RAM usage, so discarding

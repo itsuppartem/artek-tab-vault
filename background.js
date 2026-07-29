@@ -357,9 +357,9 @@ async function checkForCrashRestore() {
   try {
     await browser.notifications.create('tabvault-crash-restore', {
       type: 'basic',
-      iconUrl: browser.runtime.getURL('icons/icon.svg'),
-      title: 'Artek Tab Vault',
-      message: 'Похоже, прошлая сессия Firefox завершилась некорректно. Нажмите, чтобы открыть последний бэкап вкладок.',
+      iconUrl: browser.runtime.getURL('icons/icon-96.png'),
+      title: browser.i18n.getMessage('notif_crash_title'),
+      message: browser.i18n.getMessage('notif_crash_message'),
     });
   } catch (err) {
     // notifications permission/platform issue; skip silently.

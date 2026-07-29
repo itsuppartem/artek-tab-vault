@@ -1,6 +1,10 @@
 'use strict';
 
 const Core = window.TabVaultCore;
+const I18n = window.TabVaultI18n;
+
+I18n.apply();
+
 const SETTINGS_KEY = 'tabvault_settings';
 const SNAPSHOTS_KEY = 'tabvault_snapshots';
 const PRUNE_LOG_KEY = 'tabvault_prune_log';
@@ -18,10 +22,10 @@ const DEFAULT_SETTINGS = {
   discardedTitlePrefix: '💤 ',
 };
 
-const PRUNE_REASON_LABELS = {
-  'max-snapshots-limit': 'обрезано по лимиту количества снимков',
-  'max-size-limit': 'обрезано по лимиту размера истории',
-  'skipped-empty-snapshot': 'пропущен пустой/повреждённый снимок (защита от гонки при крэше)',
+const PRUNE_REASON_KEYS = {
+  'max-snapshots-limit': 'prune_reason_max_snapshots',
+  'max-size-limit': 'prune_reason_max_size',
+  'skipped-empty-snapshot': 'prune_reason_skipped_empty',
 };
 
 const els = {
@@ -45,7 +49,8 @@ const els = {
   status: document.getElementById('status'),
 };
 
-const SNAPSHOT_WORD_FORMS = ['снимок', 'снимка', 'снимков'];
+const SNAPSHOT_WORD_FORMS = I18n.wordForms('word_snapshot');
+const BAD_TAB_WORD_FORMS = I18n.wordForms('word_bad_tab');
 
 function showStatus(text) {
   els.status.textContent = text;
@@ -85,14 +90,14 @@ function readForm() {
 }
 
 function formatBytes(bytes) {
-  if (!bytes) return '0 КБ';
+  if (!bytes) return `0 ${I18n.t('unit_kb')}`;
   const mb = bytes / (1024 * 1024);
-  if (mb >= 1) return `${mb.toFixed(1)} МБ`;
-  return `${Math.ceil(bytes / 1024)} КБ`;
+  if (mb >= 1) return `${mb.toFixed(1)} ${I18n.t('unit_mb')}`;
+  return `${Math.ceil(bytes / 1024)} ${I18n.t('unit_kb')}`;
 }
 
 function formatLogTime(ts) {
-  return new Date(ts).toLocaleString('ru-RU', {
+  return new Date(ts).toLocaleString(I18n.localeTag(), {
     day: '2-digit',
     month: '2-digit',
     year: '2-digit',
@@ -107,20 +112,26 @@ async function loadStorageAndLog() {
   const log = (stored[PRUNE_LOG_KEY] || []).slice().reverse();
 
   const bytes = Core.totalSnapshotsBytes(snapshots);
-  els.storageUsage.textContent = `${formatBytes(bytes)} · ${snapshots.length} снимков`;
+  els.storageUsage.textContent = I18n.t('storage_usage_line', [
+    formatBytes(bytes),
+    String(snapshots.length),
+    Core.pluralizeRu(snapshots.length, SNAPSHOT_WORD_FORMS),
+  ]);
 
   els.pruneLogList.textContent = '';
   if (!log.length) {
     const empty = document.createElement('li');
     empty.className = 'empty';
-    empty.textContent = 'Пока пусто - лимиты ни разу не срабатывали';
+    empty.textContent = I18n.t('empty_prune_log');
     els.pruneLogList.appendChild(empty);
     return;
   }
   for (const entry of log) {
     const li = document.createElement('li');
-    const label = PRUNE_REASON_LABELS[entry.reason] || entry.reason;
-    const countText = entry.droppedCount > 0 ? ` (${entry.droppedCount} шт.)` : '';
+    const reasonKey = PRUNE_REASON_KEYS[entry.reason];
+    const label = reasonKey ? I18n.t(reasonKey) : entry.reason;
+    const countText =
+      entry.droppedCount > 0 ? I18n.t('prune_dropped_suffix', [String(entry.droppedCount)]) : '';
     li.textContent = `${formatLogTime(entry.timestamp)} · ${label}${countText}`;
     els.pruneLogList.appendChild(li);
   }
@@ -141,8 +152,8 @@ document.querySelectorAll('.preset-btn').forEach((btn) => {
     els.maxSnapshots.value = preset.maxSnapshots;
     els.maxBackupMB.value = preset.maxBackupMB;
     els.idleMinutes.value = preset.idleMinutes;
-    TabVaultUI.flashButton(btn, 'Применён', 1000);
-    showStatus('Профиль применён - не забудьте «Сохранить»');
+    TabVaultUI.flashButton(btn, I18n.t('flash_preset_applied'), 1000);
+    showStatus(I18n.t('status_preset_applied'));
   });
 });
 
@@ -150,15 +161,15 @@ els.saveBtn.addEventListener('click', async () => {
   const settings = readForm();
   await browser.storage.local.set({ [SETTINGS_KEY]: settings });
   fillForm(settings);
-  TabVaultUI.flashButton(els.saveBtn, 'Сохранено');
-  showStatus('Сохранено');
+  TabVaultUI.flashButton(els.saveBtn, I18n.t('flash_saved'));
+  showStatus(I18n.t('status_saved'));
 });
 
 els.resetBtn.addEventListener('click', async () => {
   await browser.storage.local.set({ [SETTINGS_KEY]: DEFAULT_SETTINGS });
   fillForm(DEFAULT_SETTINGS);
-  TabVaultUI.flashButton(els.resetBtn, 'Сброшено');
-  showStatus('Сброшено к значениям по умолчанию');
+  TabVaultUI.flashButton(els.resetBtn, I18n.t('flash_reset'));
+  showStatus(I18n.t('status_reset'));
 });
 
 els.exportBtn.addEventListener('click', async () => {
@@ -171,8 +182,13 @@ els.exportBtn.addEventListener('click', async () => {
   a.download = `tab-vault-snapshots-${Date.now()}.json`;
   a.click();
   URL.revokeObjectURL(url);
-  TabVaultUI.flashButton(els.exportBtn, 'Экспортировано');
-  showStatus(`Экспортировано ${snapshots.length} ${Core.pluralizeRu(snapshots.length, SNAPSHOT_WORD_FORMS)}`);
+  TabVaultUI.flashButton(els.exportBtn, I18n.t('flash_exported'));
+  showStatus(
+    I18n.t('status_exported', [
+      String(snapshots.length),
+      Core.pluralizeRu(snapshots.length, SNAPSHOT_WORD_FORMS),
+    ])
+  );
 });
 
 els.importInput.addEventListener('change', async () => {
@@ -182,7 +198,7 @@ els.importInput.addEventListener('change', async () => {
     const text = await file.text();
     const { snapshots: imported, skippedEntries } = Core.parseImportedSnapshots(text);
     if (!imported.length) {
-      showStatus('Ничего не найдено для импорта - проверьте файл');
+      showStatus(I18n.t('status_import_empty'));
       return;
     }
 
@@ -197,12 +213,17 @@ els.importInput.addEventListener('change', async () => {
     const snapWord = Core.pluralizeRu(imported.length, SNAPSHOT_WORD_FORMS);
     showStatus(
       skippedEntries > 0
-        ? `Импортировано ${imported.length} ${snapWord}, пропущено ${skippedEntries} ${Core.pluralizeRu(skippedEntries, ['некорректная вкладка', 'некорректные вкладки', 'некорректных вкладок'])}`
-        : `Импортировано ${imported.length} ${snapWord}`
+        ? I18n.t('status_imported_with_skips', [
+            String(imported.length),
+            snapWord,
+            String(skippedEntries),
+            Core.pluralizeRu(skippedEntries, BAD_TAB_WORD_FORMS),
+          ])
+        : I18n.t('status_imported', [String(imported.length), snapWord])
     );
     await loadStorageAndLog();
   } catch (err) {
-    showStatus('Ошибка импорта: неверный файл');
+    showStatus(I18n.t('status_import_error'));
   } finally {
     els.importInput.value = '';
   }
