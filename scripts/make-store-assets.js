@@ -91,7 +91,8 @@ function prepareWorkspace() {
     filter: (src) => !/(node_modules|\.git|store-assets|web-ext-artifacts|listing)(\/|$)/.test(src),
   });
 
-  const messages = JSON.parse(fs.readFileSync(path.join(REPO, '_locales/ru/messages.json'), 'utf8'));
+  // Store listing screenshots use English (AMO default locale).
+  const messages = JSON.parse(fs.readFileSync(path.join(REPO, '_locales/en/messages.json'), 'utf8'));
   const flat = {};
   for (const [k, v] of Object.entries(messages)) flat[k] = v.message;
   fs.writeFileSync(

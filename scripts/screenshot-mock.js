@@ -64,7 +64,8 @@ const STORE = {
   tabvault_prune_log: PRUNE_LOG,
 };
 
-// Filled in by make-store-assets.js with flat { key: message } from _locales/ru.
+// Filled in by make-store-assets.js with flat { key: message } from _locales/en
+// (AMO listing screenshots are English).
 const I18N = typeof globalThis.__TV_I18N__ === 'object' && globalThis.__TV_I18N__ ? globalThis.__TV_I18N__ : {};
 
 function getMessage(key, substitutions) {
