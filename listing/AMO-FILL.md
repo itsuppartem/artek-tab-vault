@@ -67,21 +67,26 @@ Crash-proof tab session backup and idle tab memory guardian for Firefox.
 Источник — оранжевая vault-иконка из `../icons/icon.svg`.
 
 ### Screenshots (порядок загрузки)
-1. `screenshot-01-popup.png` — попап: счётчики, Guardian, снимки, индикаторы вкладок  
-2. `screenshot-02-options.png` — страница настроек: пресеты, retention, whitelist  
-3. `screenshot-03-crash-prompt.png` — уведомление о crash-restore  
 
-Подписи к скриншотам (Caption), en-US:
+Реальные скрины из headless Firefox (`npm run screenshots`), не AI-мокапы:
+
+1. `screenshot-01-popup.png` — попап  
+2. `screenshot-02-options.png` — Guardian / настройки  
+3. `screenshot-03-backup.png` — бэкап / retention  
+
+Переснять: `npm run screenshots` (реальный UI через Chromium + puppeteer).
+
+Подписи (Caption), en-US:
 
 1. ```Popup: session snapshots, discard controls, and per-tab active/loaded/discarded state.```
-2. ```Settings: Guardian options, retention presets, whitelist, export/import.```
-3. ```After an unclean shutdown, a notification offers to restore the last backup.```
+2. ```Settings: Guardian options, unsaved-form protection, title marker, whitelist.```
+3. ```Backup retention presets, size limits, export/import, prune history.```
 
-ru-RU captions (если добавишь русскую локаль):
+ru-RU:
 
 1. ```Попап: снимки сессии, выгрузка вкладок и статус каждой вкладки.```
-2. ```Настройки: Guardian, профили хранения, белый список, экспорт/импорт.```
-3. ```После «грязного» завершения Firefox предлагает восстановить последний бэкап.```
+2. ```Настройки Guardian: формы, умная активация, префикс 💤, белый список.```
+3. ```Бэкап: профили хранения, лимиты, экспорт/импорт, журнал обрезки.```
 
 ---
 
