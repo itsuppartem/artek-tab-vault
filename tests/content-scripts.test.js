@@ -62,6 +62,22 @@ describe('content-scripts/dirty-form.js', () => {
   test('unknown messages return undefined', async () => {
     expect(await mock.browser.runtime.sendMessage({ type: 'SOMETHING_ELSE' })).toBeUndefined();
   });
+
+  test('clears dirty on form reset and SPA navigation', async () => {
+    document.getElementById('name').dispatchEvent(new Event('input', { bubbles: true }));
+    expect(await check()).toEqual({ dirty: true });
+    document.getElementById('f').dispatchEvent(new Event('reset', { bubbles: true }));
+    expect(await check()).toEqual({ dirty: false });
+
+    document.getElementById('name').dispatchEvent(new Event('input', { bubbles: true }));
+    expect(await check()).toEqual({ dirty: true });
+    window.dispatchEvent(new Event('popstate'));
+    expect(await check()).toEqual({ dirty: false });
+
+    document.getElementById('name').dispatchEvent(new Event('input', { bubbles: true }));
+    window.history.pushState({}, '', '/spa-route');
+    expect(await check()).toEqual({ dirty: false });
+  });
 });
 
 describe('content-scripts/mark-discarded.js', () => {
