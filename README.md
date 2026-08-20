@@ -29,6 +29,7 @@ artek-tab-vault/
   options/                # settings, export/import, prune log
   _locales/               # en/ru/kk/uk/be/sr UI strings
   tests/                  # Jest unit tests
+  tests/e2e/              # live Firefox e2e (not picked up by Jest)
   tests/helpers/          # WebExtension mock + script loader
 ```
 
@@ -42,7 +43,15 @@ Snap Firefox on Ubuntu: if the start script fails with "Profile Missing", the sn
 
 ## Tests
 
-The Jest suite does not need Firefox. CI on main and develop runs that suite only.
+Unit tests (Jest) do not need Firefox:
+
+    npm test
+
+Live Firefox e2e builds a web-ext zip, installs it in headless Firefox, and checks the addon id plus https://example.com. The file is tests/e2e/firefox.e2e.js (not *.test.js, so Jest ignores it). Locally it skips if firefox or geckodriver is missing, unless CI=true:
+
+    npm run test:firefox
+
+CI on main, develop, and PRs into those branches has two jobs: `test` (Jest, the merge gate) and `firefox` (live e2e canary; it may flake).
 
 ## Settings
 
@@ -67,7 +76,7 @@ Open from the popup (All settings and exclusions), or about:addons then Preferen
 
 Local development uses web-ext run (separate Firefox profile, live reload) or about:debugging temporary add-on load. Firefox Developer Edition / Nightly can install unsigned xpi files when signature checks are disabled.
 
-The version in manifest.json is a semver-like string. AMO will not accept a reused version. Packaging and lint are local/release tools; CI does not run them.
+The version in manifest.json is a semver-like string. AMO will not accept a reused version. Packaging and lint are local/release tools; the unit and firefox CI jobs do not run them.
 
 Distribution goes through addons.mozilla.org (AMO). A developer account is free.
 
@@ -79,6 +88,10 @@ API keys come from AMO Developer Hub (Manage API Keys). Use the sign script with
 After publish, listed users get updates automatically once the new version is reviewed. A new version that adds permissions prompts the user to confirm.
 
 Store copy lives in LISTING.md. Field-by-field Hub notes: listing/AMO-FILL.md. Assets: listing/ and store-assets/.
+
+## GitHub Releases
+
+Push a version tag (`vX.Y.Z`, for example `v0.3.1`). The Release workflow runs unit tests, builds the unsigned zip with web-ext, and attaches it to a GitHub Release. Use that zip for a later AMO/store upload. The workflow does not sign or submit to AMO. You can also run it by hand (workflow_dispatch); it then uses the version in package.json.
 
 ## Contributing
 

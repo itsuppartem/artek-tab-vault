@@ -4,6 +4,15 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 
 ## [Unreleased]
 
+### Added
+- Live Firefox e2e (`npm run test:firefox`): web-ext zip, headless Firefox, addon id + example.com title. Skips locally if firefox/geckodriver are missing (#20).
+- CI `firefox` canary job (setup-firefox + setup-geckodriver). Jest `test` stays the merge gate (#20).
+- Release workflow: tag `v*` or workflow_dispatch builds the zip and creates a GitHub Release for later store upload. No AMO sign (#22).
+
+### Changed
+- README, CHANGELOG, and CONTRIBUTING must update in the same PR as the code (#21).
+- CONTRIBUTING working rules: develop is daily work, main is released product only, issues first, tests and docs in the same PR, firefox job is a canary not the merge gate (#24).
+
 ### Fixed
 - Snapshot import keeps Firefox tab groups (name, color, collapsed, groupId) instead of wiping them (#6).
 - Options import uses the user's snapshot and size limits instead of always capping history at 20 (#7).
