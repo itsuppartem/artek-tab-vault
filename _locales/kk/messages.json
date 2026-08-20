@@ -158,6 +158,9 @@
   "help_whitelist": {
     "message": "Ішкі домендер автоматты есептеледі: example.com www.example.com-ды да қамтиды."
   },
+  "help_discard_shortcut": {
+    "message": "Ағымдағыдан басқаларын түсіру пернелері: Alt+Shift+D. about:addons ішінде өзгертуге болады."
+  },
   "heading_backup": {
     "message": "Сессия сақтық көшірмесі"
   },

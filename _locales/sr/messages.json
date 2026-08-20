@@ -158,6 +158,9 @@
   "help_whitelist": {
     "message": "Poddomeni se poklapaju automatski: example.com pokriva i www.example.com."
   },
+  "help_discard_shortcut": {
+    "message": "Prečica za odbacivanje svih kartica osim trenutne: Alt+Shift+D. Promenite je u about:addons."
+  },
   "heading_backup": {
     "message": "Rezerva sesija"
   },

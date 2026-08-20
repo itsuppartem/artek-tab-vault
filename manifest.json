@@ -55,7 +55,7 @@
   "commands": {
     "discard-all-except-current": {
       "suggested_key": {
-        "default": "Ctrl+Shift+D"
+        "default": "Alt+Shift+D"
       },
       "description": "__MSG_cmd_discard_all__"
     }

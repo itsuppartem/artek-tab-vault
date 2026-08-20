@@ -733,6 +733,23 @@ describe('parseImportedSnapshots', () => {
     expect(snapshots).toHaveLength(2);
   });
 
+  test('accepts a {snapshots:[...]} wrapper the same way as sessions (#35)', () => {
+    const raw = JSON.stringify({
+      snapshots: [{ createdAt: 1, tabs: [{ url: 'https://a.com', title: 'A' }] }],
+    });
+    const { snapshots, skippedEntries } = Core.parseImportedSnapshots(raw);
+    expect(snapshots).toHaveLength(1);
+    expect(snapshots[0].windows[0].tabs[0].url).toBe('https://a.com');
+    expect(skippedEntries).toBe(0);
+  });
+
+  test('unknown object returns empty so the UI can report failure (#35)', () => {
+    expect(Core.parseImportedSnapshots(JSON.stringify({ foo: 1, bar: [] }))).toEqual({
+      snapshots: [],
+      skippedEntries: 0,
+    });
+  });
+
   test('accepts a bare {tabs:[...]} object', () => {
     const { snapshots } = Core.parseImportedSnapshots(JSON.stringify({ tabs: [{ url: 'https://a.com' }] }));
     expect(snapshots).toHaveLength(1);

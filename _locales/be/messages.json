@@ -158,6 +158,9 @@
   "help_whitelist": {
     "message": "Паддамены ўлічваюцца аўтаматычна: example.com пакрые і www.example.com."
   },
+  "help_discard_shortcut": {
+    "message": "Спалучэнне клавіш «выгрузіць усе, акрамя бягучай»: Alt+Shift+D. Можна змяніць у about:addons."
+  },
   "heading_backup": {
     "message": "Бэкап сесій"
   },

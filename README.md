@@ -11,7 +11,8 @@ Firefox extension for two common pain points:
 - Visible prune log so retention is never silent.
 - Native Firefox tab groups (name, color, collapsed) captured and restored.
 - Restore into a new window or the current window.
-- Tolerant snapshot import (native JSON, URL lists, common session shapes, plain-text links).
+- Tolerant snapshot import (native JSON, URL lists, common session shapes including `{snapshots:[...]}`, plain-text links).
+- Keyboard shortcut for Discard all except current: Alt+Shift+D (remappable in about:addons).
 - Unsaved-form protection (clears on form reset and same-document SPA navigation), smart tab activation, and a configurable title marker on discarded tabs.
 - Media protection: known media hosts and in-page video/audio that is playing or paused with progress. An empty never-played video is not protected.
 - Localized UI: English, Russian, Kazakh, Ukrainian, Belarusian, Serbian.
@@ -58,13 +59,13 @@ CI on main, develop, and PRs into those branches has two jobs: `test` (Jest, the
 
 Open from the popup (All settings and exclusions), or about:addons then Preferences.
 
-- Guardian on/off and idle threshold.
+- Guardian on/off and idle threshold. Discard-all-except-current default shortcut is Alt+Shift+D (not Ctrl+Shift+D, which Firefox uses for Bookmark all tabs).
 - Skip tabs with an unsubmitted form (the content script only reports a boolean, not the field values).
 - Smart activation when a tab is closed.
 - Domain whitelist (includes subdomains).
 - Auto-backup interval, snapshot count, and history size in MB.
 - Restore into the current window (toggle next to the snapshot list in the popup).
-- Export/import snapshots. Import accepts our JSON plus flat URL lists, objects with tabs/windows/sessions, and plain-text links; bad rows are skipped.
+- Export/import snapshots. Import accepts our JSON plus flat URL lists, objects with tabs/windows/sessions/snapshots, and plain-text links; bad rows are skipped. A file with nothing to import shows a lasting error.
 - Title prefix on discarded tabs (default sleep emoji); can be turned off.
 
 ## Limits

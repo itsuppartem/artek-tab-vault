@@ -344,10 +344,10 @@
   }
 
   // Accepts our own export format, a handful of shapes used by competing
-  // session managers (array/object of windows/tabs, {sessions:[...]}), and a
-  // plain-text fallback (one URL per line, optionally "url<TAB>title"), so an
-  // import never hard-fails just because the source tool structured its JSON
-  // a little differently.
+  // session managers (array/object of windows/tabs, {sessions:[...]},
+  // {snapshots:[...]}), and a plain-text fallback (one URL per line,
+  // optionally "url<TAB>title"), so an import never hard-fails just because
+  // the source tool structured its JSON a little differently.
   function parseImportedSnapshots(input) {
     const result = { snapshots: [], skippedEntries: 0 };
     if (typeof input !== 'string' || !input.trim()) return result;
@@ -379,6 +379,8 @@
     } else if (data && typeof data === 'object') {
       if (Array.isArray(data.sessions)) {
         rawSnapshots = data.sessions;
+      } else if (Array.isArray(data.snapshots)) {
+        rawSnapshots = data.snapshots;
       } else if (Array.isArray(data.windows) || Array.isArray(data.tabs)) {
         rawSnapshots = [data];
       }

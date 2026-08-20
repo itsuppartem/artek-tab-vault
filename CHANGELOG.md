@@ -15,6 +15,10 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 - CONTRIBUTING working rules: develop is daily work, main is released product only, issues first, tests and docs in the same PR, firefox job is a canary not the merge gate (#24).
 
 ### Fixed
+- Restore keeps `about:blank` tabs instead of letting Firefox replace them with a default New Tab (#34).
+- Import accepts a `{snapshots:[...]}` wrapper and shows a lasting error when nothing was imported (#35).
+- Double-click Restore no longer opens the snapshot twice (#36).
+- Default discard shortcut is Alt+Shift+D so it no longer collides with Firefox Bookmark all tabs (#37).
 - Restore skips privileged tab URLs instead of aborting, and Backup now reports when the session was unchanged (#30 #31 #32).
 - Snapshot import keeps Firefox tab groups (name, color, collapsed, groupId) instead of wiping them (#6).
 - Options import uses the user's snapshot and size limits instead of always capping history at 20 (#7).

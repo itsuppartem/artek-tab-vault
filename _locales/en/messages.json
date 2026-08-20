@@ -158,6 +158,9 @@
   "help_whitelist": {
     "message": "Subdomains are matched automatically: example.com also covers www.example.com."
   },
+  "help_discard_shortcut": {
+    "message": "Discard-all-except-current shortcut: Alt+Shift+D. Remap it in about:addons if it conflicts."
+  },
   "heading_backup": {
     "message": "Session backup"
   },
@@ -201,7 +204,7 @@
     "message": "Import file"
   },
   "help_import": {
-    "message": "Import understands our format, plus common shapes from other tab managers (URL lists, objects with tabs/windows/sessions) and plain-text link lists - bad rows are skipped instead of failing the whole import."
+    "message": "Import understands our format, plus common shapes from other tab managers (URL lists, objects with tabs/windows/sessions/snapshots) and plain-text link lists - bad rows are skipped instead of failing the whole import."
   },
   "heading_prune_log": {
     "message": "Backup prune history"

@@ -52,10 +52,20 @@ const els = {
 const SNAPSHOT_WORD_FORMS = I18n.wordForms('word_snapshot');
 const BAD_TAB_WORD_FORMS = I18n.wordForms('word_bad_tab');
 
-function showStatus(text) {
+let statusTimer = null;
+function showStatus(text, options = {}) {
   els.status.textContent = text;
   els.status.classList.add('visible');
-  setTimeout(() => els.status.classList.remove('visible'), 1800);
+  els.status.classList.toggle('error', !!options.persist);
+  clearTimeout(statusTimer);
+  if (options.persist) {
+    statusTimer = null;
+    return;
+  }
+  statusTimer = setTimeout(() => {
+    els.status.classList.remove('visible');
+    els.status.classList.remove('error');
+  }, 1800);
 }
 
 function fillForm(settings) {
@@ -198,7 +208,7 @@ els.importInput.addEventListener('change', async () => {
     const text = await file.text();
     const { snapshots: imported, skippedEntries } = Core.parseImportedSnapshots(text);
     if (!imported.length) {
-      showStatus(I18n.t('status_import_empty'));
+      showStatus(I18n.t('status_import_empty'), { persist: true });
       return;
     }
 
@@ -226,7 +236,7 @@ els.importInput.addEventListener('change', async () => {
     );
     await loadStorageAndLog();
   } catch (err) {
-    showStatus(I18n.t('status_import_error'));
+    showStatus(I18n.t('status_import_error'), { persist: true });
   } finally {
     els.importInput.value = '';
   }

@@ -199,6 +199,11 @@ header .subtitle {
   transform: scale(0.92);
 }
 
+.snapshot-item button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
 .snapshot-item button.is-success {
   background: #3ddc84;
   border-color: #3ddc84;
