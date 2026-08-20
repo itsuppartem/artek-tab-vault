@@ -345,6 +345,27 @@ describe('background restoreSnapshot', () => {
     expect(opened).toEqual(['https://example.com', 'https://example.org']);
   });
 
+  test('windows.create throwing on a url array still restores remaining tabs via fallback', async () => {
+    const { mock } = await boot({
+      windows: [{ id: 1, tabs: [tab({ id: 1 })] }],
+      storage: { [SNAPSHOTS_KEY]: [groupedSnapshot] },
+      windowsCreate: ({ url }) => {
+        if (Array.isArray(url)) throw new Error('url array rejected');
+      },
+    });
+    const result = await mock.browser.runtime.sendMessage({
+      type: 'RESTORE_SNAPSHOT',
+      timestamp: 99,
+      intoCurrentWindow: false,
+    });
+    expect(result.ok).toBe(true);
+    expect(result.restored).toBe(2);
+    expect(mock.calls.windowsCreate.some((c) => c.url.includes('https://a.com'))).toBe(true);
+    expect(mock.calls.tabsCreate).toEqual(
+      expect.arrayContaining([expect.objectContaining({ url: 'https://b.com' })])
+    );
+  });
+
   test('all-privileged snapshot does not call windows.create', async () => {
     const privileged = {
       timestamp: 7,
