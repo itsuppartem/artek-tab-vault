@@ -9,7 +9,7 @@
   },
   "version": {
     "release_notes": {
-      "en-US": "0.3.0\n\nAdded:\n- UI localization: English, Russian, Kazakh, Ukrainian, Belarusian, Serbian (follows Firefox locale)\n\nFixed:\n- Proper PNG toolbar/listing icons (vault-dial mark) instead of a generic puzzle placeholder\n- Prefix text field styling on the dark settings page\n- Release pipeline no longer false-fails while waiting for manual AMO review after a successful upload"
+      "en-US": "0.3.1\n\nChanged:\n- Minimum Firefox version raised to 142.0 (required by data_collection_permissions on Android; clears the AMO validation warning on upload)."
     },
     "custom_license": {
       "name": {

@@ -10,6 +10,7 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 - Release workflow: tag `v*` or workflow_dispatch builds the zip and creates a GitHub Release for later store upload. No AMO sign (#22).
 
 ### Changed
+- AMO listing copy refresh (docs): description (en-US and ru-RU) now covers Guardian media protection, crash-restore prompt skip, dirty-form SPA reset, and the public MIT repo/support URLs. Repo is the listing source of truth; live Hub paste is leftover (#27).
 - README, CHANGELOG, and CONTRIBUTING must update in the same PR as the code (#21).
 - CONTRIBUTING working rules: develop is daily work, main is released product only, issues first, tests and docs in the same PR, firefox job is a canary not the merge gate (#24).
 
