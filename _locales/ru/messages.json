@@ -74,6 +74,12 @@
   "status_restored": {
     "message": "Восстановлено $1 $2"
   },
+  "status_restored_partial": {
+    "message": "Восстановлено $1 $2, пропущено $3 $4"
+  },
+  "status_restored_none": {
+    "message": "Ничего не восстановлено"
+  },
   "status_guardian_on": {
     "message": "Guardian включён"
   },
@@ -97,6 +103,12 @@
   },
   "status_snapshot_saved": {
     "message": "Снимок сессии сохранён"
+  },
+  "status_snapshot_unchanged": {
+    "message": "Сессия не изменилась"
+  },
+  "flash_unchanged": {
+    "message": "Без изменений"
   },
   "word_tab_one": {
     "message": "вкладка"

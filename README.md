@@ -71,6 +71,8 @@ Open from the popup (All settings and exclusions), or about:addons then Preferen
 
 - Firefox does not expose per-tab RAM. Guardian uses idle time; the popup shows active / loaded / discarded, not bytes.
 - Restoring a snapshot reopens tabs by URL; it does not restore in-page history, scroll, or unsaved form state.
+- Restore only reopens http(s) and about:blank. Privileged pages (about:debugging, file:, chrome:, and similar) are skipped, and the popup reports how many tabs opened vs skipped.
+- Backup now does not write a duplicate snapshot when the tab set is unchanged; the popup says the session did not change.
 - There is no API to cancel the reload Firefox starts when it activates a discarded tab. Smart activation moves focus afterwards; it cannot prevent that reload.
 
 ## Releasing a WebExtension

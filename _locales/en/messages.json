@@ -74,6 +74,12 @@
   "status_restored": {
     "message": "Restored $1 $2"
   },
+  "status_restored_partial": {
+    "message": "Restored $1 $2, skipped $3 $4"
+  },
+  "status_restored_none": {
+    "message": "Nothing was restored"
+  },
   "status_guardian_on": {
     "message": "Guardian enabled"
   },
@@ -97,6 +103,12 @@
   },
   "status_snapshot_saved": {
     "message": "Session snapshot saved"
+  },
+  "status_snapshot_unchanged": {
+    "message": "Session did not change"
+  },
+  "flash_unchanged": {
+    "message": "Unchanged"
   },
   "word_tab_one": {
     "message": "tab"

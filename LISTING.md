@@ -79,7 +79,10 @@ WHAT IT DOESN'T DO (known limitations)
   discarded/loaded state rather than a byte count.
 - Restoring a snapshot reopens tabs by URL; it doesn't restore in-page
   browsing history, scroll position, or unsaved form state from before the
-  backup was taken.
+  backup was taken. Privileged pages (about:debugging, file:, and similar)
+  are skipped; the popup reports a partial restore instead of claiming every
+  tab opened. Backup now also says when the session did not change, instead
+  of flashing Saved for a skipped duplicate snapshot.
 - Firefox gives extensions no way to cancel the reload it starts when it
   auto-activates a discarded tab; "smart tab activation" moves your focus off
   it immediately afterwards, it can't prevent the reload from starting.
@@ -178,6 +181,10 @@ Guardian: автоматическая разгрузка памяти
   и в попапе показывается состояние вкладки, а не мегабайты.
 - Восстановление открывает вкладки по URL: история переходов внутри вкладки,
   позиция прокрутки и незасабмиченные формы на момент бэкапа не возвращаются.
+  Привилегированные страницы (about:debugging, file: и подобные) пропускаются;
+  попап сообщает о частичном восстановлении, а не что открыты все вкладки.
+  Кнопка «бэкап сейчас» также говорит, если сессия не изменилась, вместо
+  вспышки «Сохранено» для пропущенного дубликата.
 - Firefox не даёт расширениям отменить перезагрузку, которую он запускает сам,
   переключаясь на выгруженную вкладку; «умная активация» лишь сразу уводит
   фокус, но не отменяет саму перезагрузку.

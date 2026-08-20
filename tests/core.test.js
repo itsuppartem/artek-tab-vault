@@ -598,6 +598,29 @@ describe('buildGroupPlan', () => {
   });
 });
 
+describe('isRestorableTabUrl', () => {
+  test('allows http, https, and about:blank', () => {
+    expect(Core.isRestorableTabUrl('http://example.com')).toBe(true);
+    expect(Core.isRestorableTabUrl('https://example.org/path')).toBe(true);
+    expect(Core.isRestorableTabUrl('HTTPS://Example.ORG')).toBe(true);
+    expect(Core.isRestorableTabUrl('about:blank')).toBe(true);
+  });
+
+  test('rejects privileged, empty, and non-http schemes', () => {
+    expect(Core.isRestorableTabUrl('about:debugging')).toBe(false);
+    expect(Core.isRestorableTabUrl('about:config')).toBe(false);
+    expect(Core.isRestorableTabUrl('moz-extension://abc/popup.html')).toBe(false);
+    expect(Core.isRestorableTabUrl('chrome://settings')).toBe(false);
+    expect(Core.isRestorableTabUrl('file:///tmp/page.html')).toBe(false);
+    expect(Core.isRestorableTabUrl('data:text/html,hi')).toBe(false);
+    expect(Core.isRestorableTabUrl('javascript:alert(1)')).toBe(false);
+    expect(Core.isRestorableTabUrl('')).toBe(false);
+    expect(Core.isRestorableTabUrl('   ')).toBe(false);
+    expect(Core.isRestorableTabUrl(null)).toBe(false);
+    expect(Core.isRestorableTabUrl(undefined)).toBe(false);
+  });
+});
+
 describe('planRestoreTargets', () => {
   const windows = [
     { tabs: [{ url: 'https://a.com' }, { url: 'about:blank' }], groups: [] },
@@ -614,9 +637,35 @@ describe('planRestoreTargets', () => {
     expect(plan.map((p) => p.mode)).toEqual(['current', 'new']);
   });
 
-  test('filters out about: urls and drops windows left with no tabs', () => {
-    const onlyAbout = [{ tabs: [{ url: 'about:blank' }], groups: [] }];
+  test('keeps about:blank together with http(s) tabs', () => {
+    const plan = Core.planRestoreTargets(windows, false);
+    expect(plan[0].tabs.map((t) => t.url)).toEqual(['https://a.com', 'about:blank']);
+  });
+
+  test('filters out privileged about: urls and drops windows left with no tabs', () => {
+    const onlyAbout = [{ tabs: [{ url: 'about:debugging' }], groups: [] }];
     expect(Core.planRestoreTargets(onlyAbout, false)).toEqual([]);
+  });
+});
+
+describe('summarizeRestorePlan', () => {
+  test('counts restorable vs skipped tabs', () => {
+    const windows = [
+      {
+        tabs: [
+          { url: 'https://a.com' },
+          { url: 'about:debugging' },
+          { url: 'about:blank' },
+          { url: 'file:///tmp/x' },
+        ],
+      },
+    ];
+    expect(Core.summarizeRestorePlan(windows)).toEqual({ restorable: 2, skipped: 2 });
+  });
+
+  test('returns zeros for empty or missing windows', () => {
+    expect(Core.summarizeRestorePlan([])).toEqual({ restorable: 0, skipped: 0 });
+    expect(Core.summarizeRestorePlan(null)).toEqual({ restorable: 0, skipped: 0 });
   });
 });
 
