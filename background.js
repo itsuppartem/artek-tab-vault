@@ -113,7 +113,7 @@ async function takeSnapshot() {
     if (Core.isSnapshotEmpty(snapshot)) {
       await appendPruneLog({ reason: 'skipped-empty-snapshot', droppedCount: 0 });
     }
-    return;
+    return { saved: false };
   }
 
   snapshots.push(snapshot);
@@ -130,6 +130,7 @@ async function takeSnapshot() {
   if (droppedBySize > 0) {
     await appendPruneLog({ reason: 'max-size-limit', droppedCount: droppedBySize });
   }
+  return { saved: true };
 }
 
 // Content script (content-scripts/dirty-form.js) tracks whether a form on
@@ -260,39 +261,124 @@ async function applyGroupPlan(plan, createdTabIds) {
   }
 }
 
+async function pinRestoredTab(tabId) {
+  if (tabId == null) return;
+  try {
+    await browser.tabs.update(tabId, { pinned: true });
+  } catch (err) {
+    // pin is best-effort; the tab is still restored.
+  }
+}
+
+async function createRestoredTab(createProps) {
+  if (!Core.isRestorableTabUrl(createProps && createProps.url)) {
+    return null;
+  }
+  try {
+    const created = await browser.tabs.create(createProps);
+    return created && created.id != null ? created.id : null;
+  } catch (err) {
+    return null;
+  }
+}
+
+// New-window restore: never pass unrestorable URLs. Create the window with
+// the first restorable URL, then tabs.create the rest (pins after). If a
+// url-array create is attempted and rejects, the same one-URL path is the
+// fallback. try/catch each create.
+async function restoreTabsIntoNewWindow(tabs) {
+  const createdTabIds = [];
+  let restored = 0;
+  let skipped = 0;
+  let windowId = null;
+
+  const openWindow = async (url) => {
+    try {
+      return await browser.windows.create({ url });
+    } catch (arrayErr) {
+      if (Array.isArray(url) && url.length) {
+        return browser.windows.create({ url: url[0] });
+      }
+      throw arrayErr;
+    }
+  };
+
+  for (const tab of tabs) {
+    if (!Core.isRestorableTabUrl(tab && tab.url)) {
+      createdTabIds.push(null);
+      skipped += 1;
+      continue;
+    }
+    try {
+      if (windowId == null) {
+        const createdWindow = await openWindow(tab.url);
+        windowId = createdWindow.id;
+        const firstId = createdWindow.tabs && createdWindow.tabs[0] && createdWindow.tabs[0].id;
+        createdTabIds.push(firstId != null ? firstId : null);
+        if (firstId != null) {
+          restored += 1;
+          if (tab.pinned) await pinRestoredTab(firstId);
+        } else {
+          skipped += 1;
+        }
+      } else {
+        const tabId = await createRestoredTab({
+          windowId,
+          url: tab.url,
+          pinned: !!tab.pinned,
+        });
+        createdTabIds.push(tabId);
+        if (tabId != null) restored += 1;
+        else skipped += 1;
+      }
+    } catch (err) {
+      createdTabIds.push(null);
+      skipped += 1;
+    }
+  }
+  return { createdTabIds, restored, skipped };
+}
+
 async function restoreSnapshot(timestamp, options = {}) {
   const stored = await browser.storage.local.get(STORAGE_KEYS.SNAPSHOTS);
   const snapshots = stored[STORAGE_KEYS.SNAPSHOTS] || [];
   const snapshot = snapshots.find((s) => s.timestamp === timestamp);
-  if (!snapshot) return false;
+  if (!snapshot) return { ok: false, restored: 0, skipped: 0 };
 
+  const summary = Core.summarizeRestorePlan(snapshot.windows);
   const plans = Core.planRestoreTargets(snapshot.windows, !!options.intoCurrentWindow);
+  let restored = 0;
+  let skipped = summary.skipped;
 
   for (const plan of plans) {
+    const tabs = (plan.tabs || []).filter((t) => Core.isRestorableTabUrl(t && t.url));
+    if (tabs.length < (plan.tabs || []).length) {
+      skipped += (plan.tabs || []).length - tabs.length;
+    }
     let createdTabIds = [];
+    if (!tabs.length) continue;
+
     if (plan.mode === 'current') {
       const currentWindow = await browser.windows.getLastFocused({ windowTypes: ['normal'] });
-      for (const tab of plan.tabs) {
-        const created = await browser.tabs.create({ windowId: currentWindow.id, url: tab.url, pinned: !!tab.pinned });
-        createdTabIds.push(created.id);
+      for (const tab of tabs) {
+        const tabId = await createRestoredTab({
+          windowId: currentWindow.id,
+          url: tab.url,
+          pinned: !!tab.pinned,
+        });
+        createdTabIds.push(tabId);
+        if (tabId != null) restored += 1;
+        else skipped += 1;
       }
     } else {
-      const createdWindow = await browser.windows.create({ url: plan.tabs.map((t) => t.url) });
-      createdTabIds = (createdWindow.tabs || []).map((t) => t.id);
-      // windows.create({ url }) cannot pin tabs; apply pins after the window exists.
-      for (let i = 0; i < plan.tabs.length; i++) {
-        if (plan.tabs[i].pinned && createdTabIds[i] != null) {
-          try {
-            await browser.tabs.update(createdTabIds[i], { pinned: true });
-          } catch (err) {
-            // pin is best-effort; the tab is still restored.
-          }
-        }
-      }
+      const opened = await restoreTabsIntoNewWindow(tabs);
+      createdTabIds = opened.createdTabIds;
+      restored += opened.restored;
+      skipped += opened.skipped;
     }
-    await applyGroupPlan(plan, createdTabIds);
+    await applyGroupPlan({ ...plan, tabs }, createdTabIds);
   }
-  return true;
+  return { ok: restored > 0, restored, skipped };
 }
 
 browser.runtime.onMessage.addListener(async (message) => {
@@ -322,8 +408,7 @@ browser.runtime.onMessage.addListener(async (message) => {
     case 'RESTORE_SNAPSHOT':
       return restoreSnapshot(message.timestamp, { intoCurrentWindow: !!message.intoCurrentWindow });
     case 'BACKUP_NOW':
-      await takeSnapshot();
-      return true;
+      return takeSnapshot();
     case 'ACTIVATE_TAB':
       await browser.tabs.update(message.tabId, { active: true });
       return true;

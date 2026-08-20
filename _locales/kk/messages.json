@@ -74,6 +74,12 @@
   "status_restored": {
     "message": "Қалпына келтірілді: $1 $2"
   },
+  "status_restored_partial": {
+    "message": "Қалпына келтірілді: $1 $2, өткізілді: $3 $4"
+  },
+  "status_restored_none": {
+    "message": "Ештеңе қалпына келтірілмеді"
+  },
   "status_guardian_on": {
     "message": "Guardian қосылған"
   },
@@ -97,6 +103,12 @@
   },
   "status_snapshot_saved": {
     "message": "Сессия суреті сақталды"
+  },
+  "status_snapshot_unchanged": {
+    "message": "Сессия өзгерген жоқ"
+  },
+  "flash_unchanged": {
+    "message": "Өзгеріссіз"
   },
   "word_tab_one": {
     "message": "қойынды"

@@ -74,6 +74,12 @@
   "status_restored": {
     "message": "Адноўлена $1 $2"
   },
+  "status_restored_partial": {
+    "message": "Адноўлена $1 $2, прапушчана $3 $4"
+  },
+  "status_restored_none": {
+    "message": "Нічога не адноўлена"
+  },
   "status_guardian_on": {
     "message": "Guardian уключаны"
   },
@@ -97,6 +103,12 @@
   },
   "status_snapshot_saved": {
     "message": "Здымак сесіі захаваны"
+  },
+  "status_snapshot_unchanged": {
+    "message": "Сесія не змянілася"
+  },
+  "flash_unchanged": {
+    "message": "Без зменаў"
   },
   "word_tab_one": {
     "message": "укладка"

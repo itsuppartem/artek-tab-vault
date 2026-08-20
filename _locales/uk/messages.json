@@ -74,6 +74,12 @@
   "status_restored": {
     "message": "Відновлено $1 $2"
   },
+  "status_restored_partial": {
+    "message": "Відновлено $1 $2, пропущено $3 $4"
+  },
+  "status_restored_none": {
+    "message": "Нічого не відновлено"
+  },
   "status_guardian_on": {
     "message": "Guardian увімкнено"
   },
@@ -97,6 +103,12 @@
   },
   "status_snapshot_saved": {
     "message": "Знімок сесії збережено"
+  },
+  "status_snapshot_unchanged": {
+    "message": "Сесія не змінилася"
+  },
+  "flash_unchanged": {
+    "message": "Без змін"
   },
   "word_tab_one": {
     "message": "вкладка"

@@ -15,6 +15,7 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 - CONTRIBUTING working rules: develop is daily work, main is released product only, issues first, tests and docs in the same PR, firefox job is a canary not the merge gate (#24).
 
 ### Fixed
+- Restore skips privileged tab URLs instead of aborting, and Backup now reports when the session was unchanged (#30 #31 #32).
 - Snapshot import keeps Firefox tab groups (name, color, collapsed, groupId) instead of wiping them (#6).
 - Options import uses the user's snapshot and size limits instead of always capping history at 20 (#7).
 - Restoring a snapshot into a new window re-applies pinned tabs after the window is created (#8).

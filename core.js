@@ -231,10 +231,35 @@
     return plan;
   }
 
+  // Privileged/internal URLs cannot be opened via windows.create / tabs.create
+  // (Firefox rejects the whole call if any URL in the list is privileged).
+  // about:blank is the only about: URL extensions can restore.
+  function isRestorableTabUrl(url) {
+    if (typeof url !== 'string') return false;
+    const trimmed = url.trim();
+    if (!trimmed) return false;
+    const lower = trimmed.toLowerCase();
+    if (lower === 'about:blank') return true;
+    if (lower.startsWith('http://') || lower.startsWith('https://')) return true;
+    return false;
+  }
+
+  function summarizeRestorePlan(windows) {
+    let restorable = 0;
+    let skipped = 0;
+    for (const win of windows || []) {
+      for (const tab of win.tabs || []) {
+        if (isRestorableTabUrl(tab && tab.url)) restorable += 1;
+        else skipped += 1;
+      }
+    }
+    return { restorable, skipped };
+  }
+
   function planRestoreTargets(windows, intoCurrentWindow) {
     return (windows || [])
       .map((win, index) => {
-        const tabs = (win.tabs || []).filter((t) => t.url && !t.url.startsWith('about:'));
+        const tabs = (win.tabs || []).filter((t) => isRestorableTabUrl(t.url));
         const mode = intoCurrentWindow && index === 0 ? 'current' : 'new';
         return { mode, tabs, groups: win.groups || [] };
       })
@@ -498,6 +523,8 @@
     clampNumber,
     pickReplacementActiveTab,
     buildGroupPlan,
+    isRestorableTabUrl,
+    summarizeRestorePlan,
     planRestoreTargets,
     shouldShowCrashPrompt,
     parseImportedSnapshots,

@@ -331,6 +331,9 @@ function createMockBrowser(options = {}) {
       },
       create: async (createProps) => {
         calls.tabsCreate.push(createProps);
+        if (typeof options.tabsCreate === 'function') {
+          await options.tabsCreate(createProps);
+        }
         const focused = windows.find((w) => w.focused) || windows[0] || addWindow({ focused: true });
         const windowId = createProps.windowId != null ? createProps.windowId : focused.id;
         const tab = addTab({
@@ -397,6 +400,9 @@ function createMockBrowser(options = {}) {
       create: async ({ url } = {}) => {
         const urls = url == null ? ['about:blank'] : Array.isArray(url) ? url : [url];
         calls.windowsCreate.push({ url: urls });
+        if (typeof options.windowsCreate === 'function') {
+          await options.windowsCreate({ url, urls });
+        }
         const win = addWindow({ focused: true });
         for (const u of urls) addTab({ url: u, windowId: win.id, pinned: false });
         const winTabs = tabs.filter((t) => t.windowId === win.id);

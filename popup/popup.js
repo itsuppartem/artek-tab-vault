@@ -67,14 +67,31 @@ function renderSnapshots(snapshots) {
     const button = document.createElement('button');
     button.textContent = I18n.t('btn_restore');
     button.addEventListener('click', async () => {
-      await browser.runtime.sendMessage({
+      const result = await browser.runtime.sendMessage({
         type: 'RESTORE_SNAPSHOT',
         timestamp: snap.timestamp,
         intoCurrentWindow: restoreIntoCurrentWindowEl.checked,
       });
-      const count = tabCount(snap);
+      const restored = result && typeof result.restored === 'number' ? result.restored : 0;
+      const skipped = result && typeof result.skipped === 'number' ? result.skipped : 0;
+      if (restored <= 0) {
+        TabVaultUI.flashButton(button, I18n.t('flash_done'), 1300);
+        showPopupStatus(I18n.t('status_restored_none'));
+        return;
+      }
       TabVaultUI.flashButton(button, I18n.t('flash_opened'), 1300);
-      showPopupStatus(I18n.t('status_restored', [String(count), Core.pluralizeRu(count, TAB_WORD_FORMS)]));
+      if (skipped > 0) {
+        showPopupStatus(
+          I18n.t('status_restored_partial', [
+            String(restored),
+            Core.pluralizeRu(restored, TAB_WORD_FORMS),
+            String(skipped),
+            Core.pluralizeRu(skipped, TAB_WORD_FORMS),
+          ])
+        );
+      } else {
+        showPopupStatus(I18n.t('status_restored', [String(restored), Core.pluralizeRu(restored, TAB_WORD_FORMS)]));
+      }
     });
 
     li.appendChild(span);
@@ -159,10 +176,15 @@ discardNowBtn.addEventListener('click', async () => {
 });
 
 backupNowBtn.addEventListener('click', async () => {
-  await browser.runtime.sendMessage({ type: 'BACKUP_NOW' });
+  const result = await browser.runtime.sendMessage({ type: 'BACKUP_NOW' });
   await refresh();
-  TabVaultUI.flashButton(backupNowBtn, I18n.t('flash_saved'));
-  showPopupStatus(I18n.t('status_snapshot_saved'));
+  if (result && result.saved) {
+    TabVaultUI.flashButton(backupNowBtn, I18n.t('flash_saved'));
+    showPopupStatus(I18n.t('status_snapshot_saved'));
+  } else {
+    TabVaultUI.flashButton(backupNowBtn, I18n.t('flash_unchanged'));
+    showPopupStatus(I18n.t('status_snapshot_unchanged'));
+  }
 });
 
 refresh();

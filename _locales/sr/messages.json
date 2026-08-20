@@ -74,6 +74,12 @@
   "status_restored": {
     "message": "Vraćeno $1 $2"
   },
+  "status_restored_partial": {
+    "message": "Vraćeno $1 $2, preskočeno $3 $4"
+  },
+  "status_restored_none": {
+    "message": "Ništa nije vraćeno"
+  },
   "status_guardian_on": {
     "message": "Guardian uključen"
   },
@@ -97,6 +103,12 @@
   },
   "status_snapshot_saved": {
     "message": "Snimak sesije sačuvan"
+  },
+  "status_snapshot_unchanged": {
+    "message": "Sesija se nije promenila"
+  },
+  "flash_unchanged": {
+    "message": "Bez izmena"
   },
   "word_tab_one": {
     "message": "kartica"
