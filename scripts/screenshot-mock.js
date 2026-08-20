@@ -11,14 +11,14 @@
  * numbers chosen to flatter the extension.
  */
 
-const NOW = Date.parse('2026-07-29T14:12:00Z');
+const NOW = Date.parse('2026-08-20T12:00:00Z');
 
 const SETTINGS = {
   guardianEnabled: true,
-  idleMinutes: 30,
-  backupIntervalMinutes: 1,
-  maxSnapshots: 100,
-  maxBackupMB: 60,
+  idleMinutes: 15,
+  backupIntervalMinutes: 5,
+  maxSnapshots: 20,
+  maxBackupMB: 15,
   neverDiscardDomains: ['mail.google.com', 'github.com', 'figma.com'],
   smartTabActivation: true,
   protectUnsavedForms: true,

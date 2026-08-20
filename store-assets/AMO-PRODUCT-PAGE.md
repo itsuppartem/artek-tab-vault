@@ -88,7 +88,7 @@ Three ready to upload, in this order, from `screenshots/`:
 |------|-----------------|-----------------|
 | `01-popup.png` (850×1960) | Popup: tab counts, guardian controls, session snapshots, and per-tab active/loaded/discarded state | Попап: счётчики вкладок, управление guardian, снимки сессий и состояние каждой вкладки |
 | `02-guardian-settings.png` (1500×1700) | Guardian settings: idle threshold, unsaved-form protection, discarded-tab title marker, domain whitelist | Настройки guardian: порог простоя, защита форм, метка в заголовке, белый список доменов |
-| `03-backup-retention.png` (1500×2450) | Backup retention: interval, count and size limits with presets, and a visible log of every trim | Хранение бэкапов: интервал, лимиты по количеству и размеру с профилями, журнал обрезки |
+| `03-backup-retention.png` (1500×2450) | Backup retention: Balanced 5 min interval, count and size limits with presets, and a visible log of every trim | Хранение бэкапов: интервал, лимиты по количеству и размеру с профилями, журнал обрезки |
 
 Regenerate them with `npm run screenshots` after any UI change, so the store
 never shows a stale interface.

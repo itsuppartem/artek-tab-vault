@@ -4,6 +4,9 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 
 ## [Unreleased]
 
+### Changed
+- Store screenshots and README refreshed for the current 0.3.2 UI (Balanced defaults). No version bump (#48).
+
 ## [0.3.2] - 2026-08-20
 
 ### Added
