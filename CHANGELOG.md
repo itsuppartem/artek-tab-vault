@@ -4,7 +4,29 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-08-20
+
+### Added
+- Live Firefox e2e (`npm run test:firefox`): web-ext zip, headless Firefox, addon id + example.com title. Skips locally if firefox/geckodriver are missing (#20).
+- CI `firefox` canary job (setup-firefox + setup-geckodriver). Jest `test` stays the merge gate (#20).
+- Release workflow: tag `v*` or workflow_dispatch builds the zip and creates a GitHub Release for later store upload. No AMO sign (#22).
+
+### Changed
+- AMO listing copy refresh (docs): description (en-US and ru-RU) now covers Guardian media protection, crash-restore prompt skip, dirty-form SPA reset, and the public MIT repo/support URLs. Repo is the listing source of truth; live Hub paste is leftover (#27).
+- README, CHANGELOG, and CONTRIBUTING must update in the same PR as the code (#21).
+- CONTRIBUTING working rules: develop is daily work, main is released product only, issues first, tests and docs in the same PR, firefox job is a canary not the merge gate (#24).
+
 ### Fixed
+- Popup status stays visible until the next action instead of vanishing after 1800ms (#39).
+- Restore into current window checkbox persists in settings (#40).
+- Popup tab list refreshes after discard, restore, activate, and backup (#41).
+- Discard all except current now unloads other tabs in all normal windows, not only the focused window (#42).
+- Default and Balanced auto-backup interval is 5 minutes so the snapshot cap lasts longer; Compact stays 2, Archivist stays 1. A value of 1 is still allowed (#43).
+- Restore keeps `about:blank` tabs instead of letting Firefox replace them with a default New Tab (#34).
+- Import accepts a `{snapshots:[...]}` wrapper and shows a lasting error when nothing was imported (#35).
+- Double-click Restore no longer opens the snapshot twice (#36).
+- Default discard shortcut is Alt+Shift+D so it no longer collides with Firefox Bookmark all tabs (#37).
+- Restore skips privileged tab URLs instead of aborting, and Backup now reports when the session was unchanged (#30 #31 #32).
 - Snapshot import keeps Firefox tab groups (name, color, collapsed, groupId) instead of wiping them (#6).
 - Options import uses the user's snapshot and size limits instead of always capping history at 20 (#7).
 - Restoring a snapshot into a new window re-applies pinned tabs after the window is created (#8).

@@ -9,7 +9,7 @@
   },
   "version": {
     "release_notes": {
-      "en-US": "0.3.0\n\nAdded:\n- UI localization: English, Russian, Kazakh, Ukrainian, Belarusian, Serbian (follows Firefox locale)\n\nFixed:\n- Proper PNG toolbar/listing icons (vault-dial mark) instead of a generic puzzle placeholder\n- Prefix text field styling on the dark settings page\n- Release pipeline no longer false-fails while waiting for manual AMO review after a successful upload"
+      "en-US": "0.3.2\n\nFixed:\n- Restore skips privileged URLs instead of aborting; about:blank is kept; Backup now says when the session was unchanged.\n- Import accepts a snapshots wrapper and shows an error when nothing was imported.\n- Double-click Restore no longer opens the snapshot twice.\n- Discard shortcut is Alt+Shift+D (no longer Ctrl+Shift+D).\n- Discard all except current unloads tabs in all windows.\n- Popup status stays visible; restore-into-current checkbox persists; tab list refreshes after actions.\n- Default auto-backup interval is 5 minutes.\n- Guardian skips in-use media and known media hosts.\n- Crash-restore prompt skips install/update/reload and does not re-fire.\n- Dirty-form protection clears on reset and SPA navigation.\n\nAdded:\n- Live Firefox e2e canary and GitHub Release zip workflow.\n"
     },
     "custom_license": {
       "name": {

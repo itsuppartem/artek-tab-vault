@@ -40,13 +40,20 @@ Independent session backup
   a few common export shapes from other tab/session managers, skipping only
   the individual entries it can't understand instead of failing outright.
 - Detects a likely crash/unclean shutdown on the next Firefox launch and
-  proactively notifies you to restore the last backup.
+  proactively notifies you to restore the last backup. The crash-restore
+  prompt is skipped on addon install, update, or reload, and does not re-fire
+  after it has already been shown.
 
 Guardian: automatic memory relief
 - Automatically discards (unloads) tabs that have been idle for a
   configurable number of minutes, freeing RAM and CPU without closing them.
 - Never touches the active tab, pinned tabs, tabs playing audio, or (by
   default) a tab with an unsubmitted form - so you don't lose typed input.
+- Media protection: also skips known media hosts and tabs with in-page
+  video or audio that is playing or paused with progress. An empty
+  never-played video is not protected.
+- Dirty-form protection clears on form reset and same-document SPA
+  navigation, so a route change does not keep the tab undiscardable forever.
 - Domain whitelist: tell it to never discard specific sites (e.g. your email,
   a long-running dashboard).
 - Smart tab activation: when the active tab is closed, immediately hands
@@ -72,7 +79,10 @@ WHAT IT DOESN'T DO (known limitations)
   discarded/loaded state rather than a byte count.
 - Restoring a snapshot reopens tabs by URL; it doesn't restore in-page
   browsing history, scroll position, or unsaved form state from before the
-  backup was taken.
+  backup was taken. Privileged pages (about:debugging, file:, and similar)
+  are skipped; the popup reports a partial restore instead of claiming every
+  tab opened. Backup now also says when the session did not change, instead
+  of flashing Saved for a skipped duplicate snapshot.
 - Firefox gives extensions no way to cancel the reload it starts when it
   auto-activates a discarded tab; "smart tab activation" moves your focus off
   it immediately afterwards, it can't prevent the reload from starting.
@@ -83,14 +93,21 @@ PERMISSIONS
 - unlimitedStorage - lets the local backup history grow past the browser's
   default ~5-10MB local-storage quota when you raise the size limit above the
   default; still fully local, nothing is uploaded anywhere.
-- Access to all sites - used for two on-device-only things: (1) a content
+- Access to all sites - used for on-device-only things: (1) a content
   script that detects whether a page has an unsubmitted form, so that tab
   can be skipped by the memory guardian (only a true/false flag is kept, the
-  form's contents are never read, stored, or sent anywhere); (2) rewriting a
-  tab's own title (e.g. adding "💤 ") right before discarding it, since
-  Firefox has no dedicated API for that. Neither use ever transmits data off
-  your machine.
+  form's contents are never read, stored, or sent anywhere); (2) the same
+  probe reports whether in-page video/audio is in use (playing or paused
+  with progress) — again only a boolean, never the media itself; (3)
+  rewriting a tab's own title (e.g. adding "💤 ") right before discarding it,
+  since Firefox has no dedicated API for that. None of these uses ever
+  transmits data off your machine.
 - No browsing data ever leaves your machine.
+
+Artek Tab Vault is open source (MIT). Source:
+https://github.com/itsuppartem/artek-tab-vault
+Support and issue reports:
+https://github.com/itsuppartem/artek-tab-vault/issues
 
 Feedback and bug reports are welcome via the support site/homepage link on
 this page - please leave a review if something doesn't work as expected
@@ -130,13 +147,20 @@ Artek Tab Vault закрывает две самые частые боли Firef
   несколько распространённых форматов других менеджеров вкладок, пропуская
   только те записи, которые не удалось разобрать, а не весь файл.
 - Замечает вероятный краш или «грязное» завершение и при следующем запуске
-  Firefox сам предлагает восстановить последний бэкап.
+  Firefox сам предлагает восстановить последний бэкап. Подсказка
+  пропускается при установке, обновлении или перезагрузке расширения и
+  не срабатывает повторно, если уже была показана.
 
 Guardian: автоматическая разгрузка памяти
 - Автоматически выгружает вкладки, простаивающие заданное число минут:
   освобождает RAM и CPU, не закрывая их.
 - Никогда не трогает активную вкладку, закреплённые вкладки, вкладки со звуком
   и (по умолчанию) вкладки с незаполненной формой - чтобы не потерять ввод.
+- Защита медиа: также не выгружает известные медиа-хосты и вкладки с видео
+  или аудио на странице, если оно играет или стоит на паузе с прогрессом.
+  Пустое, ни разу не запущенное видео не защищается.
+- Защита незаполненной формы сбрасывается при reset формы и SPA-навигации
+  в том же документе, чтобы смена маршрута не держала вкладку вечно.
 - Белый список доменов: сайты, которые выгружать нельзя никогда (почта,
   дашборд и т.п.).
 - Умная активация: при закрытии активной вкладки фокус сразу уходит на уже
@@ -157,6 +181,10 @@ Guardian: автоматическая разгрузка памяти
   и в попапе показывается состояние вкладки, а не мегабайты.
 - Восстановление открывает вкладки по URL: история переходов внутри вкладки,
   позиция прокрутки и незасабмиченные формы на момент бэкапа не возвращаются.
+  Привилегированные страницы (about:debugging, file: и подобные) пропускаются;
+  попап сообщает о частичном восстановлении, а не что открыты все вкладки.
+  Кнопка «бэкап сейчас» также говорит, если сессия не изменилась, вместо
+  вспышки «Сохранено» для пропущенного дубликата.
 - Firefox не даёт расширениям отменить перезагрузку, которую он запускает сам,
   переключаясь на выгруженную вкладку; «умная активация» лишь сразу уводит
   фокус, но не отменяет саму перезагрузку.
@@ -167,13 +195,20 @@ Guardian: автоматическая разгрузка памяти
 - unlimitedStorage - позволяет локальной истории бэкапов выйти за стандартную
   квоту локального хранилища (~5-10 МБ), если поднять лимит размера. Всё
   остаётся локально, никуда не выгружается.
-- Доступ ко всем сайтам - нужен ровно для двух вещей, обе выполняются только на
+- Доступ ко всем сайтам - нужен для вещей, которые выполняются только на
   вашем устройстве: (1) контент-скрипт определяет, есть ли на странице
   незаполненная форма, чтобы guardian не выгрузил такую вкладку (хранится
   только флаг да/нет, содержимое формы не читается, не сохраняется и никуда не
-  отправляется); (2) подмена заголовка самой вкладки (добавление «💤 ») перед
+  отправляется); (2) тот же зонд сообщает, используется ли видео/аудио на
+  странице (играет или на паузе с прогрессом) — снова только булев флаг,
+  не само медиа; (3) подмена заголовка самой вкладки (добавление «💤 ») перед
   выгрузкой, так как отдельного API для этого у Firefox нет.
 - Никакие данные о вашем браузинге не покидают устройство.
+
+Artek Tab Vault — открытое ПО (лицензия MIT). Исходный код:
+https://github.com/itsuppartem/artek-tab-vault
+Поддержка и сообщения об ошибках:
+https://github.com/itsuppartem/artek-tab-vault/issues
 
 Пожелания и баг-репорты - через ссылку на страницу поддержки на этой странице.
 Если что-то работает не так, лучше оставить отзыв с описанием, чем просто

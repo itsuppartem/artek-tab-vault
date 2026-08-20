@@ -74,6 +74,12 @@
   "status_restored": {
     "message": "Vraćeno $1 $2"
   },
+  "status_restored_partial": {
+    "message": "Vraćeno $1 $2, preskočeno $3 $4"
+  },
+  "status_restored_none": {
+    "message": "Ništa nije vraćeno"
+  },
   "status_guardian_on": {
     "message": "Guardian uključen"
   },
@@ -97,6 +103,12 @@
   },
   "status_snapshot_saved": {
     "message": "Snimak sesije sačuvan"
+  },
+  "status_snapshot_unchanged": {
+    "message": "Sesija se nije promenila"
+  },
+  "flash_unchanged": {
+    "message": "Bez izmena"
   },
   "word_tab_one": {
     "message": "kartica"
@@ -145,6 +157,9 @@
   },
   "help_whitelist": {
     "message": "Poddomeni se poklapaju automatski: example.com pokriva i www.example.com."
+  },
+  "help_discard_shortcut": {
+    "message": "Prečica za odbacivanje svih kartica osim trenutne: Alt+Shift+D. Promenite je u about:addons."
   },
   "heading_backup": {
     "message": "Rezerva sesija"

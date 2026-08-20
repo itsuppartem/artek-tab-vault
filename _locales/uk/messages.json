@@ -74,6 +74,12 @@
   "status_restored": {
     "message": "Відновлено $1 $2"
   },
+  "status_restored_partial": {
+    "message": "Відновлено $1 $2, пропущено $3 $4"
+  },
+  "status_restored_none": {
+    "message": "Нічого не відновлено"
+  },
   "status_guardian_on": {
     "message": "Guardian увімкнено"
   },
@@ -97,6 +103,12 @@
   },
   "status_snapshot_saved": {
     "message": "Знімок сесії збережено"
+  },
+  "status_snapshot_unchanged": {
+    "message": "Сесія не змінилася"
+  },
+  "flash_unchanged": {
+    "message": "Без змін"
   },
   "word_tab_one": {
     "message": "вкладка"
@@ -146,6 +158,9 @@
   "help_whitelist": {
     "message": "Піддомени враховуються автоматично: example.com покриє і www.example.com."
   },
+  "help_discard_shortcut": {
+    "message": "Сполучення клавіш «вивантажити всі, крім поточної»: Alt+Shift+D. Можна змінити в about:addons."
+  },
   "heading_backup": {
     "message": "Бекап сесій"
   },
@@ -189,7 +204,7 @@
     "message": "Імпорт файлу"
   },
   "help_import": {
-    "message": "Імпорт розуміє наш формат і схожі формати інших менеджерів вкладок (список URL, обʼєкт з tabs/windows/sessions) і звичайний текстовий список посилань - некоректні рядки пропускаються."
+    "message": "Імпорт розуміє наш формат і схожі формати інших менеджерів вкладок (список URL, обʼєкт з tabs/windows/sessions/snapshots) і звичайний текстовий список посилань - некоректні рядки пропускаються."
   },
   "heading_prune_log": {
     "message": "Історія обрізання бекапів"

@@ -74,6 +74,12 @@
   "status_restored": {
     "message": "Восстановлено $1 $2"
   },
+  "status_restored_partial": {
+    "message": "Восстановлено $1 $2, пропущено $3 $4"
+  },
+  "status_restored_none": {
+    "message": "Ничего не восстановлено"
+  },
   "status_guardian_on": {
     "message": "Guardian включён"
   },
@@ -97,6 +103,12 @@
   },
   "status_snapshot_saved": {
     "message": "Снимок сессии сохранён"
+  },
+  "status_snapshot_unchanged": {
+    "message": "Сессия не изменилась"
+  },
+  "flash_unchanged": {
+    "message": "Без изменений"
   },
   "word_tab_one": {
     "message": "вкладка"
@@ -146,6 +158,9 @@
   "help_whitelist": {
     "message": "Поддомены учитываются автоматически: example.com закроет и www.example.com."
   },
+  "help_discard_shortcut": {
+    "message": "Сочетание клавиш «выгрузить все, кроме текущей»: Alt+Shift+D. Можно сменить в about:addons."
+  },
   "heading_backup": {
     "message": "Бэкап сессий"
   },
@@ -189,7 +204,7 @@
     "message": "Импорт файла"
   },
   "help_import": {
-    "message": "Импорт понимает наш формат, а также похожие форматы других менеджеров вкладок (список URL, объект с tabs/windows/sessions) и обычный текстовый список ссылок - некорректные строки просто пропускаются, а не ломают весь импорт."
+    "message": "Импорт понимает наш формат, а также похожие форматы других менеджеров вкладок (список URL, объект с tabs/windows/sessions/snapshots) и обычный текстовый список ссылок - некорректные строки просто пропускаются, а не ломают весь импорт."
   },
   "heading_prune_log": {
     "message": "История обрезки бэкапов"

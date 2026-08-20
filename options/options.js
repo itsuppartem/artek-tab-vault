@@ -12,7 +12,7 @@ const PRUNE_LOG_KEY = 'tabvault_prune_log';
 const DEFAULT_SETTINGS = {
   guardianEnabled: true,
   idleMinutes: 15,
-  backupIntervalMinutes: 1,
+  backupIntervalMinutes: 5,
   maxSnapshots: 20,
   maxBackupMB: 15,
   neverDiscardDomains: [],
@@ -20,6 +20,7 @@ const DEFAULT_SETTINGS = {
   protectUnsavedForms: true,
   markDiscardedInTitle: true,
   discardedTitlePrefix: '💤 ',
+  restoreIntoCurrentWindow: false,
 };
 
 const PRUNE_REASON_KEYS = {
@@ -52,10 +53,20 @@ const els = {
 const SNAPSHOT_WORD_FORMS = I18n.wordForms('word_snapshot');
 const BAD_TAB_WORD_FORMS = I18n.wordForms('word_bad_tab');
 
-function showStatus(text) {
+let statusTimer = null;
+function showStatus(text, options = {}) {
   els.status.textContent = text;
   els.status.classList.add('visible');
-  setTimeout(() => els.status.classList.remove('visible'), 1800);
+  els.status.classList.toggle('error', !!options.persist);
+  clearTimeout(statusTimer);
+  if (options.persist) {
+    statusTimer = null;
+    return;
+  }
+  statusTimer = setTimeout(() => {
+    els.status.classList.remove('visible');
+    els.status.classList.remove('error');
+  }, 1800);
 }
 
 function fillForm(settings) {
@@ -71,7 +82,7 @@ function fillForm(settings) {
   els.whitelist.value = (settings.neverDiscardDomains || []).join('\n');
 }
 
-function readForm() {
+function readForm(extra = {}) {
   return Core.sanitizeSettings(
     {
       guardianEnabled: els.guardianEnabled.checked,
@@ -84,6 +95,7 @@ function readForm() {
       maxSnapshots: els.maxSnapshots.value,
       maxBackupMB: els.maxBackupMB.value,
       neverDiscardDomains: Core.parseDomainList(els.whitelist.value),
+      ...extra,
     },
     DEFAULT_SETTINGS
   );
@@ -158,7 +170,9 @@ document.querySelectorAll('.preset-btn').forEach((btn) => {
 });
 
 els.saveBtn.addEventListener('click', async () => {
-  const settings = readForm();
+  const stored = await browser.storage.local.get(SETTINGS_KEY);
+  const current = Core.sanitizeSettings(stored[SETTINGS_KEY], DEFAULT_SETTINGS);
+  const settings = readForm({ restoreIntoCurrentWindow: current.restoreIntoCurrentWindow });
   await browser.storage.local.set({ [SETTINGS_KEY]: settings });
   fillForm(settings);
   TabVaultUI.flashButton(els.saveBtn, I18n.t('flash_saved'));
@@ -198,7 +212,7 @@ els.importInput.addEventListener('change', async () => {
     const text = await file.text();
     const { snapshots: imported, skippedEntries } = Core.parseImportedSnapshots(text);
     if (!imported.length) {
-      showStatus(I18n.t('status_import_empty'));
+      showStatus(I18n.t('status_import_empty'), { persist: true });
       return;
     }
 
@@ -226,7 +240,7 @@ els.importInput.addEventListener('change', async () => {
     );
     await loadStorageAndLog();
   } catch (err) {
-    showStatus(I18n.t('status_import_error'));
+    showStatus(I18n.t('status_import_error'), { persist: true });
   } finally {
     els.importInput.value = '';
   }

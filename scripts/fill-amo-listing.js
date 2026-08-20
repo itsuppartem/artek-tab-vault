@@ -106,21 +106,26 @@ function addonPath(suffix = '') {
 }
 
 async function patchMetadata(descriptionEn, descriptionRu, developerComments) {
-  // Repo is private — never publish the GitHub URL as Homepage/Support.
-  // Leave those null until there is a public page; clear explicitly so a
-  // re-run doesn't leave a stale private link on the listing.
+  // Repo is public — set Homepage and Support on en-US and ru.
+  const homepageUrl = 'https://github.com/itsuppartem/artek-tab-vault';
+  const supportUrl = 'https://github.com/itsuppartem/artek-tab-vault/issues';
   const payload = {
     description: {
       'en-US': descriptionEn,
       'ru': descriptionRu,
     },
-    homepage: null,
-    support_url: null,
+    homepage: {
+      'en-US': homepageUrl,
+      'ru': homepageUrl,
+    },
+    support_url: {
+      'en-US': supportUrl,
+      'ru': supportUrl,
+    },
     developer_comments: {
       'en-US': developerComments,
     },
-    // Only tags that exist on AMO's fixed list (GET /api/v5/addons/tags/).
-    tags: ['privacy', 'security'],
+    tags: ['tabs', 'session', 'backup', 'memory', 'discard', 'productivity', 'privacy', 'crash recovery'],
     default_locale: 'en-US',
     is_experimental: false,
     requires_payment: false,
@@ -250,19 +255,25 @@ async function main() {
     'Permissions notes for reviewers:',
     '- <all_urls> is used only on-device: (1) a content script that reports a',
     '  boolean "has unsaved form" flag so the guardian can skip that tab —',
-    '  form contents are never read, stored, or transmitted; (2) a one-shot',
-    '  content script that prefixes document.title (e.g. "💤 ") immediately',
-    '  before tabs.discard(), because Firefox has no API to set a tab title.',
+    '  form contents are never read, stored, or transmitted; (2) the same',
+    '  on-device probe reports a boolean "has in-use media" flag (playing or',
+    '  paused-with-progress video/audio, or a known media host) — like the',
+    '  dirty-form flag, this is a boolean only, never the media bytes or page',
+    '  contents; (3) a one-shot content script that prefixes document.title',
+    '  immediately before tabs.discard(), because Firefox has no API to set',
+    '  a tab title.',
     '- unlimitedStorage is for the local snapshot history when the user raises',
     '  the size cap; nothing is uploaded.',
     '- tabGroups is used to capture/restore native Firefox tab group name/color.',
     '- notifications is used for the optional crash-restore prompt after an',
-    '  unclean shutdown.',
+    '  unclean shutdown. The prompt is skipped on install/update/reload and',
+    '  does not re-fire.',
     '- No remote code, no analytics, no third-party servers. Data never leaves',
     "  the user's machine.",
     '',
-    'Source is private for now; Jest unit tests cover pure logic in core.js',
-    'and CI runs on every push. Happy to share a reviewer build/zip on request.',
+    'The add-on is open source (MIT). Source and tests: the public GitHub',
+    'repository linked as Homepage. Jest unit tests cover pure logic in core.js',
+    'and CI runs on every push.',
   ].join('\n');
 
   if (mode === 'all' || mode === 'meta') {

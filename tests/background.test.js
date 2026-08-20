@@ -9,7 +9,7 @@ const SESSION_STATE_KEY = 'tabvault_session_state';
 const DEFAULT_SETTINGS = {
   guardianEnabled: true,
   idleMinutes: 15,
-  backupIntervalMinutes: 1,
+  backupIntervalMinutes: 5,
   maxSnapshots: 20,
   maxBackupMB: 15,
   neverDiscardDomains: [],
@@ -17,6 +17,7 @@ const DEFAULT_SETTINGS = {
   protectUnsavedForms: true,
   markDiscardedInTitle: true,
   discardedTitlePrefix: '💤 ',
+  restoreIntoCurrentWindow: false,
 };
 
 function tab(partial) {
@@ -63,6 +64,8 @@ describe('background GET_STATE', () => {
     expect(state.totalTabs).toBe(2);
     expect(state.discardedCount).toBe(1);
     expect(state.settings.guardianEnabled).toBe(true);
+    expect(state.settings.backupIntervalMinutes).toBe(5);
+    expect(state.settings.restoreIntoCurrentWindow).toBe(false);
     const stamps = state.snapshots.map((s) => s.timestamp);
     expect(stamps.indexOf(2)).toBeGreaterThanOrEqual(0);
     expect(stamps.indexOf(1)).toBeGreaterThan(stamps.indexOf(2));
@@ -94,7 +97,17 @@ describe('background takeSnapshot', () => {
       windows: [{ id: 1, tabs: [tab({ id: 1, url: 'https://a.com', title: 'A' })] }],
     });
     expect(mock.storageData[SNAPSHOTS_KEY]).toHaveLength(1);
-    await mock.browser.runtime.sendMessage({ type: 'BACKUP_NOW' });
+    const result = await mock.browser.runtime.sendMessage({ type: 'BACKUP_NOW' });
+    expect(result).toEqual({ saved: false });
+    expect(mock.storageData[SNAPSHOTS_KEY]).toHaveLength(1);
+  });
+
+  test('successful first backup returns saved:true', async () => {
+    const { mock } = await boot({ windows: [] });
+    expect(mock.storageData[SNAPSHOTS_KEY] || []).toHaveLength(0);
+    mock.addWindow({ id: 1, tabs: [tab({ id: 1, url: 'https://a.com', title: 'A' })] });
+    const result = await mock.browser.runtime.sendMessage({ type: 'BACKUP_NOW' });
+    expect(result).toEqual({ saved: true });
     expect(mock.storageData[SNAPSHOTS_KEY]).toHaveLength(1);
   });
 
@@ -103,7 +116,8 @@ describe('background takeSnapshot', () => {
       windows: [{ id: 1, tabs: [tab({ id: 1, url: 'https://a.com', title: 'A' })] }],
     });
     mock.addTab({ id: 2, windowId: 1, url: 'https://b.com', title: 'B' });
-    await mock.browser.runtime.sendMessage({ type: 'BACKUP_NOW' });
+    const result = await mock.browser.runtime.sendMessage({ type: 'BACKUP_NOW' });
+    expect(result).toEqual({ saved: true });
     expect(mock.storageData[SNAPSHOTS_KEY]).toHaveLength(2);
     expect(mock.storageData[SNAPSHOTS_KEY][1].windows[0].tabs).toHaveLength(2);
   });
@@ -225,6 +239,59 @@ describe('background discardAllExceptCurrent', () => {
     expect(result.discardedCount).toBe(1);
     expect(mock.calls.tabsDiscard).toEqual([2]);
   });
+  test("discards other windows and keeps only the focused active tab (#42)", async () => {
+    const { mock } = await boot({
+      windows: [
+        {
+          id: 1,
+          focused: true,
+          type: "normal",
+          tabs: [
+            tab({ id: 1, active: true, url: "https://now.com" }),
+            tab({ id: 2, url: "https://gone-here.com" }),
+          ],
+        },
+        {
+          id: 2,
+          focused: false,
+          type: "normal",
+          tabs: [
+            tab({ id: 3, active: true, url: "https://other-active.com" }),
+            tab({ id: 4, url: "https://other-bg.com" }),
+          ],
+        },
+      ],
+    });
+    const result = await mock.browser.runtime.sendMessage({ type: "DISCARD_ALL_EXCEPT_CURRENT" });
+    expect(result.discardedCount).toBe(3);
+    expect(mock.calls.tabsDiscard.sort((a, b) => a - b)).toEqual([2, 3, 4]);
+    const loaded = mock.tabs.filter((t) => !t.discarded).map((t) => t.id);
+    expect(loaded).toEqual([1]);
+  });
+
+  test("does not discard a pinned tab in another window (#42)", async () => {
+    const { mock } = await boot({
+      windows: [
+        { id: 1, focused: true, tabs: [tab({ id: 1, active: true, url: "https://now.com" })] },
+        { id: 2, focused: false, tabs: [tab({ id: 8, pinned: true, url: "https://pin-other.com" }), tab({ id: 9, url: "https://gone.com" })] },
+      ],
+    });
+    await mock.browser.runtime.sendMessage({ type: "DISCARD_ALL_EXCEPT_CURRENT" });
+    expect(mock.calls.tabsDiscard).toEqual([9]);
+    expect(mock.tabs.find((t) => t.id === 8).discarded).toBe(false);
+  });
+
+  test("does not discard an audible tab in another window (#42)", async () => {
+    const { mock } = await boot({
+      windows: [
+        { id: 1, focused: true, tabs: [tab({ id: 1, active: true, url: "https://now.com" })] },
+        { id: 2, focused: false, tabs: [tab({ id: 8, audible: true, url: "https://music.com" }), tab({ id: 9, url: "https://gone.com" })] },
+      ],
+    });
+    await mock.browser.runtime.sendMessage({ type: "DISCARD_ALL_EXCEPT_CURRENT" });
+    expect(mock.calls.tabsDiscard).toEqual([9]);
+    expect(mock.tabs.find((t) => t.id === 8).discarded).toBe(false);
+  });
 });
 
 describe('background restoreSnapshot', () => {
@@ -247,8 +314,8 @@ describe('background restoreSnapshot', () => {
       windows: [{ id: 1, tabs: [tab({ id: 1 })] }],
       storage: { [SNAPSHOTS_KEY]: [groupedSnapshot] },
     });
-    const ok = await mock.browser.runtime.sendMessage({ type: 'RESTORE_SNAPSHOT', timestamp: 123456 });
-    expect(ok).toBe(false);
+    const result = await mock.browser.runtime.sendMessage({ type: 'RESTORE_SNAPSHOT', timestamp: 123456 });
+    expect(result).toEqual({ ok: false, restored: 0, skipped: 0 });
     expect(mock.calls.windowsCreate).toEqual([]);
     expect(mock.calls.tabsCreate).toEqual([]);
   });
@@ -258,14 +325,17 @@ describe('background restoreSnapshot', () => {
       windows: [{ id: 1, tabs: [tab({ id: 1 })] }],
       storage: { [SNAPSHOTS_KEY]: [groupedSnapshot] },
     });
-    const ok = await mock.browser.runtime.sendMessage({
+    const result = await mock.browser.runtime.sendMessage({
       type: 'RESTORE_SNAPSHOT',
       timestamp: 99,
       intoCurrentWindow: false,
     });
-    expect(ok).toBe(true);
+    expect(result).toEqual({ ok: true, restored: 2, skipped: 0 });
     expect(mock.calls.windowsCreate).toHaveLength(1);
-    expect(mock.calls.windowsCreate[0].url).toEqual(['https://a.com', 'https://b.com']);
+    expect(mock.calls.windowsCreate[0].url).toEqual(['https://a.com']);
+    expect(mock.calls.tabsCreate).toEqual(
+      expect.arrayContaining([expect.objectContaining({ url: 'https://b.com', pinned: false })])
+    );
     expect(mock.calls.tabsUpdate.some((c) => c.props.pinned === true)).toBe(true);
   });
 
@@ -274,12 +344,12 @@ describe('background restoreSnapshot', () => {
       windows: [{ id: 1, focused: true, tabs: [tab({ id: 1 })] }],
       storage: { [SNAPSHOTS_KEY]: [groupedSnapshot] },
     });
-    const ok = await mock.browser.runtime.sendMessage({
+    const result = await mock.browser.runtime.sendMessage({
       type: 'RESTORE_SNAPSHOT',
       timestamp: 99,
       intoCurrentWindow: true,
     });
-    expect(ok).toBe(true);
+    expect(result).toEqual({ ok: true, restored: 2, skipped: 0 });
     expect(mock.calls.windowsCreate).toEqual([]);
     expect(mock.calls.tabsCreate[0]).toMatchObject({ url: 'https://a.com', pinned: true, windowId: 1 });
     expect(mock.calls.tabsCreate[1]).toMatchObject({ url: 'https://b.com', pinned: false, windowId: 1 });
@@ -295,6 +365,173 @@ describe('background restoreSnapshot', () => {
     expect(mock.calls.tabGroupsUpdate).toEqual(
       expect.arrayContaining([expect.objectContaining({ props: expect.objectContaining({ title: 'Work', color: 'blue', collapsed: true }) })])
     );
+  });
+
+  const mixedSnapshot = {
+    timestamp: 42,
+    windows: [
+      {
+        tabs: [
+          { url: 'about:debugging', title: 'Debugging' },
+          { url: 'https://example.com', title: 'Example' },
+          { url: 'https://example.org', title: 'Org' },
+        ],
+      },
+    ],
+  };
+
+  test('new-window restore with about:debugging plus https still opens the https tabs', async () => {
+    const { mock } = await boot({
+      windows: [{ id: 1, tabs: [tab({ id: 1 })] }],
+      storage: { [SNAPSHOTS_KEY]: [mixedSnapshot] },
+    });
+    const result = await mock.browser.runtime.sendMessage({
+      type: 'RESTORE_SNAPSHOT',
+      timestamp: 42,
+      intoCurrentWindow: false,
+    });
+    expect(result.ok).toBe(true);
+    expect(result.restored).toBe(2);
+    expect(result.skipped).toBeGreaterThan(0);
+    expect(mock.calls.windowsCreate).toHaveLength(1);
+    expect(mock.calls.windowsCreate[0].url).toEqual(['https://example.com']);
+    expect(mock.calls.windowsCreate[0].url).not.toContain('about:debugging');
+    expect(mock.calls.tabsCreate.map((c) => c.url)).toEqual(['https://example.org']);
+    const opened = [...mock.calls.windowsCreate[0].url, ...mock.calls.tabsCreate.map((c) => c.url)];
+    expect(opened).toEqual(['https://example.com', 'https://example.org']);
+  });
+
+  test('windows.create throwing on a url array still restores remaining tabs via fallback', async () => {
+    const { mock } = await boot({
+      windows: [{ id: 1, tabs: [tab({ id: 1 })] }],
+      storage: { [SNAPSHOTS_KEY]: [groupedSnapshot] },
+      windowsCreate: ({ url }) => {
+        if (Array.isArray(url)) throw new Error('url array rejected');
+      },
+    });
+    const result = await mock.browser.runtime.sendMessage({
+      type: 'RESTORE_SNAPSHOT',
+      timestamp: 99,
+      intoCurrentWindow: false,
+    });
+    expect(result.ok).toBe(true);
+    expect(result.restored).toBe(2);
+    expect(mock.calls.windowsCreate.some((c) => c.url.includes('https://a.com'))).toBe(true);
+    expect(mock.calls.tabsCreate).toEqual(
+      expect.arrayContaining([expect.objectContaining({ url: 'https://b.com' })])
+    );
+  });
+
+  test('all-privileged snapshot does not call windows.create', async () => {
+    const privileged = {
+      timestamp: 7,
+      windows: [{ tabs: [{ url: 'about:debugging' }, { url: 'about:config' }] }],
+    };
+    const { mock } = await boot({
+      windows: [{ id: 1, tabs: [tab({ id: 1 })] }],
+      storage: { [SNAPSHOTS_KEY]: [privileged] },
+    });
+    const result = await mock.browser.runtime.sendMessage({
+      type: 'RESTORE_SNAPSHOT',
+      timestamp: 7,
+      intoCurrentWindow: false,
+    });
+    expect(result).toEqual({ ok: false, restored: 0, skipped: 2 });
+    expect(mock.calls.windowsCreate).toEqual([]);
+  });
+
+
+  test('new-window restore with https + about:blank creates both (#34)', async () => {
+    const blankSnap = {
+      timestamp: 34,
+      windows: [
+        {
+          tabs: [
+            { url: 'https://example.com', title: 'Example' },
+            { url: 'about:blank', title: '' },
+          ],
+        },
+      ],
+    };
+    const { mock } = await boot({
+      windows: [{ id: 1, tabs: [tab({ id: 1 })] }],
+      storage: { [SNAPSHOTS_KEY]: [blankSnap] },
+    });
+    const result = await mock.browser.runtime.sendMessage({
+      type: 'RESTORE_SNAPSHOT',
+      timestamp: 34,
+      intoCurrentWindow: false,
+    });
+    expect(result).toEqual({ ok: true, restored: 2, skipped: 0 });
+    const opened = [
+      ...mock.calls.windowsCreate.flatMap((c) => c.url),
+      ...mock.calls.tabsCreate.map((c) => c.url),
+    ];
+    expect(opened).toEqual(expect.arrayContaining(['https://example.com', 'about:blank']));
+    expect(opened.filter((u) => u === 'https://example.com')).toHaveLength(1);
+    expect(opened.filter((u) => u === 'about:blank')).toHaveLength(1);
+  });
+
+  test('new-window restore does not seed windows.create with about:blank (#34)', async () => {
+    const blankFirst = {
+      timestamp: 35,
+      windows: [
+        {
+          tabs: [
+            { url: 'about:blank', title: '' },
+            { url: 'https://example.com', title: 'Example' },
+          ],
+        },
+      ],
+    };
+    const { mock } = await boot({
+      windows: [{ id: 1, tabs: [tab({ id: 1 })] }],
+      storage: { [SNAPSHOTS_KEY]: [blankFirst] },
+    });
+    const result = await mock.browser.runtime.sendMessage({
+      type: 'RESTORE_SNAPSHOT',
+      timestamp: 35,
+      intoCurrentWindow: false,
+    });
+    expect(result).toEqual({ ok: true, restored: 2, skipped: 0 });
+    expect(mock.calls.windowsCreate).toHaveLength(1);
+    expect(mock.calls.windowsCreate[0].url).toEqual(['https://example.com']);
+    expect(mock.calls.windowsCreate[0].url).not.toContain('about:blank');
+    expect(mock.calls.tabsCreate.map((c) => c.url)).toContain('about:blank');
+  });
+
+  test('overlapping RESTORE_SNAPSHOT for the same timestamp opens one window (#36)', async () => {
+    const { mock } = await boot({
+      windows: [{ id: 1, tabs: [tab({ id: 1 })] }],
+      storage: { [SNAPSHOTS_KEY]: [groupedSnapshot] },
+    });
+    const p1 = mock.browser.runtime.sendMessage({ type: 'RESTORE_SNAPSHOT', timestamp: 99 });
+    const p2 = mock.browser.runtime.sendMessage({ type: 'RESTORE_SNAPSHOT', timestamp: 99 });
+    const [r1, r2] = await Promise.all([p1, p2]);
+    expect(mock.calls.windowsCreate).toHaveLength(1);
+    const oks = [r1, r2].filter((r) => r && r.ok);
+    expect(oks).toHaveLength(1);
+    expect(oks[0].restored).toBe(2);
+    const ignored = [r1, r2].find((r) => r && !r.ok);
+    expect(ignored).toEqual({ ok: false, restored: 0, skipped: 0 });
+  });
+
+  test('current-window restore skips about:debugging and still creates https', async () => {
+    const { mock } = await boot({
+      windows: [{ id: 1, focused: true, tabs: [tab({ id: 1 })] }],
+      storage: { [SNAPSHOTS_KEY]: [mixedSnapshot] },
+    });
+    const result = await mock.browser.runtime.sendMessage({
+      type: 'RESTORE_SNAPSHOT',
+      timestamp: 42,
+      intoCurrentWindow: true,
+    });
+    expect(result.ok).toBe(true);
+    expect(result.restored).toBe(2);
+    expect(result.skipped).toBeGreaterThan(0);
+    expect(mock.calls.windowsCreate).toEqual([]);
+    expect(mock.calls.tabsCreate.map((c) => c.url)).toEqual(['https://example.com', 'https://example.org']);
+    expect(mock.calls.tabsCreate.map((c) => c.url)).not.toContain('about:debugging');
   });
 });
 

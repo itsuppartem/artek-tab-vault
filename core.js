@@ -166,6 +166,7 @@
       protectUnsavedForms: merged.protectUnsavedForms !== undefined ? !!merged.protectUnsavedForms : !!defaults.protectUnsavedForms,
       markDiscardedInTitle: merged.markDiscardedInTitle !== undefined ? !!merged.markDiscardedInTitle : !!defaults.markDiscardedInTitle,
       discardedTitlePrefix: sanitizeTitlePrefix(merged.discardedTitlePrefix, defaults.discardedTitlePrefix),
+      restoreIntoCurrentWindow: !!merged.restoreIntoCurrentWindow,
     };
   }
 
@@ -231,10 +232,35 @@
     return plan;
   }
 
+  // Privileged/internal URLs cannot be opened via windows.create / tabs.create
+  // (Firefox rejects the whole call if any URL in the list is privileged).
+  // about:blank is the only about: URL extensions can restore.
+  function isRestorableTabUrl(url) {
+    if (typeof url !== 'string') return false;
+    const trimmed = url.trim();
+    if (!trimmed) return false;
+    const lower = trimmed.toLowerCase();
+    if (lower === 'about:blank') return true;
+    if (lower.startsWith('http://') || lower.startsWith('https://')) return true;
+    return false;
+  }
+
+  function summarizeRestorePlan(windows) {
+    let restorable = 0;
+    let skipped = 0;
+    for (const win of windows || []) {
+      for (const tab of win.tabs || []) {
+        if (isRestorableTabUrl(tab && tab.url)) restorable += 1;
+        else skipped += 1;
+      }
+    }
+    return { restorable, skipped };
+  }
+
   function planRestoreTargets(windows, intoCurrentWindow) {
     return (windows || [])
       .map((win, index) => {
-        const tabs = (win.tabs || []).filter((t) => t.url && !t.url.startsWith('about:'));
+        const tabs = (win.tabs || []).filter((t) => isRestorableTabUrl(t.url));
         const mode = intoCurrentWindow && index === 0 ? 'current' : 'new';
         return { mode, tabs, groups: win.groups || [] };
       })
@@ -319,10 +345,10 @@
   }
 
   // Accepts our own export format, a handful of shapes used by competing
-  // session managers (array/object of windows/tabs, {sessions:[...]}), and a
-  // plain-text fallback (one URL per line, optionally "url<TAB>title"), so an
-  // import never hard-fails just because the source tool structured its JSON
-  // a little differently.
+  // session managers (array/object of windows/tabs, {sessions:[...]},
+  // {snapshots:[...]}), and a plain-text fallback (one URL per line,
+  // optionally "url<TAB>title"), so an import never hard-fails just because
+  // the source tool structured its JSON a little differently.
   function parseImportedSnapshots(input) {
     const result = { snapshots: [], skippedEntries: 0 };
     if (typeof input !== 'string' || !input.trim()) return result;
@@ -354,6 +380,8 @@
     } else if (data && typeof data === 'object') {
       if (Array.isArray(data.sessions)) {
         rawSnapshots = data.sessions;
+      } else if (Array.isArray(data.snapshots)) {
+        rawSnapshots = data.snapshots;
       } else if (Array.isArray(data.windows) || Array.isArray(data.tabs)) {
         rawSnapshots = [data];
       }
@@ -461,7 +489,7 @@
   // field stays editable afterwards.
   const RETENTION_PRESETS = {
     compact: { idleMinutes: 10, backupIntervalMinutes: 2, maxSnapshots: 10, maxBackupMB: 5 },
-    balanced: { idleMinutes: 15, backupIntervalMinutes: 1, maxSnapshots: 20, maxBackupMB: 15 },
+    balanced: { idleMinutes: 15, backupIntervalMinutes: 5, maxSnapshots: 20, maxBackupMB: 15 },
     archivist: { idleMinutes: 30, backupIntervalMinutes: 1, maxSnapshots: 100, maxBackupMB: 60 },
   };
 
@@ -498,6 +526,8 @@
     clampNumber,
     pickReplacementActiveTab,
     buildGroupPlan,
+    isRestorableTabUrl,
+    summarizeRestorePlan,
     planRestoreTargets,
     shouldShowCrashPrompt,
     parseImportedSnapshots,

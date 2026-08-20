@@ -262,6 +262,7 @@ describe('sanitizeSettings', () => {
     protectUnsavedForms: true,
     markDiscardedInTitle: true,
     discardedTitlePrefix: '💤 ',
+    restoreIntoCurrentWindow: false,
   };
 
   test('fills in missing fields with defaults', () => {
@@ -319,6 +320,10 @@ describe('sanitizeSettings', () => {
   test('discardedTitlePrefix: falls back to default for empty or non-string input', () => {
     expect(Core.sanitizeSettings({ discardedTitlePrefix: '' }, defaults).discardedTitlePrefix).toBe(defaults.discardedTitlePrefix);
     expect(Core.sanitizeSettings({ discardedTitlePrefix: 42 }, defaults).discardedTitlePrefix).toBe(defaults.discardedTitlePrefix);
+  });
+  test("restoreIntoCurrentWindow defaults to false and accepts true (#40)", () => {
+    expect(Core.sanitizeSettings({}, defaults).restoreIntoCurrentWindow).toBe(false);
+    expect(Core.sanitizeSettings({ restoreIntoCurrentWindow: true }, defaults).restoreIntoCurrentWindow).toBe(true);
   });
 });
 
@@ -598,6 +603,29 @@ describe('buildGroupPlan', () => {
   });
 });
 
+describe('isRestorableTabUrl', () => {
+  test('allows http, https, and about:blank', () => {
+    expect(Core.isRestorableTabUrl('http://example.com')).toBe(true);
+    expect(Core.isRestorableTabUrl('https://example.org/path')).toBe(true);
+    expect(Core.isRestorableTabUrl('HTTPS://Example.ORG')).toBe(true);
+    expect(Core.isRestorableTabUrl('about:blank')).toBe(true);
+  });
+
+  test('rejects privileged, empty, and non-http schemes', () => {
+    expect(Core.isRestorableTabUrl('about:debugging')).toBe(false);
+    expect(Core.isRestorableTabUrl('about:config')).toBe(false);
+    expect(Core.isRestorableTabUrl('moz-extension://abc/popup.html')).toBe(false);
+    expect(Core.isRestorableTabUrl('chrome://settings')).toBe(false);
+    expect(Core.isRestorableTabUrl('file:///tmp/page.html')).toBe(false);
+    expect(Core.isRestorableTabUrl('data:text/html,hi')).toBe(false);
+    expect(Core.isRestorableTabUrl('javascript:alert(1)')).toBe(false);
+    expect(Core.isRestorableTabUrl('')).toBe(false);
+    expect(Core.isRestorableTabUrl('   ')).toBe(false);
+    expect(Core.isRestorableTabUrl(null)).toBe(false);
+    expect(Core.isRestorableTabUrl(undefined)).toBe(false);
+  });
+});
+
 describe('planRestoreTargets', () => {
   const windows = [
     { tabs: [{ url: 'https://a.com' }, { url: 'about:blank' }], groups: [] },
@@ -614,9 +642,35 @@ describe('planRestoreTargets', () => {
     expect(plan.map((p) => p.mode)).toEqual(['current', 'new']);
   });
 
-  test('filters out about: urls and drops windows left with no tabs', () => {
-    const onlyAbout = [{ tabs: [{ url: 'about:blank' }], groups: [] }];
+  test('keeps about:blank together with http(s) tabs', () => {
+    const plan = Core.planRestoreTargets(windows, false);
+    expect(plan[0].tabs.map((t) => t.url)).toEqual(['https://a.com', 'about:blank']);
+  });
+
+  test('filters out privileged about: urls and drops windows left with no tabs', () => {
+    const onlyAbout = [{ tabs: [{ url: 'about:debugging' }], groups: [] }];
     expect(Core.planRestoreTargets(onlyAbout, false)).toEqual([]);
+  });
+});
+
+describe('summarizeRestorePlan', () => {
+  test('counts restorable vs skipped tabs', () => {
+    const windows = [
+      {
+        tabs: [
+          { url: 'https://a.com' },
+          { url: 'about:debugging' },
+          { url: 'about:blank' },
+          { url: 'file:///tmp/x' },
+        ],
+      },
+    ];
+    expect(Core.summarizeRestorePlan(windows)).toEqual({ restorable: 2, skipped: 2 });
+  });
+
+  test('returns zeros for empty or missing windows', () => {
+    expect(Core.summarizeRestorePlan([])).toEqual({ restorable: 0, skipped: 0 });
+    expect(Core.summarizeRestorePlan(null)).toEqual({ restorable: 0, skipped: 0 });
   });
 });
 
@@ -682,6 +736,23 @@ describe('parseImportedSnapshots', () => {
     });
     const { snapshots } = Core.parseImportedSnapshots(raw);
     expect(snapshots).toHaveLength(2);
+  });
+
+  test('accepts a {snapshots:[...]} wrapper the same way as sessions (#35)', () => {
+    const raw = JSON.stringify({
+      snapshots: [{ createdAt: 1, tabs: [{ url: 'https://a.com', title: 'A' }] }],
+    });
+    const { snapshots, skippedEntries } = Core.parseImportedSnapshots(raw);
+    expect(snapshots).toHaveLength(1);
+    expect(snapshots[0].windows[0].tabs[0].url).toBe('https://a.com');
+    expect(skippedEntries).toBe(0);
+  });
+
+  test('unknown object returns empty so the UI can report failure (#35)', () => {
+    expect(Core.parseImportedSnapshots(JSON.stringify({ foo: 1, bar: [] }))).toEqual({
+      snapshots: [],
+      skippedEntries: 0,
+    });
   });
 
   test('accepts a bare {tabs:[...]} object', () => {
@@ -800,6 +871,7 @@ describe('backupIntervalMinutes clamp', () => {
     protectUnsavedForms: true,
     markDiscardedInTitle: true,
     discardedTitlePrefix: '💤 ',
+    restoreIntoCurrentWindow: false,
   };
 
   test('clamps backupIntervalMinutes to 0.5–60', () => {
@@ -829,3 +901,30 @@ describe('shouldShowCrashPrompt extra contract (#11 characterization)', () => {
     expect(Core.shouldShowCrashPrompt(unclean, { launchKind: 'reload' })).toBe(false);
   });
 });
+
+describe("default backup interval (#43)", () => {
+  test("default and balanced preset backupIntervalMinutes is 5", () => {
+    expect(Core.RETENTION_PRESETS.balanced.backupIntervalMinutes).toBe(5);
+    expect(Core.RETENTION_PRESETS.compact.backupIntervalMinutes).toBe(2);
+    expect(Core.RETENTION_PRESETS.archivist.backupIntervalMinutes).toBe(1);
+  });
+
+  test("sanitizeSettings still allows backupIntervalMinutes of 1", () => {
+    const defaults = {
+      guardianEnabled: true,
+      idleMinutes: 15,
+      backupIntervalMinutes: 5,
+      maxSnapshots: 20,
+      maxBackupMB: 15,
+      neverDiscardDomains: [],
+      smartTabActivation: true,
+      protectUnsavedForms: true,
+      markDiscardedInTitle: true,
+      discardedTitlePrefix: "💤 ",
+      restoreIntoCurrentWindow: false,
+    };
+    expect(Core.sanitizeSettings({ backupIntervalMinutes: 1 }, defaults).backupIntervalMinutes).toBe(1);
+    expect(Core.sanitizeSettings({}, defaults).backupIntervalMinutes).toBe(5);
+  });
+});
+
