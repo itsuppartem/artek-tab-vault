@@ -270,6 +270,10 @@ async function pinRestoredTab(tabId) {
   }
 }
 
+function isAboutBlankUrl(url) {
+  return typeof url === 'string' && url.trim().toLowerCase() === 'about:blank';
+}
+
 async function createRestoredTab(createProps) {
   if (!Core.isRestorableTabUrl(createProps && createProps.url)) {
     return null;
@@ -282,64 +286,96 @@ async function createRestoredTab(createProps) {
   }
 }
 
-// New-window restore: never pass unrestorable URLs. Create the window with
-// the first restorable URL, then tabs.create the rest (pins after). If a
+async function openRestoreWindow(url) {
+  try {
+    return await browser.windows.create({ url });
+  } catch (arrayErr) {
+    if (Array.isArray(url) && url.length) {
+      return browser.windows.create({ url: url[0] });
+    }
+    throw arrayErr;
+  }
+}
+
+// New-window restore: never pass unrestorable URLs. Never seed windows.create
+// with about:blank — Firefox treats that as an empty URL and opens the New
+// Tab page instead of a real about:blank tab. Seed with the first http(s)
+// URL when one exists, then tabs.create about:blank (and the rest). If a
 // url-array create is attempted and rejects, the same one-URL path is the
 // fallback. try/catch each create.
 async function restoreTabsIntoNewWindow(tabs) {
-  const createdTabIds = [];
+  const createdTabIds = new Array(tabs.length).fill(null);
   let restored = 0;
   let skipped = 0;
+
+  const restorableIndexes = [];
+  for (let i = 0; i < tabs.length; i++) {
+    if (Core.isRestorableTabUrl(tabs[i] && tabs[i].url)) restorableIndexes.push(i);
+    else skipped += 1;
+  }
+  if (!restorableIndexes.length) return { createdTabIds, restored, skipped };
+
+  let seedIndex = restorableIndexes.find((i) => !isAboutBlankUrl(tabs[i].url));
+  if (seedIndex === undefined) seedIndex = -1;
+
   let windowId = null;
-
-  const openWindow = async (url) => {
-    try {
-      return await browser.windows.create({ url });
-    } catch (arrayErr) {
-      if (Array.isArray(url) && url.length) {
-        return browser.windows.create({ url: url[0] });
-      }
-      throw arrayErr;
-    }
-  };
-
-  for (const tab of tabs) {
-    if (!Core.isRestorableTabUrl(tab && tab.url)) {
-      createdTabIds.push(null);
-      skipped += 1;
-      continue;
-    }
-    try {
-      if (windowId == null) {
-        const createdWindow = await openWindow(tab.url);
-        windowId = createdWindow.id;
-        const firstId = createdWindow.tabs && createdWindow.tabs[0] && createdWindow.tabs[0].id;
-        createdTabIds.push(firstId != null ? firstId : null);
-        if (firstId != null) {
-          restored += 1;
-          if (tab.pinned) await pinRestoredTab(firstId);
-        } else {
-          skipped += 1;
-        }
+  try {
+    if (seedIndex >= 0) {
+      const seed = tabs[seedIndex];
+      const createdWindow = await openRestoreWindow(seed.url);
+      windowId = createdWindow.id;
+      const firstId = createdWindow.tabs && createdWindow.tabs[0] && createdWindow.tabs[0].id;
+      createdTabIds[seedIndex] = firstId != null ? firstId : null;
+      if (firstId != null) {
+        restored += 1;
+        if (seed.pinned) await pinRestoredTab(firstId);
       } else {
-        const tabId = await createRestoredTab({
-          windowId,
-          url: tab.url,
-          pinned: !!tab.pinned,
-        });
-        createdTabIds.push(tabId);
-        if (tabId != null) restored += 1;
-        else skipped += 1;
+        skipped += 1;
       }
+    } else {
+      // Only about:blank left. windows.create(about:blank) becomes New Tab
+      // on Firefox, so open an empty window and create blanks via tabs.create.
+      const createdWindow = await browser.windows.create({});
+      windowId = createdWindow.id;
+    }
+  } catch (err) {
+    return { createdTabIds, restored, skipped: skipped + restorableIndexes.filter((i) => createdTabIds[i] == null).length };
+  }
+
+  for (const i of restorableIndexes) {
+    if (i === seedIndex) continue;
+    const tab = tabs[i];
+    try {
+      const tabId = await createRestoredTab({
+        windowId,
+        url: tab.url,
+        pinned: !!tab.pinned,
+      });
+      createdTabIds[i] = tabId;
+      if (tabId != null) restored += 1;
+      else skipped += 1;
     } catch (err) {
-      createdTabIds.push(null);
       skipped += 1;
     }
   }
   return { createdTabIds, restored, skipped };
 }
 
+const restoreInFlight = new Set();
+
 async function restoreSnapshot(timestamp, options = {}) {
+  if (restoreInFlight.has(timestamp)) {
+    return { ok: false, restored: 0, skipped: 0 };
+  }
+  restoreInFlight.add(timestamp);
+  try {
+    return await restoreSnapshotUnlocked(timestamp, options);
+  } finally {
+    restoreInFlight.delete(timestamp);
+  }
+}
+
+async function restoreSnapshotUnlocked(timestamp, options = {}) {
   const stored = await browser.storage.local.get(STORAGE_KEYS.SNAPSHOTS);
   const snapshots = stored[STORAGE_KEYS.SNAPSHOTS] || [];
   const snapshot = snapshots.find((s) => s.timestamp === timestamp);

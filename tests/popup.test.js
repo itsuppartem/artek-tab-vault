@@ -48,9 +48,11 @@ async function mount(state = makeState(), responses = {}) {
       if (message.type === 'DISCARD_ALL_EXCEPT_CURRENT') return { discardedCount: 2 };
       if (message.type === 'BACKUP_NOW') return responses.BACKUP_NOW !== undefined ? responses.BACKUP_NOW : { saved: true };
       if (message.type === 'RESTORE_SNAPSHOT') {
-        return responses.RESTORE_SNAPSHOT !== undefined
-          ? responses.RESTORE_SNAPSHOT
-          : { ok: true, restored: 2, skipped: 0 };
+        const r =
+          responses.RESTORE_SNAPSHOT !== undefined
+            ? responses.RESTORE_SNAPSHOT
+            : { ok: true, restored: 2, skipped: 0 };
+        return typeof r === 'function' ? r(message) : r;
       }
       if (message.type === 'ACTIVATE_TAB') return true;
       return undefined;
@@ -168,5 +170,22 @@ describe('popup', () => {
     document.querySelector('#snapshotList button').click();
     await flushPromises(15);
     expect(document.getElementById('popupStatus').textContent).toBe('Nothing was restored');
+  });
+
+  test('two rapid Restore clicks send only one RESTORE_SNAPSHOT (#36)', async () => {
+    let release;
+    const gate = new Promise((resolve) => {
+      release = resolve;
+    });
+    const { messages } = await mount(makeState(), {
+      RESTORE_SNAPSHOT: () => gate.then(() => ({ ok: true, restored: 2, skipped: 0 })),
+    });
+    const button = document.querySelector('#snapshotList button');
+    button.click();
+    button.click();
+    expect(button.disabled).toBe(true);
+    release();
+    await flushPromises(20);
+    expect(messages.filter((m) => m.type === 'RESTORE_SNAPSHOT')).toHaveLength(1);
   });
 });

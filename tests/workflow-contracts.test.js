@@ -48,6 +48,13 @@ describe('workflow contracts', () => {
     expect(body).toMatch(/close issues only after reading CI logs/i);
   });
 
+  test('discard-all-except-current default shortcut is not Ctrl+Shift+D (#37)', () => {
+    const manifest = JSON.parse(read('manifest.json'));
+    const suggested = manifest.commands['discard-all-except-current'].suggested_key.default;
+    expect(suggested).not.toBe('Ctrl+Shift+D');
+    expect(suggested).toBe('Alt+Shift+D');
+  });
+
   test('rejectBadWorkflowShape rejects a workflow missing a firefox job or using pull_request_target', () => {
     expect(() => rejectBadWorkflowShape('name: CI\njobs:\n  test:\n    runs-on: ubuntu-latest\n')).toThrow(/firefox job/);
     expect(() => rejectBadWorkflowShape('on:\n  pull_request_target:\njobs:\n  test:\n\n  firefox:\n')).toThrow(/pull_request_target/);

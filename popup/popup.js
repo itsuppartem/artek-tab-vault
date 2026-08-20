@@ -67,11 +67,18 @@ function renderSnapshots(snapshots) {
     const button = document.createElement('button');
     button.textContent = I18n.t('btn_restore');
     button.addEventListener('click', async () => {
-      const result = await browser.runtime.sendMessage({
-        type: 'RESTORE_SNAPSHOT',
-        timestamp: snap.timestamp,
-        intoCurrentWindow: restoreIntoCurrentWindowEl.checked,
-      });
+      if (button.disabled) return;
+      button.disabled = true;
+      let result;
+      try {
+        result = await browser.runtime.sendMessage({
+          type: 'RESTORE_SNAPSHOT',
+          timestamp: snap.timestamp,
+          intoCurrentWindow: restoreIntoCurrentWindowEl.checked,
+        });
+      } finally {
+        button.disabled = false;
+      }
       const restored = result && typeof result.restored === 'number' ? result.restored : 0;
       const skipped = result && typeof result.skipped === 'number' ? result.skipped : 0;
       if (restored <= 0) {

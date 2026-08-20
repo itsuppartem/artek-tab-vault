@@ -143,6 +143,34 @@ describe('options page', () => {
     expect(snaps.map((s) => s.timestamp)).toEqual([3, 10, 11]);
   });
 
+  test('import accepts {snapshots:[...]} with tabs (#35)', async () => {
+    const mock = await mount({ [SNAPSHOTS_KEY]: [] });
+    const payload = JSON.stringify({
+      snapshots: [{ createdAt: 9, tabs: [{ url: 'https://wrapped.com', title: 'Wrapped' }] }],
+    });
+    const file = { text: async () => payload };
+    const input = document.getElementById('importInput');
+    Object.defineProperty(input, 'files', { configurable: true, value: [file] });
+    input.dispatchEvent(new Event('change'));
+    await flushPromises(25);
+    expect(mock.storageData[SNAPSHOTS_KEY]).toHaveLength(1);
+    expect(mock.storageData[SNAPSHOTS_KEY][0].windows[0].tabs[0].url).toBe('https://wrapped.com');
+    expect(document.getElementById('status').classList.contains('error')).toBe(false);
+  });
+
+  test('unknown object import shows a lasting failure status (#35)', async () => {
+    await mount({ [SNAPSHOTS_KEY]: [] });
+    const file = { text: async () => JSON.stringify({ notSnapshots: true }) };
+    const input = document.getElementById('importInput');
+    Object.defineProperty(input, 'files', { configurable: true, value: [file] });
+    input.dispatchEvent(new Event('change'));
+    await flushPromises(25);
+    const status = document.getElementById('status');
+    expect(status.textContent).toMatch(/Nothing found/i);
+    expect(status.classList.contains('visible')).toBe(true);
+    expect(status.classList.contains('error')).toBe(true);
+  });
+
   test('import accepts a flat URL list and reports empty input', async () => {
     const mock = await mount({ [SNAPSHOTS_KEY]: [] });
     const file = { text: async () => JSON.stringify(['https://a.com', 'https://b.com']) };
@@ -157,7 +185,10 @@ describe('options page', () => {
     Object.defineProperty(input, 'files', { configurable: true, value: [empty] });
     input.dispatchEvent(new Event('change'));
     await flushPromises(15);
-    expect(document.getElementById('status').textContent).toMatch(/Nothing found/i);
+    const emptyStatus = document.getElementById('status');
+    expect(emptyStatus.textContent).toMatch(/Nothing found/i);
+    expect(emptyStatus.classList.contains('error')).toBe(true);
+    expect(emptyStatus.classList.contains('visible')).toBe(true);
   });
 
   test('import keeps more than 20 snapshots when the user cap is higher (#7)', async () => {

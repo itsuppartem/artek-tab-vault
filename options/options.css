@@ -166,6 +166,10 @@ code {
   transform: translateY(0);
 }
 
+.status.error {
+  color: #ff8a80;
+}
+
 .tv-flash {
   animation: tv-row-flash 0.6s ease;
   border-radius: 6px;
