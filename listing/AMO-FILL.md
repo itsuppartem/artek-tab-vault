@@ -1,19 +1,19 @@
-# AMO Product Page — field guide
+# AMO Product Page — what to paste where
 
-Developer Hub → **Edit Product Page**. Icon and screenshot files live in this listing/ folder.
+Developer Hub → **Edit Product Page**. Icons and screenshots live in this `listing/` folder.
 
-Canonical full description: ../LISTING.md. Below are ready-to-paste pieces for each form field.
+Canonical full description: `../LISTING.md`. Ready-made snippets for each Hub field are below.
 
 ## Auto-fill via the AMO API
 
 ```bash
 source ~/.config/web-ext-keys/artek-tab-vault-amo.env
 node scripts/fill-amo-listing.js          # meta + icon + previews
-node scripts/fill-amo-listing.js meta     # только текст/теги/иконка
-node scripts/fill-amo-listing.js previews # добить скриншоты (если throttle)
+node scripts/fill-amo-listing.js meta     # text / tags / icon only
+node scripts/fill-amo-listing.js previews # screenshots (if throttled)
 ```
 
-Support Email is not filled by the API and is not in the repo; set it in Hub.
+The API does not set Support Email — that value is not in the repo; enter it by hand in Hub.
 
 ---
 
@@ -24,75 +24,70 @@ Support Email is not filled by the API and is not in the repo; set it in Hub.
 Artek Tab Vault
 ```
 
-### Summary (already set)
+### Summary (already set — leave it)
 ```
 Crash-proof tab session backup and idle tab memory guardian for Firefox.
 ```
 
 ### Description (en-US) — paste in full
-Copy the Description (full, en-US) block from ../LISTING.md.
+Copy the **Description (full, en-US)** block from `../LISTING.md` (between the triple backticks).
 
-Do not rewrite it by hand so the listing and repo stay in sync.
+Do not rewrite it by hand, so the live listing and the repo stay in sync.
 
 ### Description (ru-RU) — optional but recommended
-Copy the Description (ru-RU) block from ../LISTING.md.
-In Developer Hub, add the Russian locale and paste the Russian store copy.
+Copy the **Description (ru-RU)** block from `../LISTING.md`.
+In Developer Hub: add the **Русский** locale and paste the Russian text there.
 
 ### Experimental?
-`This add-on is ready for general use.` — оставь как есть (No).
+`This add-on is ready for general use.` — leave as is (No).
 
 ### Requires Payment?
-`This add-on doesn't require any additional payments…` — оставь как есть (No).
+`This add-on doesn't require any additional payments…` — leave as is (No).
 
 ### Categories
-`Tabs` — уже стоит, ок.
+`Tabs` — already set.
 
 ### Email (Support Email)
-Поставь свой рабочий email (тот, на который готов отвечать юзерам).  
-Пока в репо email не зашит — заполни вручную в Hub.
+Use a work address you will actually answer. It is not stored in this repo — fill it in Hub.
 
 ---
 
 ## Images
 
 ### Add-on icon
-Загрузи по размерам:
+Upload by size:
 
 | Size   | File |
 |--------|------|
-| 32×32  | `amo-icon-32.png` |
-| 64×64  | `amo-icon-64.png` |
-| 128×128| `amo-icon-128.png` |
+| 32x32  | amo-icon-32.png |
+| 64x64  | amo-icon-64.png |
+| 128x128| amo-icon-128.png |
 
-Источник — оранжевая vault-иконка из `../icons/icon.svg`.
+Source: the orange vault mark in ../icons/icon.svg.
 
-### Screenshots (порядок загрузки)
+### Store images (upload order)
 
-Реальные скрины из headless Firefox (`npm run screenshots`), не AI-мокапы:
+Real captures of the extension UI, not generated mockups:
 
-1. `screenshot-01-popup.png` — попап  
-2. `screenshot-02-options.png` — Guardian / настройки  
-3. `screenshot-03-backup.png` — бэкап / retention  
+1. screenshot-01-popup.png — popup
+2. screenshot-02-options.png — Guardian / settings
+3. screenshot-03-backup.png — backup / retention
 
-Переснять: `npm run screenshots` (реальный UI через Chromium + puppeteer).
+Regenerate via the store-assets script in package.json.
 
-Подписи (Caption), en-US:
+Captions, en-US:
 
-1. ```Popup: session snapshots, discard controls, and per-tab active/loaded/discarded state.```
-2. ```Settings: Guardian options, unsaved-form protection, title marker, whitelist.```
-3. ```Backup retention presets, size limits, export/import, prune history.```
+1. Popup: session snapshots, discard controls, and per-tab active/loaded/discarded state.
+2. Settings: Guardian options, unsaved-form protection, title marker, whitelist.
+3. Backup retention presets, size limits, export/import, prune history.
 
-ru-RU:
-
-1. ```Попап: снимки сессии, выгрузка вкладок и статус каждой вкладки.```
-2. ```Настройки Guardian: формы, умная активация, префикс 💤, белый список.```
-3. ```Бэкап: профили хранения, лимиты, экспорт/импорт, журнал обрезки.```
+ru-RU captions stay in Russian (they are store-listing copy, not repo docs).
 
 ---
 
 ## Additional Details
 
-### Tags (через запятую / по одному в Hub)
+### Tags (comma-separated, or one per field in Hub)
 ```
 tabs
 session
@@ -105,21 +100,20 @@ crash recovery
 ```
 
 ### Contributions URL
-Оставь пустым, пока нет Patreon/Ko-fi.  
-Если появится — вставь сюда позже.
+Leave empty until there is a Patreon/Ko-fi (or similar). Add it here later if that changes.
 
 ### Default Locale
-`English (US)` — ок.
+`English (US)` — keep.
 
 ### Homepage / Website
-Оставь **пустым**. Репозиторий приватный — публичный GitHub URL на listing нельзя.
-Когда появится публичная страница / публичные Issues — вставь сюда и в `scripts/fill-amo-listing.js`.
+Leave **empty**. The repository is private — do not publish a GitHub URL on the listing.
+When there is a public page or public Issues, add it here and in `scripts/fill-amo-listing.js`.
 
 ---
 
 ## Technical Details
 
-### Developer Comments (только для ревьюеров AMO, не публично)
+### Developer Comments (AMO reviewers only, not public)
 ```
 Artek Tab Vault combines two local-only features: rolling session snapshots
 and idle-tab discarding via the native tabs.discard API.
@@ -128,7 +122,7 @@ Permissions notes for reviewers:
 - <all_urls> is used only on-device: (1) a content script that reports a
   boolean "has unsaved form" flag so the guardian can skip that tab —
   form contents are never read, stored, or transmitted; (2) a one-shot
-  content script that prefixes document.title (e.g. "💤 ") immediately
+  content script that prefixes document.title immediately
   before tabs.discard(), because Firefox has no API to set a tab title.
 - unlimitedStorage is for the local snapshot history when the user raises
   the size cap; nothing is uploaded.
@@ -143,20 +137,20 @@ cover pure logic in core.js; CI runs on every push.
 ```
 
 ### Whiteboard
-Оставь пустым.
+Leave empty.
 
 ---
 
-## Checklist before submitting changes
+## Checklist before Submit changes
 
-- [ ] Description en-US вставлена из LISTING.md
-- [ ] Description ru-RU (желательно)
-- [ ] Email заполнен
-- [ ] Homepage = GitHub URL
-- [ ] Иконки 32/64/128 загружены
-- [ ] 3 скриншота загружены с captions
-- [ ] Tags добавлены
-- [ ] Developer Comments вставлены
-- [ ] Сохранить (Submit Changes)
+- [ ] Description en-US pasted from LISTING.md
+- [ ] Description ru-RU (recommended)
+- [ ] Email filled in
+- [ ] Homepage left empty (private repo)
+- [ ] Icons 32/64/128 uploaded
+- [ ] Three store images uploaded with captions
+- [ ] Tags added
+- [ ] Developer Comments pasted
+- [ ] Save (Submit Changes)
 
-После сохранения страница AMO обновится; версия 0.2.0 останется в Awaiting Review — ревьюеры увидят уже заполненный listing.
+After save, the AMO page updates; reviewers of a pending version will see the filled listing.

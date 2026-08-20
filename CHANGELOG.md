@@ -5,12 +5,11 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 ## [Unreleased]
 
 ### Fixed
-- Importing a native Tab Vault export keeps tab groups and group membership instead of wiping them.
-- Snapshot import now honors the user's retention limits (count and size), not the default cap of 20.
-- Restoring a snapshot into a new window applies pinned tabs after the window is created.
-- Restored tab groups keep their collapsed state.
-- Counting tabs in a missing/empty snapshot returns 0 instead of throwing.
-
+- Snapshot import keeps Firefox tab groups (name, color, collapsed, groupId) instead of wiping them (#6).
+- Options import uses the user's snapshot and size limits instead of always capping history at 20 (#7).
+- Restoring a snapshot into a new window re-applies pinned tabs after the window is created (#8).
+- Restored tab groups keep their collapsed state (#9).
+- countTabsInSnapshot returns 0 for null or malformed snapshots instead of throwing (#10).
 
 ## [0.3.1] - 2026-07-29
 
