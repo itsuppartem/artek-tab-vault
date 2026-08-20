@@ -46,7 +46,9 @@ describe('content-scripts/dirty-form.js', () => {
   test('marks dirty on contenteditable input and ignores a plain div', async () => {
     document.getElementById('plain').dispatchEvent(new Event('input', { bubbles: true }));
     expect(await check()).toEqual({ dirty: false });
-    document.getElementById('edit').dispatchEvent(new Event('input', { bubbles: true }));
+    const edit = document.getElementById('edit');
+    Object.defineProperty(edit, 'isContentEditable', { value: true });
+    edit.dispatchEvent(new Event('input', { bubbles: true }));
     expect(await check()).toEqual({ dirty: true });
   });
 

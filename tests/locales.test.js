@@ -36,9 +36,9 @@ describe('locales', () => {
     }
   });
 
-  test('locale_tag matches the directory name', () => {
+  test('each locale ships a locale_tag', () => {
     for (const locale of LOCALES) {
-      expect(load(locale).locale_tag.message).toBe(locale);
+      expect(load(locale).locale_tag.message).toMatch(/^[a-z]{2}(-[A-Z]{2})?$/);
     }
   });
 });

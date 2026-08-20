@@ -175,7 +175,7 @@ describe('options page', () => {
         windows: [{ tabs: [{ url: `https://new.com/${i}` }] }],
       }))
     );
-    const file = new File([imported], 'more.json', { type: 'application/json' });
+    const file = { text: async () => imported };
     const input = document.getElementById('importInput');
     Object.defineProperty(input, 'files', { configurable: true, value: [file] });
     input.dispatchEvent(new Event('change'));
