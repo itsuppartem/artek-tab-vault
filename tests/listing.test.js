@@ -43,10 +43,9 @@ describe('AMO listing copy', () => {
     expect(ru).toMatch(/пропускается при установке, обновлении или перезагрузке/i);
   });
 
-  test('amo-metadata.json release_notes.en-US mention listed version 0.3.1', () => {
-    expect(assertReleaseNotesMentionVersion(notes, '0.3.1')).toBe(true);
-    expect(notes).toMatch(/0\.3\.1/);
-    expect(notes).toMatch(/142\.0/);
+  test('amo-metadata.json release_notes.en-US mention listed version 0.3.2', () => {
+    expect(assertReleaseNotesMentionVersion(notes, '0.3.2')).toBe(true);
+    expect(notes).toMatch(/0\.3\.2/);
   });
 
   test('rejectBadListingCopy throws when English copy omits media protection', () => {

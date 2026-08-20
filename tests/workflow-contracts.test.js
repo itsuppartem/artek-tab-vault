@@ -55,6 +55,13 @@ describe('workflow contracts', () => {
     expect(suggested).toBe('Alt+Shift+D');
   });
 
+  test('package.json and manifest.json versions match 0.3.2', () => {
+    const pkg = JSON.parse(read('package.json'));
+    const manifest = JSON.parse(read('manifest.json'));
+    expect(pkg.version).toBe('0.3.2');
+    expect(manifest.version).toBe('0.3.2');
+  });
+
   test('rejectBadWorkflowShape rejects a workflow missing a firefox job or using pull_request_target', () => {
     expect(() => rejectBadWorkflowShape('name: CI\njobs:\n  test:\n    runs-on: ubuntu-latest\n')).toThrow(/firefox job/);
     expect(() => rejectBadWorkflowShape('on:\n  pull_request_target:\njobs:\n  test:\n\n  firefox:\n')).toThrow(/pull_request_target/);

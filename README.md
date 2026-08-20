@@ -95,7 +95,7 @@ Store copy lives in LISTING.md (source of truth). Field-by-field Hub notes: list
 
 ## GitHub Releases
 
-Push a version tag (`vX.Y.Z`, for example `v0.3.1`). The Release workflow runs unit tests, builds the unsigned zip with web-ext, and attaches it to a GitHub Release. Use that zip for a later AMO/store upload. The workflow does not sign or submit to AMO. You can also run it by hand (workflow_dispatch); it then uses the version in package.json.
+Push a version tag (`vX.Y.Z`, for example `v0.3.2`). The Release workflow runs unit tests, builds the unsigned zip with web-ext, and attaches it to a GitHub Release. Use that zip for a later AMO/store upload. The workflow does not sign or submit to AMO. You can also run it by hand (workflow_dispatch); it then uses the version in package.json.
 
 ## Contributing
 
