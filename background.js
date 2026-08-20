@@ -355,18 +355,41 @@ browser.commands.onCommand.addListener((command) => {
 // come up at startup and it's still false, the previous run never reached
 // that "all windows closed" path - most likely a crash, force-quit, or power
 // loss - so we proactively point the user at their last backup.
-async function markSessionState(cleanExit) {
-  await browser.storage.local.set({ [SESSION_STATE_KEY]: { cleanExit } });
+async function markSessionState(cleanExit, extra) {
+  const crashNotified = !!(extra && extra.crashNotified);
+  await browser.storage.local.set({ [SESSION_STATE_KEY]: { cleanExit, crashNotified } });
 }
 
-async function checkForCrashRestore() {
+function resolveLaunchKind() {
+  return new Promise((resolve) => {
+    let settled = false;
+    const finish = (kind) => {
+      if (settled) return;
+      settled = true;
+      resolve(kind);
+    };
+    if (browser.runtime.onInstalled) {
+      browser.runtime.onInstalled.addListener((details) => {
+        finish(details && details.reason === 'update' ? 'update' : 'install');
+      });
+    }
+    if (browser.runtime.onStartup) {
+      browser.runtime.onStartup.addListener(() => finish('startup'));
+    }
+    setTimeout(() => finish('startup'), 0);
+  });
+}
+
+async function checkForCrashRestore(launchKind) {
   const stored = await browser.storage.local.get(SESSION_STATE_KEY);
   const previousState = stored[SESSION_STATE_KEY];
-  await markSessionState(false);
-  if (!Core.shouldShowCrashPrompt(previousState)) return;
-
   const snapshotsStored = await browser.storage.local.get(STORAGE_KEYS.SNAPSHOTS);
-  if (!(snapshotsStored[STORAGE_KEYS.SNAPSHOTS] || []).length) return;
+  const hasSnapshots = (snapshotsStored[STORAGE_KEYS.SNAPSHOTS] || []).length > 0;
+  const show =
+    hasSnapshots && Core.shouldShowCrashPrompt(previousState, { launchKind: launchKind || 'startup' });
+  const keepNotified = !!(previousState && previousState.cleanExit === false && previousState.crashNotified);
+  await markSessionState(false, { crashNotified: show || keepNotified });
+  if (!show) return;
 
   try {
     await browser.notifications.create('tabvault-crash-restore', {
@@ -398,5 +421,6 @@ browser.windows.onRemoved.addListener(async () => {
   scheduleAlarms();
   await takeSnapshot();
   await updateBadge();
-  await checkForCrashRestore();
+  const launchKind = await resolveLaunchKind();
+  await checkForCrashRestore(launchKind);
 })();

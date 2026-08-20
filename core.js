@@ -212,9 +212,13 @@
   // Instead we track whether the last session ended via a normal all-windows-
   // closed path; if the extension starts up and that flag was never set, the
   // previous run most likely ended in a crash/force-kill/power loss.
-  function shouldShowCrashPrompt(sessionState) {
+  function shouldShowCrashPrompt(sessionState, options) {
     if (!sessionState) return false;
-    return sessionState.cleanExit === false;
+    if (sessionState.cleanExit !== false) return false;
+    if (sessionState.crashNotified) return false;
+    const launchKind = options && options.launchKind;
+    if (launchKind && launchKind !== 'startup') return false;
+    return true;
   }
 
   // --- Roadmap #7: tolerant snapshot import ---------------------------------

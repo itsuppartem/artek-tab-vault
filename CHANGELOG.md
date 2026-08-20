@@ -10,6 +10,8 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 - Restoring a snapshot into a new window re-applies pinned tabs after the window is created (#8).
 - Restored tab groups keep their collapsed state (#9).
 - countTabsInSnapshot returns 0 for null or malformed snapshots instead of throwing (#10).
+- Crash-restore notification no longer re-fires after it was already shown, and it is skipped on addon install/update (#11).
+- Unsaved-form protection clears the dirty flag on form reset and same-document SPA navigations (#12).
 
 ## [0.3.1] - 2026-07-29
 

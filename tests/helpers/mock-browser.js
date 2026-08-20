@@ -222,6 +222,8 @@ function createMockBrowser(options = {}) {
   const tabRemovedListeners = [];
   const windowRemovedListeners = [];
   const notificationClickedListeners = [];
+  const installedListeners = [];
+  const startupListeners = [];
   const tabMessageHandlers = options.tabMessageHandlers || {};
   const alarms = new Map();
 
@@ -280,6 +282,16 @@ function createMockBrowser(options = {}) {
       getURL: (p) => p,
       openOptionsPage: async () => {
         calls.openOptionsPage.push(true);
+      },
+      onInstalled: {
+        addListener(fn) {
+          installedListeners.push(fn);
+        },
+      },
+      onStartup: {
+        addListener(fn) {
+          startupListeners.push(fn);
+        },
       },
     },
     tabs: {
@@ -495,12 +507,23 @@ function createMockBrowser(options = {}) {
     emitNotificationClicked(id) {
       for (const listener of notificationClickedListeners) listener(id);
     },
+    emitInstalled(reason) {
+      for (const listener of installedListeners) listener({ reason });
+    },
+    emitStartup() {
+      for (const listener of startupListeners) listener();
+    },
   };
 }
 
 async function readyBackground(options = {}) {
   const mock = createMockBrowser(options);
   const sandbox = loadBackground(mock.browser);
+  await flushPromises(40);
+  const launchKind = options.launchKind || 'startup';
+  if (launchKind === 'startup') mock.emitStartup();
+  else if (launchKind === 'update') mock.emitInstalled('update');
+  else if (launchKind === 'install') mock.emitInstalled('install');
   await flushPromises(40);
   return { mock, sandbox };
 }
