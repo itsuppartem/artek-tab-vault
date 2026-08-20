@@ -1,120 +1,42 @@
 # Artek Tab Vault
 
-Расширение для Firefox, закрывающее две частые боли из r/firefox:
+Firefox extension for two common tab-management problems:
 
-1. **Потеря вкладок после краша/обновления** — расширение ведёт свой независимый бэкап всех окон/вкладок (интервал настраивается), не завязанный на встроенный session restore.
-2. **Разрастание RAM из-за десятков открытых вкладок** — Guardian автоматически выгружает (`tabs.discard`) вкладки, которые простаивают дольше заданного времени. Закреплённые, активные, со звуком и из белого списка не трогаются.
+1. **Lost tabs after a crash or update** — keeps an independent rolling backup of every window and tab, separate from Firefox built-in session restore.
+2. **RAM growth from dozens of open tabs** — Guardian discards idle tabs. Pinned, active, audible, and whitelisted tabs are left alone.
 
-## Структура
+## Install for development
 
-```
-artek-tab-vault/
-  manifest.json
-  core.js               # чистая логика (discard-решения, снапшоты, настройки, импорт) - без browser.* API
-  ui-feedback.js         # общие DOM-хелперы для popup/options: анимация кнопок + флеш успеха
-  background.js         # фоновый скрипт: alarms, tabs API, storage, tabGroups, notifications
-  content-scripts/      # dirty-form.js - детектор незасабмиченной формы на странице
-  popup/                 # быстрый попап на тулбаре (статус вкладок, снимки)
-  options/               # полноценная страница настроек (белый список, экспорт/импорт)
-  icons/                 # icon.svg + сгенерённые из него PNG 48/96/128 (AMO не рендерит SVG)
-  store-assets/          # материалы для страницы на AMO: скриншоты + гайд по полям
-  scripts/               # утилиты разработки, в пакет расширения не попадают
-  tests/core.test.js     # юнит-тесты на Jest
-```
+Install dependencies, then start a local Firefox session with the extension loaded and live reload.
 
-`core.js` специально не трогает `browser.*`, чтобы его можно было гонять в Node тестами и не мокать половину WebExtension API.
+You can also load it from about:debugging: This Firefox, Load Temporary Add-on, then pick manifest.json.
 
-## Установка для разработки
+On Snap Firefox, the start script puts the temporary profile under the home directory so the sandbox can see it.
 
-```bash
-npm install
-npm start        # web-ext run — поднимет Firefox с загруженным расширением и hot-reload
-```
+## Tests and CI
 
-Либо руками: `about:debugging` → **This Firefox** → **Load Temporary Add-on…** → выбрать `manifest.json`.
+The Jest suite covers core logic, the background page, popup, options, content scripts, i18n, and locales.
 
-**Snap Firefox (Ubuntu по умолчанию)**: если `npm start` падает с "Profile Missing", это из-за sandbox-изоляции snap — Firefox не видит временный профиль, который `web-ext` создаёт в системном `/tmp`. Скрипт `start` уже фиксит это, выставляя `TMPDIR` внутри `$HOME` (snap имеет туда доступ через интерфейс `home`). Если запускаешь `web-ext` напрямую (не через `npm start`), не забудь `TMPDIR="$HOME/firefox-webext-tmp"` перед командой.
+CI runs that suite on pushes and pull requests to main and develop. Local web-ext lint is optional and is not part of CI.
 
-## Тесты и линт
+## Repository layout
 
-```bash
-npm test          # jest, юнит-тесты на core.js (discard-логика, whitelist, снапшоты, sanitize настроек)
-npm run lint      # web-ext lint — проверка манифеста и кода на соответствие требованиям AMO
-```
+- core.js — pure logic, no browser APIs, shared by the background page and tests
+- background.js — alarms, tabs, storage, tab groups, notifications
+- popup/ and options/ — toolbar UI and settings
+- content-scripts/ — unsaved-form detector and discarded-title marker
+- _locales/ — addon UI translations (en, ru, kk, uk, be, sr)
+- tests/ — Jest suite
+- scripts/ — development utilities, not shipped in the extension zip
 
-Сейчас: 97 тестов, 0 ошибок и предупреждений линтера.
+## Settings
 
-## Материалы для страницы на AMO
+Open via the popup or about:addons Preferences: Guardian, idle threshold, unsaved-form protection, smart activation, domain whitelist, backup interval and retention, export/import, and an optional discarded-tab title prefix.
 
-```bash
-npm run screenshots   # перерисовывает иконки и скриншоты попапа/настроек через headless Firefox
-```
+## Limits
 
-Скрипт копирует расширение во временную папку, подсовывает мок `browser.*` API (`scripts/screenshot-mock.js`) и снимает реальный UI — сами файлы в репозитории при этом не меняются. Результат кладётся в `icons/` и `store-assets/screenshots/`. Гонять после любой правки UI, иначе на витрине останется устаревший интерфейс.
+Firefox does not expose per-tab RAM, so Guardian uses idle time. Restoring a snapshot reopens tabs by URL. Smart activation cannot cancel the reload Firefox starts when it focuses a discarded tab.
 
-Тексты для всех полей Developer Hub — в `store-assets/AMO-PRODUCT-PAGE.md`, описание и summary — в `LISTING.md`.
+## Contributing
 
-## Настройки (options page)
-
-Доступны через попап → «Все настройки и исключения…», либо `about:addons` → расширение → Preferences.
-
-- Guardian on/off, порог простоя.
-- Защита вкладок с незасабмиченной формой (content script проверяет только факт правки, не содержимое).
-- Умная активация при закрытии вкладки on/off.
-- Белый список доменов, которые никогда не выгружаются (с поддоменами).
-- Интервал автобэкапа и сколько снимков хранить.
-- Восстановление в текущее окно вместо нового (тумблер в попапе рядом со списком снимков).
-- Экспорт/импорт снимков сессии — принимает наш JSON, а также плоский список URL, `{tabs:[...]}` / `{sessions:[...]}` и обычный текстовый список ссылок; некорректные записи просто пропускаются.
-- Лимит размера истории бэкапов (МБ, поверх лимита по количеству), три готовых профиля (Компактный/Сбалансированный/Архивариус), и видимый лог обрезки — когда и почему старые снимки реально удалились или снимок был пропущен.
-- Метка «💤» в заголовке выгруженной вкладки — видно прямо в списке вкладок Firefox, текст/эмодзи префикса настраивается, можно выключить.
-
-## Ограничения
-
-- Firefox WebExtension API не даёт точный RAM per-tab — Guardian работает по эвристике простоя (idle time), а не по факту потребления памяти; попап показывает статус (активна/загружена/выгружена) вместо байтов.
-- Восстановление снимка открывает вкладки как новые (по URL), а не восстанавливает историю/скролл внутри вкладки.
-- Нет API, чтобы отменить перезагрузку, которую Firefox сам запускает при активации выгруженной вкладки — «умная активация» переключает фокус сразу после этого, но не предотвращает сам запуск reload.
-
-## Как вообще устроен релиз WebExtension-расширений
-
-### 1. Локальная разработка
-- `web-ext run` — запускает отдельный профиль Firefox с автозагрузкой расширения и live-reload при сохранении файлов.
-- `about:debugging#/runtime/this-firefox` → *Load Temporary Add-on* — вручную, без CLI; расширение выгружается при закрытии Firefox.
-- `about:config` → `xpinstall.signatures.required=false` в Firefox Developer Edition/Nightly — можно ставить неподписанные `.xpi` постоянно, для локальной отладки.
-
-### 2. Версионирование и сборка
-- `manifest.json.version` — semver-подобная строка (`1.2.3`), инкрементируется на каждый релиз, ревью AMO не пропустит повторную версию.
-- `web-ext build` — паковка в `.zip`/`.xpi`, `web-ext lint` — обязательная проверка перед сдачей (permissions, CSP, deprecated API, `eval`, unsafe innerHTML и т.д.).
-- Хорошая практика — CI (GitHub Actions): на пуш/тег гонять `npm test` + `web-ext lint` + `web-ext build`, артефакт прикладывать к релизу.
-
-### 3. Подпись и распространение
-Два пути, оба через **addons.mozilla.org (AMO)**, аккаунт разработчика бесплатный:
-
-- **Listed** (в каталоге AMO) — сабмит через Developer Hub, публичная страница, поиск, авто-обновления через AMO. Проходит модерацию: сначала автоматическая проверка (тот же движок, что в `web-ext lint`, плюс сканы на вредоносный код), затем ручное ревью модератором Mozilla (особенно для чувствительных permissions). С версии с content-script на `<all_urls>` (защита форм) и `tabGroups` у нас теперь есть один "чувствительный" permission — ожидай более внимательное/долгое ручное ревью первого такого билда, чем было раньше с одними `tabs/storage/alarms/idle/notifications`.
-- **Unlisted (self-distributed)** — тоже подписывается Mozilla (`web-ext sign` с API-ключом из AMO), но без публичной страницы в каталоге: ставишь `.xpi` вручную или раздаёшь ссылкой/через свой сайт. Ревью легче, всё равно есть автоматическая проверка при подписи.
-
-Получить API-ключ: AMO → Developer Hub → **Manage API Keys**. Дальше:
-
-```bash
-npm run sign   # web-ext sign --channel=unlisted, нужны переменные окружения
-              # WEB_EXT_API_KEY и WEB_EXT_API_SECRET
-```
-
-Для listed-канала меняешь `--channel=listed` и всё равно проходит через сайт для метаданных (скриншоты, описание, категория, privacy policy — если собираешь любые данные, а мы не собираем).
-
-### 4. Обновления после публикации
-- Listed: пользователи получают обновления автоматически через AMO, как только новая версия прошла ревью.
-- Unlisted: либо `update_url` в манифесте на свой JSON update-манифест, либо пользователь сам ставит новый `.xpi`.
-- Каждое существенное изменение permissions в новой версии — Firefox явно предупреждает пользователя и просит подтвердить установку обновления.
-
-### 5. Чек-лист перед сдачей в AMO
-- [ ] `web-ext lint` — 0 errors.
-- [ ] `npm test` — зелёный.
-- [ ] Явно понятно, зачем каждый permission (в описании addon-а на AMO это иногда спрашивают).
-- [ ] Иконки 48/96/128px, скриншоты для листинга (если listed).
-- [ ] Если когда-нибудь добавишь сбор любых данных (аналитика, телеметрия) — обновить `data_collection_permissions` в манифесте и privacy policy, иначе ревью зарубит.
-
-## Дальше можно добавить
-
-- Учёт `about:` и внутренних страниц отдельно при восстановлении.
-- Синхронизацию снимков через `storage.sync` между устройствами.
-- GitHub Actions workflow: `test` → `lint` → `build` → attach to release.
+See CONTRIBUTING.md. Feature work lands on develop via pull request. main is updated only by PR from develop.

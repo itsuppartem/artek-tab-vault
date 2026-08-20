@@ -15,7 +15,14 @@
   },
   "devDependencies": {
     "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
     "puppeteer-core": "^24.43.1",
     "web-ext": "^8.3.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "<rootDir>/tests/**/*.test.js"
+    ]
   }
 }

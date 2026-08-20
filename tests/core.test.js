@@ -208,6 +208,14 @@ describe('snapshot helpers', () => {
     };
     expect(Core.countTabsInSnapshot(snapshot)).toBe(3);
   });
+
+  test('countTabsInSnapshot returns 0 for null, undefined, or malformed input (#10)', () => {
+    expect(Core.countTabsInSnapshot(null)).toBe(0);
+    expect(Core.countTabsInSnapshot(undefined)).toBe(0);
+    expect(Core.countTabsInSnapshot({})).toBe(0);
+    expect(Core.countTabsInSnapshot({ windows: null })).toBe(0);
+    expect(Core.countTabsInSnapshot({ windows: [{}, { tabs: [1] }] })).toBe(1);
+  });
 });
 
 describe('sanitizeSettings', () => {
@@ -548,6 +556,14 @@ describe('buildGroupPlan', () => {
     const plan = Core.buildGroupPlan([{ url: 'https://a.com', groupId: -1 }], groups);
     expect(plan).toEqual([]);
   });
+
+  test('carries collapsed through to the restore plan (#9)', () => {
+    const plan = Core.buildGroupPlan(
+      [{ url: 'https://a.com', groupId: 5 }],
+      [{ id: 5, title: 'Work', color: 'blue', collapsed: true }]
+    );
+    expect(plan).toEqual([{ title: 'Work', color: 'blue', collapsed: true, tabIndexes: [0] }]);
+  });
 });
 
 describe('planRestoreTargets', () => {
@@ -660,5 +676,111 @@ describe('parseImportedSnapshots', () => {
   test('returns no snapshots for empty/blank input', () => {
     expect(Core.parseImportedSnapshots('')).toEqual({ snapshots: [], skippedEntries: 0 });
     expect(Core.parseImportedSnapshots('   ')).toEqual({ snapshots: [], skippedEntries: 0 });
+  });
+
+  test('preserves native tab groups, groupId, pinned, and collapsed (#6 #9)', () => {
+    const native = JSON.stringify([
+      {
+        timestamp: 100,
+        windows: [
+          {
+            groups: [{ id: 7, title: 'Work', color: 'blue', collapsed: true }],
+            tabs: [{ url: 'https://a.com', title: 'A', groupId: 7, pinned: true }],
+          },
+        ],
+      },
+    ]);
+    const { snapshots, skippedEntries } = Core.parseImportedSnapshots(native);
+    expect(skippedEntries).toBe(0);
+    expect(snapshots[0].windows[0].groups).toEqual([
+      { id: 7, title: 'Work', color: 'blue', collapsed: true },
+    ]);
+    expect(snapshots[0].windows[0].tabs[0]).toMatchObject({
+      url: 'https://a.com',
+      title: 'A',
+      groupId: 7,
+      pinned: true,
+    });
+  });
+});
+
+describe('www vs apex whitelist (current behavior)', () => {
+  test('www host matches an apex whitelist entry via the subdomain rule', () => {
+    expect(Core.isWhitelisted('https://www.example.com/page', ['example.com'])).toBe(true);
+  });
+
+  test('apex host does not match a www-only whitelist entry', () => {
+    expect(Core.isWhitelisted('https://example.com/', ['www.example.com'])).toBe(false);
+  });
+});
+
+describe('countTabsInSnapshot null-safety (#10)', () => {
+  test('returns 0 for null, undefined, or a snapshot without windows', () => {
+    expect(Core.countTabsInSnapshot(null)).toBe(0);
+    expect(Core.countTabsInSnapshot(undefined)).toBe(0);
+    expect(Core.countTabsInSnapshot({})).toBe(0);
+    expect(Core.countTabsInSnapshot({ windows: [{ tabs: null }] })).toBe(0);
+  });
+});
+
+describe('parseImportedSnapshots native groups (#6)', () => {
+  test('native export format preserves groups and tab groupId', () => {
+    const native = JSON.stringify([
+      {
+        timestamp: 100,
+        windows: [
+          {
+            id: 1,
+            groups: [{ id: 7, title: 'Work', color: 'blue', collapsed: true }],
+            tabs: [
+              { url: 'https://a.com', title: 'A', pinned: false, groupId: 7 },
+              { url: 'https://b.com', title: 'B', pinned: true, groupId: -1 },
+            ],
+          },
+        ],
+      },
+    ]);
+    const { snapshots, skippedEntries } = Core.parseImportedSnapshots(native);
+    expect(skippedEntries).toBe(0);
+    expect(snapshots[0].windows[0].groups).toEqual([
+      { id: 7, title: 'Work', color: 'blue', collapsed: true },
+    ]);
+    expect(snapshots[0].windows[0].tabs[0].groupId).toBe(7);
+    expect(snapshots[0].windows[0].tabs[1]).toMatchObject({ groupId: -1, pinned: true });
+  });
+
+  test('flat URL lists still import without groups', () => {
+    const { snapshots } = Core.parseImportedSnapshots(JSON.stringify(['https://a.com']));
+    expect(snapshots[0].windows[0].groups).toEqual([]);
+    expect(snapshots[0].windows[0].tabs[0].groupId).toBe(-1);
+  });
+});
+
+describe('backupIntervalMinutes clamp', () => {
+  const defaults = {
+    guardianEnabled: true,
+    idleMinutes: 15,
+    backupIntervalMinutes: 1,
+    maxSnapshots: 20,
+    maxBackupMB: 15,
+    neverDiscardDomains: [],
+    smartTabActivation: true,
+    protectUnsavedForms: true,
+    markDiscardedInTitle: true,
+    discardedTitlePrefix: '💤 ',
+  };
+
+  test('clamps backupIntervalMinutes to 0.5–60', () => {
+    expect(Core.sanitizeSettings({ backupIntervalMinutes: 0.1 }, defaults).backupIntervalMinutes).toBe(0.5);
+    expect(Core.sanitizeSettings({ backupIntervalMinutes: 90 }, defaults).backupIntervalMinutes).toBe(60);
+    expect(Core.sanitizeSettings({ backupIntervalMinutes: 5 }, defaults).backupIntervalMinutes).toBe(5);
+  });
+});
+
+describe('shouldShowCrashPrompt extra contract (#11 characterization)', () => {
+  test('is false unless cleanExit is strictly false', () => {
+    expect(Core.shouldShowCrashPrompt({})).toBe(false);
+    expect(Core.shouldShowCrashPrompt({ cleanExit: 0 })).toBe(false);
+    expect(Core.shouldShowCrashPrompt({ cleanExit: null })).toBe(false);
   });
 });
