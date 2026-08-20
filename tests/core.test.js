@@ -783,4 +783,17 @@ describe('shouldShowCrashPrompt extra contract (#11 characterization)', () => {
     expect(Core.shouldShowCrashPrompt({ cleanExit: 0 })).toBe(false);
     expect(Core.shouldShowCrashPrompt({ cleanExit: null })).toBe(false);
   });
+
+  test('does not re-fire after the unclean event was already notified', () => {
+    expect(Core.shouldShowCrashPrompt({ cleanExit: false, crashNotified: true })).toBe(false);
+    expect(Core.shouldShowCrashPrompt({ cleanExit: false, crashNotified: false })).toBe(true);
+  });
+
+  test('skips install, update, and reload launches', () => {
+    const unclean = { cleanExit: false };
+    expect(Core.shouldShowCrashPrompt(unclean, { launchKind: 'startup' })).toBe(true);
+    expect(Core.shouldShowCrashPrompt(unclean, { launchKind: 'update' })).toBe(false);
+    expect(Core.shouldShowCrashPrompt(unclean, { launchKind: 'install' })).toBe(false);
+    expect(Core.shouldShowCrashPrompt(unclean, { launchKind: 'reload' })).toBe(false);
+  });
 });

@@ -378,13 +378,37 @@ describe('background crash prompt contract (#11 characterization)', () => {
     expect(mock.calls.openOptionsPage).toHaveLength(1);
   });
 
+  test('does not notify again when crashNotified is already set', async () => {
+    const { mock } = await boot({
+      windows: [{ id: 1, tabs: [tab({ id: 1 })] }],
+      storage: {
+        [SESSION_STATE_KEY]: { cleanExit: false, crashNotified: true },
+        [SNAPSHOTS_KEY]: [{ timestamp: 1, windows: [{ tabs: [{ url: 'https://a.com' }] }] }],
+      },
+    });
+    expect(mock.calls.notificationsCreate).toEqual([]);
+    expect(mock.storageData[SESSION_STATE_KEY].crashNotified).toBe(true);
+  });
+
+  test('does not notify on addon update even if the previous exit was unclean', async () => {
+    const { mock } = await boot({
+      launchKind: 'update',
+      windows: [{ id: 1, tabs: [tab({ id: 1 })] }],
+      storage: {
+        [SESSION_STATE_KEY]: { cleanExit: false },
+        [SNAPSHOTS_KEY]: [{ timestamp: 1, windows: [{ tabs: [{ url: 'https://a.com' }] }] }],
+      },
+    });
+    expect(mock.calls.notificationsCreate).toEqual([]);
+  });
+
   test('last window closing marks a clean exit', async () => {
     const { mock } = await boot({
       windows: [{ id: 1, tabs: [tab({ id: 1 })] }],
     });
     mock.emitWindowRemoved(1);
     await flushPromises(15);
-    expect(mock.storageData[SESSION_STATE_KEY]).toEqual({ cleanExit: true });
+    expect(mock.storageData[SESSION_STATE_KEY]).toEqual({ cleanExit: true, crashNotified: false });
   });
 });
 
