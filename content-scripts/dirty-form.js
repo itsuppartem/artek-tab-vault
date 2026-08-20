@@ -51,9 +51,31 @@
     wrap('replaceState');
   }
 
+  function collectIframeSrcs() {
+    const srcs = [];
+    const frames = document.querySelectorAll('iframe[src]');
+    for (let i = 0; i < frames.length; i++) {
+      if (frames[i].src) srcs.push(frames[i].src);
+    }
+    return srcs;
+  }
+
+  function hasMedia() {
+    const Core = window.TabVaultCore;
+    const nodes = Array.from(document.querySelectorAll('video, audio'));
+    if (Core && Core.pageHasInUseMedia) {
+      return Core.pageHasInUseMedia(nodes, collectIframeSrcs());
+    }
+    return nodes.some((el) => {
+      if (!el || el.ended) return false;
+      if (!el.paused) return true;
+      return typeof el.currentTime === 'number' && el.currentTime > 0;
+    });
+  }
+
   browser.runtime.onMessage.addListener((message) => {
     if (message && message.type === 'TABVAULT_CHECK_DIRTY_FORM') {
-      return Promise.resolve({ dirty });
+      return Promise.resolve({ dirty, hasMedia: hasMedia() });
     }
     return undefined;
   });

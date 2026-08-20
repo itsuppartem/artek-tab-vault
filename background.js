@@ -136,13 +136,26 @@ async function takeSnapshot() {
 // the page was touched since load and not yet submitted. If it can't be
 // reached (no content script on that page, e.g. about: pages) we assume the
 // tab is safe to discard rather than blocking the guardian forever.
-async function tabHasUnsavedForm(tabId) {
+async function probeTabGuards(tabId) {
   try {
     const response = await browser.tabs.sendMessage(tabId, { type: DIRTY_FORM_MESSAGE });
-    return !!(response && response.dirty);
+    return {
+      dirty: !!(response && response.dirty),
+      hasMedia: !!(response && response.hasMedia),
+    };
   } catch (err) {
-    return false;
+    return { dirty: false, hasMedia: false };
   }
+}
+
+async function tabHasUnsavedForm(tabId) {
+  const guards = await probeTabGuards(tabId);
+  return guards.dirty;
+}
+
+async function tabHasProtectedMedia(tabId) {
+  const guards = await probeTabGuards(tabId);
+  return guards.hasMedia;
 }
 
 // Roadmap #10: mark the tab's title (e.g. "💤 Original Title") right
@@ -183,7 +196,9 @@ async function runGuardian() {
     });
 
     if (!shouldDiscard) continue;
-    if (settings.protectUnsavedForms && (await tabHasUnsavedForm(tab.id))) continue;
+    const guards = await probeTabGuards(tab.id);
+    if (guards.hasMedia) continue;
+    if (settings.protectUnsavedForms && guards.dirty) continue;
 
     try {
       await markThenDiscard(tab.id);
@@ -210,7 +225,10 @@ async function discardAllExceptCurrent() {
     if (tab.id === activeTab?.id) continue;
     if (Core.isWhitelisted(tab.url, settings.neverDiscardDomains)) continue;
     if (tab.pinned || tab.audible || tab.discarded) continue;
-    if (settings.protectUnsavedForms && (await tabHasUnsavedForm(tab.id))) continue;
+    if (Core.isKnownMediaUrl(tab.url)) continue;
+    const guards = await probeTabGuards(tab.id);
+    if (guards.hasMedia) continue;
+    if (settings.protectUnsavedForms && guards.dirty) continue;
     try {
       await markThenDiscard(tab.id);
       discardedCount++;

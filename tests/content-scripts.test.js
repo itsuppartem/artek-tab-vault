@@ -33,50 +33,72 @@ describe('content-scripts/dirty-form.js', () => {
   }
 
   test('starts clean and reports dirty after input on a form field', async () => {
-    expect(await check()).toEqual({ dirty: false });
+    expect(await check()).toEqual({ dirty: false, hasMedia: false });
     document.getElementById('name').dispatchEvent(new Event('input', { bubbles: true }));
-    expect(await check()).toEqual({ dirty: true });
+    expect(await check()).toEqual({ dirty: true, hasMedia: false });
   });
 
   test('marks dirty on textarea input and select change', async () => {
     document.getElementById('bio').dispatchEvent(new Event('input', { bubbles: true }));
-    expect(await check()).toEqual({ dirty: true });
+    expect(await check()).toEqual({ dirty: true, hasMedia: false });
   });
 
   test('marks dirty on contenteditable input and ignores a plain div', async () => {
     document.getElementById('plain').dispatchEvent(new Event('input', { bubbles: true }));
-    expect(await check()).toEqual({ dirty: false });
+    expect(await check()).toEqual({ dirty: false, hasMedia: false });
     const edit = document.getElementById('edit');
     Object.defineProperty(edit, 'isContentEditable', { value: true });
     edit.dispatchEvent(new Event('input', { bubbles: true }));
-    expect(await check()).toEqual({ dirty: true });
+    expect(await check()).toEqual({ dirty: true, hasMedia: false });
   });
 
   test('submit clears the dirty flag', async () => {
     document.getElementById('name').dispatchEvent(new Event('input', { bubbles: true }));
-    expect(await check()).toEqual({ dirty: true });
+    expect(await check()).toEqual({ dirty: true, hasMedia: false });
     document.getElementById('f').dispatchEvent(new Event('submit', { bubbles: true }));
-    expect(await check()).toEqual({ dirty: false });
+    expect(await check()).toEqual({ dirty: false, hasMedia: false });
   });
 
   test('unknown messages return undefined', async () => {
     expect(await mock.browser.runtime.sendMessage({ type: 'SOMETHING_ELSE' })).toBeUndefined();
   });
 
+  test('reports hasMedia for a paused video with progress', async () => {
+    const video = document.createElement('video');
+    Object.defineProperties(video, {
+      paused: { value: true },
+      ended: { value: false },
+      currentTime: { value: 15 },
+    });
+    document.body.appendChild(video);
+    expect((await check()).hasMedia).toBe(true);
+  });
+
+  test('does not treat a never-played video element as in-use media', async () => {
+    const video = document.createElement('video');
+    Object.defineProperties(video, {
+      paused: { value: true },
+      ended: { value: false },
+      currentTime: { value: 0 },
+    });
+    document.body.appendChild(video);
+    expect((await check()).hasMedia).toBe(false);
+  });
+
   test('clears dirty on form reset and SPA navigation', async () => {
     document.getElementById('name').dispatchEvent(new Event('input', { bubbles: true }));
-    expect(await check()).toEqual({ dirty: true });
+    expect(await check()).toEqual({ dirty: true, hasMedia: false });
     document.getElementById('f').dispatchEvent(new Event('reset', { bubbles: true }));
-    expect(await check()).toEqual({ dirty: false });
+    expect(await check()).toEqual({ dirty: false, hasMedia: false });
 
     document.getElementById('name').dispatchEvent(new Event('input', { bubbles: true }));
-    expect(await check()).toEqual({ dirty: true });
+    expect(await check()).toEqual({ dirty: true, hasMedia: false });
     window.dispatchEvent(new Event('popstate'));
-    expect(await check()).toEqual({ dirty: false });
+    expect(await check()).toEqual({ dirty: false, hasMedia: false });
 
     document.getElementById('name').dispatchEvent(new Event('input', { bubbles: true }));
     window.history.pushState({}, '', '/spa-route');
-    expect(await check()).toEqual({ dirty: false });
+    expect(await check()).toEqual({ dirty: false, hasMedia: false });
   });
 });
 
