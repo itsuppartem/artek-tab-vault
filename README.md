@@ -17,6 +17,20 @@ Firefox extension for two common pain points:
 - Media protection: known media hosts and in-page video/audio that is playing or paused with progress. An empty never-played video is not protected.
 - Localized UI: English, Russian, Kazakh, Ukrainian, Belarusian, Serbian.
 
+## Screenshots
+
+Popup: open/discarded counts, snapshots, restore-into-current-window.
+
+![Popup](listing/screenshot-01-popup.png)
+
+Guardian settings.
+
+![Guardian settings](listing/screenshot-02-options.png)
+
+Session backup with Balanced interval (5 min).
+
+![Session backup](listing/screenshot-03-backup.png)
+
 ## Layout
 
 ```

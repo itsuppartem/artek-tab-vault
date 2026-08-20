@@ -7,6 +7,8 @@ const {
   assertCiHasFirefoxJob,
   assertReleaseWorkflow,
   e2eMatchedByJest,
+  rejectMissingListingScreenshots,
+  LISTING_SCREENSHOT_PATHS,
 } = require('./helpers/workflow-contracts');
 
 const ROOT = path.join(__dirname, '..');
@@ -67,4 +69,32 @@ describe('workflow contracts', () => {
     expect(() => rejectBadWorkflowShape('on:\n  pull_request_target:\njobs:\n  test:\n\n  firefox:\n')).toThrow(/pull_request_target/);
     expect(() => rejectBadWorkflowShape('')).toThrow(/non-empty/);
   });
+
+  test('screenshot-mock.js uses Balanced defaults (backupIntervalMinutes: 5, not 1) (#48)', () => {
+    const mock = read('scripts/screenshot-mock.js');
+    expect(mock).toMatch(/backupIntervalMinutes:\s*5\b/);
+    expect(mock).not.toMatch(/backupIntervalMinutes:\s*1\b/);
+    expect(mock).toMatch(/idleMinutes:\s*15\b/);
+    expect(mock).toMatch(/maxSnapshots:\s*20\b/);
+    expect(mock).toMatch(/maxBackupMB:\s*15\b/);
+  });
+
+  test('listing PNG files exist and are non-trivial (size > 10KB) (#48)', () => {
+    for (const rel of LISTING_SCREENSHOT_PATHS) {
+      const full = path.join(ROOT, rel);
+      expect(fs.existsSync(full)).toBe(true);
+      expect(fs.statSync(full).size).toBeGreaterThan(10_000);
+    }
+  });
+
+  test('README embeds listing/screenshot-01-popup.png, screenshot-02-options.png, screenshot-03-backup.png (#48)', () => {
+    const readme = read('README.md');
+    expect(rejectMissingListingScreenshots(readme)).toBe(true);
+  });
+
+  test('rejectMissingListingScreenshots rejects a README that omits listing image paths (#48)', () => {
+    expect(() => rejectMissingListingScreenshots('')).toThrow(/non-empty/);
+    expect(() => rejectMissingListingScreenshots('no shots here')).toThrow(/listing\/screenshot-01-popup\.png/);
+  });
+
 });
