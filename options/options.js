@@ -12,7 +12,7 @@ const PRUNE_LOG_KEY = 'tabvault_prune_log';
 const DEFAULT_SETTINGS = {
   guardianEnabled: true,
   idleMinutes: 15,
-  backupIntervalMinutes: 1,
+  backupIntervalMinutes: 5,
   maxSnapshots: 20,
   maxBackupMB: 15,
   neverDiscardDomains: [],
@@ -20,6 +20,7 @@ const DEFAULT_SETTINGS = {
   protectUnsavedForms: true,
   markDiscardedInTitle: true,
   discardedTitlePrefix: '💤 ',
+  restoreIntoCurrentWindow: false,
 };
 
 const PRUNE_REASON_KEYS = {
@@ -81,7 +82,7 @@ function fillForm(settings) {
   els.whitelist.value = (settings.neverDiscardDomains || []).join('\n');
 }
 
-function readForm() {
+function readForm(extra = {}) {
   return Core.sanitizeSettings(
     {
       guardianEnabled: els.guardianEnabled.checked,
@@ -94,6 +95,7 @@ function readForm() {
       maxSnapshots: els.maxSnapshots.value,
       maxBackupMB: els.maxBackupMB.value,
       neverDiscardDomains: Core.parseDomainList(els.whitelist.value),
+      ...extra,
     },
     DEFAULT_SETTINGS
   );
@@ -168,7 +170,9 @@ document.querySelectorAll('.preset-btn').forEach((btn) => {
 });
 
 els.saveBtn.addEventListener('click', async () => {
-  const settings = readForm();
+  const stored = await browser.storage.local.get(SETTINGS_KEY);
+  const current = Core.sanitizeSettings(stored[SETTINGS_KEY], DEFAULT_SETTINGS);
+  const settings = readForm({ restoreIntoCurrentWindow: current.restoreIntoCurrentWindow });
   await browser.storage.local.set({ [SETTINGS_KEY]: settings });
   fillForm(settings);
   TabVaultUI.flashButton(els.saveBtn, I18n.t('flash_saved'));

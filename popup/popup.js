@@ -26,12 +26,9 @@ const TAB_STATE_LABELS = {
 const SETTINGS_KEY = 'tabvault_settings';
 const TAB_WORD_FORMS = I18n.wordForms('word_tab');
 
-let popupStatusTimer = null;
 function showPopupStatus(text) {
   popupStatusEl.textContent = text;
   popupStatusEl.classList.add('visible');
-  clearTimeout(popupStatusTimer);
-  popupStatusTimer = setTimeout(() => popupStatusEl.classList.remove('visible'), 1800);
 }
 
 function formatTime(ts) {
@@ -84,6 +81,7 @@ function renderSnapshots(snapshots) {
       if (restored <= 0) {
         TabVaultUI.flashButton(button, I18n.t('flash_done'), 1300);
         showPopupStatus(I18n.t('status_restored_none'));
+        await refresh();
         return;
       }
       TabVaultUI.flashButton(button, I18n.t('flash_opened'), 1300);
@@ -99,6 +97,7 @@ function renderSnapshots(snapshots) {
       } else {
         showPopupStatus(I18n.t('status_restored', [String(restored), Core.pluralizeRu(restored, TAB_WORD_FORMS)]));
       }
+      await refresh();
     });
 
     li.appendChild(span);
@@ -129,9 +128,10 @@ function renderTabList(tabs) {
     li.appendChild(dot);
     li.appendChild(title);
     li.appendChild(state);
-    li.addEventListener('click', () => {
+    li.addEventListener('click', async () => {
       TabVaultUI.flashElement(li, 400);
-      browser.runtime.sendMessage({ type: 'ACTIVATE_TAB', tabId: tab.id });
+      await browser.runtime.sendMessage({ type: 'ACTIVATE_TAB', tabId: tab.id });
+      await refresh();
     });
     tabListEl.appendChild(li);
   }
@@ -143,6 +143,7 @@ async function refresh() {
   discardedTabsEl.textContent = state.discardedCount;
   guardianEnabledEl.checked = state.settings.guardianEnabled;
   idleMinutesEl.value = state.settings.idleMinutes;
+  restoreIntoCurrentWindowEl.checked = !!state.settings.restoreIntoCurrentWindow;
   renderSnapshots(state.snapshots);
   renderTabList(state.tabsList);
 }
@@ -157,6 +158,10 @@ guardianEnabledEl.addEventListener('change', () => {
   patchSettings({ guardianEnabled: guardianEnabledEl.checked });
   TabVaultUI.flashElement(guardianEnabledEl.closest('.row'));
   showPopupStatus(guardianEnabledEl.checked ? I18n.t('status_guardian_on') : I18n.t('status_guardian_off'));
+});
+
+restoreIntoCurrentWindowEl.addEventListener('change', () => {
+  patchSettings({ restoreIntoCurrentWindow: restoreIntoCurrentWindowEl.checked });
 });
 
 idleMinutesEl.addEventListener('change', () => {

@@ -25,6 +25,7 @@ const SETTINGS = {
   protectUnsavedForms: true,
   markDiscardedInTitle: true,
   discardedTitlePrefix: '💤 ',
+  restoreIntoCurrentWindow: false,
 };
 
 async function mount(storage = {}) {
@@ -78,6 +79,7 @@ describe('options page', () => {
     await flushPromises(15);
     expect(mock.storageData[SETTINGS_KEY].idleMinutes).toBe(15);
     expect(mock.storageData[SETTINGS_KEY].maxSnapshots).toBe(20);
+    expect(mock.storageData[SETTINGS_KEY].backupIntervalMinutes).toBe(5);
   });
 
   test('export creates a JSON download of stored snapshots', async () => {
@@ -213,4 +215,14 @@ describe('options page', () => {
     await flushPromises(25);
     expect(mock.storageData[SNAPSHOTS_KEY]).toHaveLength(26);
   });
+
+  test("save keeps restoreIntoCurrentWindow from storage (#40)", async () => {
+    const mock = await mount({
+      [SETTINGS_KEY]: { ...SETTINGS, restoreIntoCurrentWindow: true },
+    });
+    document.getElementById("saveBtn").click();
+    await flushPromises(15);
+    expect(mock.storageData[SETTINGS_KEY].restoreIntoCurrentWindow).toBe(true);
+  });
+
 });

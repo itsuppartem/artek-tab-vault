@@ -15,6 +15,11 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 - CONTRIBUTING working rules: develop is daily work, main is released product only, issues first, tests and docs in the same PR, firefox job is a canary not the merge gate (#24).
 
 ### Fixed
+- Popup status stays visible until the next action instead of vanishing after 1800ms (#39).
+- Restore into current window checkbox persists in settings (#40).
+- Popup tab list refreshes after discard, restore, activate, and backup (#41).
+- Discard all except current now unloads other tabs in all normal windows, not only the focused window (#42).
+- Default and Balanced auto-backup interval is 5 minutes so the snapshot cap lasts longer; Compact stays 2, Archivist stays 1. A value of 1 is still allowed (#43).
 - Restore keeps `about:blank` tabs instead of letting Firefox replace them with a default New Tab (#34).
 - Import accepts a `{snapshots:[...]}` wrapper and shows a lasting error when nothing was imported (#35).
 - Double-click Restore no longer opens the snapshot twice (#36).
