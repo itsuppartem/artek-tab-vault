@@ -4,6 +4,13 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 
 ## [Unreleased]
 
+### Fixed
+- Snapshot import keeps Firefox tab groups (name, color, collapsed, groupId) instead of wiping them (#6).
+- Options import uses the user's snapshot and size limits instead of always capping history at 20 (#7).
+- Restoring a snapshot into a new window re-applies pinned tabs after the window is created (#8).
+- Restored tab groups keep their collapsed state (#9).
+- countTabsInSnapshot returns 0 for null or malformed snapshots instead of throwing (#10).
+
 ## [0.3.1] - 2026-07-29
 
 ### Changed
@@ -23,7 +30,7 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 
 ### Added
 - "💤" title marker on discarded tabs: the guardian now rewrites a tab's title (e.g. `💤 Original Title`) right before discarding it, so it's visible directly in Firefox's tab strip/sidebar - not only in the popup. Prefix text/emoji is configurable, feature can be turned off. Doesn't work on pages that block script injection (about:, addons.mozilla.org, PDF viewer).
-- Configurable backup retention: an optional size cap (MB, on top of the existing snapshot-count cap) with three ready-made presets (Компактный/Сбалансированный/Архивариус) in settings, plus a visible "История обрезки бэкапов" log showing exactly when and why old snapshots were trimmed or a snapshot was skipped - no more silent history loss.
+- Configurable backup retention: an optional size cap (MB, on top of the existing snapshot-count cap) with three ready-made presets (Compact/Balanced/Archivist) in settings, plus a visible "Backup prune history" log showing exactly when and why old snapshots were trimmed or a snapshot was skipped - no more silent history loss.
 - Native Firefox tab group support: backups now capture group name/color, and restoring a snapshot recreates the groups (requires Firefox's `tabGroups` API; tabs still restore fine without it).
 - Unsaved-form protection: the guardian now skips discarding a tab that has an unsubmitted form, so you don't silently lose typed input. Can be turned off in settings.
 - Proactive crash-restore prompt: on the next Firefox launch after a likely crash/unclean shutdown, a notification offers to open the last backup.
@@ -33,7 +40,7 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 
 ### Changed
 - Smart tab activation on close: when the active tab is closed, focus now jumps to the nearest already-loaded tab instead of a freshly-discarded neighbor. Firefox has no API to cancel the reload it starts internally, so this mitigates rather than fully eliminates the jump-and-reload annoyance. Can be turned off in settings.
-- Visual confirmation for actions: buttons in the popup and settings page now show a brief press animation and a green "✓ done" flash after an action actually completes (discard, backup, restore, save, reset, export, import, preset), plus a short text confirmation (with correct counts, e.g. "Выгружено 3 вкладки") - previously a click gave no feedback beyond the data quietly changing.
+- Visual confirmation for actions: buttons in the popup and settings page now show a brief press animation and a green "✓ done" flash after an action actually completes (discard, backup, restore, save, reset, export, import, preset), plus a short text confirmation (with correct counts, e.g. "Discarded 3 tabs") - previously a click gave no feedback beyond the data quietly changing.
 
 ### Fixed
 - Snapshot integrity guard: the backup engine no longer persists a fully-empty (zero-tab) snapshot. Firefox can't have a window with zero tabs, so this state only occurs during a startup/shutdown race - previously it could still get saved and evict good history from the rolling backup.

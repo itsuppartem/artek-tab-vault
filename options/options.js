@@ -202,12 +202,15 @@ els.importInput.addEventListener('change', async () => {
       return;
     }
 
-    const stored = await browser.storage.local.get(SNAPSHOTS_KEY);
+    const stored = await browser.storage.local.get([SNAPSHOTS_KEY, SETTINGS_KEY]);
     const existing = stored[SNAPSHOTS_KEY] || [];
-    const merged = Core.pruneSnapshots(
-      [...existing, ...imported].sort((a, b) => a.timestamp - b.timestamp),
-      DEFAULT_SETTINGS.maxSnapshots
-    );
+    const currentSettings = Core.sanitizeSettings(stored[SETTINGS_KEY], DEFAULT_SETTINGS);
+    const combined = [...existing, ...imported].sort((a, b) => a.timestamp - b.timestamp);
+    const maxBytes = currentSettings.maxBackupMB > 0 ? currentSettings.maxBackupMB * 1024 * 1024 : null;
+    const { snapshots: merged } = Core.enforceRetentionLimits(combined, {
+      maxSnapshots: currentSettings.maxSnapshots,
+      maxBytes,
+    });
     await browser.storage.local.set({ [SNAPSHOTS_KEY]: merged });
     TabVaultUI.flashElement(els.importLabel, 1000);
     const snapWord = Core.pluralizeRu(imported.length, SNAPSHOT_WORD_FORMS);

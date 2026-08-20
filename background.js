@@ -230,7 +230,11 @@ async function applyGroupPlan(plan, createdTabIds) {
     if (!tabIds.length) continue;
     try {
       const groupId = await browser.tabs.group({ tabIds });
-      await browser.tabGroups.update(groupId, { title: group.title, color: group.color });
+      await browser.tabGroups.update(groupId, {
+        title: group.title,
+        color: group.color,
+        collapsed: !!group.collapsed,
+      });
     } catch (err) {
       // tabGroups API unavailable on this Firefox version/platform; the tabs
       // still get restored, just ungrouped.
@@ -256,7 +260,17 @@ async function restoreSnapshot(timestamp, options = {}) {
       }
     } else {
       const createdWindow = await browser.windows.create({ url: plan.tabs.map((t) => t.url) });
-      createdTabIds = createdWindow.tabs.map((t) => t.id);
+      createdTabIds = (createdWindow.tabs || []).map((t) => t.id);
+      // windows.create({ url }) cannot pin tabs; apply pins after the window exists.
+      for (let i = 0; i < plan.tabs.length; i++) {
+        if (plan.tabs[i].pinned && createdTabIds[i] != null) {
+          try {
+            await browser.tabs.update(createdTabIds[i], { pinned: true });
+          } catch (err) {
+            // pin is best-effort; the tab is still restored.
+          }
+        }
+      }
     }
     await applyGroupPlan(plan, createdTabIds);
   }

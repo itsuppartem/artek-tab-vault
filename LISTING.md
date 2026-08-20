@@ -99,9 +99,9 @@ instead of just a low rating, so it can actually get fixed.
 
 ## Description (ru-RU)
 
-The extension's own UI is Russian, so AMO carries a Russian translation of the
-description next to the English default locale. Keep both in sync when either
-changes.
+The addon UI is localized (English default plus ru/kk/uk/be/sr). AMO also carries
+a Russian product-page translation next to the English default locale. Keep both
+in sync when either changes.
 
 ```
 Artek Tab Vault закрывает две самые частые боли Firefox: потерю всех открытых

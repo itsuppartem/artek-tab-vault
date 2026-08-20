@@ -63,9 +63,8 @@ Support address shown publicly on the listing. Needs a real, monitored inbox —
 AMO reviewers also use it for policy questions. Not filled yet (decision needed).
 
 ### Website
-Homepage link on the listing. The GitHub repo is currently **private**, so a link
-to it would 404 for everyone. Options: make the repo public, or leave this empty
-until there's something to point at (decision needed).
+Homepage link on the listing. The GitHub repo is public. Use the repository URL as the listing homepage and
+the Issues page as the support site.
 
 ---
 
@@ -116,9 +115,8 @@ Leave empty unless there's a real page — AMO rejects links that aren't on its
 allowed donation-host list (decision needed).
 
 ### Default locale
-`English (US)` — keep. The extension's own UI is Russian, so also fill the
-Russian locale for summary/description (see above) instead of switching the
-default; English default reaches a much wider AMO audience.
+`English (US)` — keep as the default. The addon UI is localized; still fill the
+Russian locale for summary/description so AMO visitors in ru-RU see native copy.
 
 ### Homepage
 Same consideration as Website above. If the repo goes public, use the repo URL
@@ -143,9 +141,9 @@ Two deliberate design choices worth knowing before you install:
    on idle time rather than measured RAM, and the popup shows each tab's
    loaded/discarded state instead of a fake megabyte number.
 
-The interface is currently Russian only; an English UI is planned. Bug reports
-and feature requests are read - please describe the problem in a review or on
-the support page rather than leaving a bare low rating.
+The interface follows Firefox's language (English, Russian, Kazakh, Ukrainian,
+Belarusian, Serbian). Bug reports and feature requests are read - please describe
+the problem in a review or on the support page rather than leaving a bare low rating.
 ```
 
 ### UUID
@@ -181,9 +179,8 @@ No remote code, no analytics, no network requests of any kind. All data
 requested only because users can raise the snapshot history size limit above the
 default local-storage quota.
 
-To exercise the extension: open the toolbar popup, press "Выгрузить все, кроме
-текущей" (discard all except current) with a few tabs open, then "Сделать бэкап
-сейчас" (backup now) and restore the snapshot from the list.
+To exercise the extension: open the toolbar popup, press "Discard all except current"
+with a few tabs open, then "Backup now" and restore the snapshot from the list.
 ```
 
 ---
@@ -191,5 +188,5 @@ To exercise the extension: open the toolbar popup, press "Выгрузить в�
 ## Still needs a decision from the owner
 
 - Support **Email** address for the listing.
-- **Website/Homepage**: make the GitHub repo public, or leave empty.
+- **Website/Homepage**: public GitHub repository URL.
 - **Contributions URL**: donation link, or none.

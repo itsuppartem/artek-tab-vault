@@ -3,3 +3,4 @@ web-ext-artifacts/
 *.zip
 .web-extension-id
 .amo-upload-uuid
+.cursor/
