@@ -1,10 +1,10 @@
-# AMO Product Page — что куда вставить
+# AMO Product Page — field guide
 
-Developer Hub → **Edit Product Page**. Файлы иконок/скриншотов лежат в этой же папке `listing/`.
+Developer Hub → **Edit Product Page**. Icon and screenshot files live in this listing/ folder.
 
-Канонический полный текст описания: `../LISTING.md`. Ниже — готовые куски под каждое поле формы.
+Canonical full description: ../LISTING.md. Below are ready-to-paste pieces for each form field.
 
-## Автозаливка через AMO API
+## Auto-fill via the AMO API
 
 ```bash
 source ~/.config/web-ext-keys/artek-tab-vault-amo.env
@@ -13,7 +13,7 @@ node scripts/fill-amo-listing.js meta     # только текст/теги/и�
 node scripts/fill-amo-listing.js previews # добить скриншоты (если throttle)
 ```
 
-Email (Support Email) API не заполняет — его нет в репо; поставь руками в Hub.
+Support Email is not filled by the API and is not in the repo; set it in Hub.
 
 ---
 
@@ -24,19 +24,19 @@ Email (Support Email) API не заполняет — его нет в репо;
 Artek Tab Vault
 ```
 
-### Summary (уже стоит — можно не трогать)
+### Summary (already set)
 ```
 Crash-proof tab session backup and idle tab memory guardian for Firefox.
 ```
 
-### Description (en-US) — вставь целиком
-Скопируй блок **Description (full, en-US)** из `../LISTING.md` (между тройными кавычками).
+### Description (en-US) — paste in full
+Copy the Description (full, en-US) block from ../LISTING.md.
 
-Коротко: полный текст уже там; не переписывай руками, чтобы listing и код не разъехались.
+Do not rewrite it by hand so the listing and repo stay in sync.
 
-### Description (ru-RU) — опционально, но желательно
-Скопируй блок **Description (ru-RU)** из `../LISTING.md`.
-В Developer Hub: добавь locale **Русский** и вставь туда русский текст.
+### Description (ru-RU) — optional but recommended
+Copy the Description (ru-RU) block from ../LISTING.md.
+In Developer Hub, add the Russian locale and paste the Russian store copy.
 
 ### Experimental?
 `This add-on is ready for general use.` — оставь как есть (No).
@@ -147,7 +147,7 @@ cover pure logic in core.js; CI runs on every push.
 
 ---
 
-## Чеклист перед Submit changes
+## Checklist before submitting changes
 
 - [ ] Description en-US вставлена из LISTING.md
 - [ ] Description ru-RU (желательно)
