@@ -12,7 +12,8 @@ Firefox extension for two common pain points:
 - Native Firefox tab groups (name, color, collapsed) captured and restored.
 - Restore into a new window or the current window.
 - Tolerant snapshot import (native JSON, URL lists, common session shapes, plain-text links).
-- Unsaved-form protection, smart tab activation, and a configurable title marker on discarded tabs.
+- Unsaved-form protection (clears on form reset and same-document SPA navigation), smart tab activation, and a configurable title marker on discarded tabs.
+- Media protection: known media hosts and in-page video/audio that is playing or paused with progress. An empty never-played video is not protected.
 - Localized UI: English, Russian, Kazakh, Ukrainian, Belarusian, Serbian.
 
 ## Layout
@@ -87,7 +88,7 @@ API keys come from AMO Developer Hub (Manage API Keys). Use the sign script with
 
 After publish, listed users get updates automatically once the new version is reviewed. A new version that adds permissions prompts the user to confirm.
 
-Store copy lives in LISTING.md. Field-by-field Hub notes: listing/AMO-FILL.md. Assets: listing/ and store-assets/.
+Store copy lives in LISTING.md (source of truth). Field-by-field Hub notes: listing/AMO-FILL.md. Assets: listing/ and store-assets/. The addon is listed; paste Hub fields from those files — do not leave Homepage empty.
 
 ## GitHub Releases
 
@@ -99,4 +100,5 @@ See CONTRIBUTING.md. Feature work goes to develop via pull request. develop to m
 
 ## License
 
-MIT. See LICENSE.
+MIT. See LICENSE. The repository is public: https://github.com/itsuppartem/artek-tab-vault
+Issues: https://github.com/itsuppartem/artek-tab-vault/issues

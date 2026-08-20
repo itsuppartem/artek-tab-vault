@@ -75,6 +75,8 @@ Real captures of the extension UI, not generated mockups:
 
 Regenerate via the store-assets script in package.json.
 
+Captions are **required** (do not leave them empty).
+
 Captions, en-US:
 
 1. Popup: session snapshots, discard controls, and per-tab active/loaded/discarded state.
@@ -106,8 +108,23 @@ Leave empty until there is a Patreon/Ko-fi (or similar). Add it here later if th
 `English (US)` — keep.
 
 ### Homepage / Website
-Leave **empty**. The repository is private — do not publish a GitHub URL on the listing.
-When there is a public page or public Issues, add it here and in `scripts/fill-amo-listing.js`.
+**Required.** Set on **en-US** and **ru** (same URL). The repository is public. Do not leave Homepage empty.
+
+```
+https://github.com/itsuppartem/artek-tab-vault
+```
+
+Open-source (MIT) plus this repo URL is required listing copy, not optional. Also paste the URL into both Description locales (see `../LISTING.md`).
+
+### Support site
+**Required.** Set on **en-US** and **ru** (same URL):
+
+```
+https://github.com/itsuppartem/artek-tab-vault/issues
+```
+
+### Slug
+Target: `artek-tab-vault` if AMO allows changing the current hash slug. Do not invent a new version to change the slug.
 
 ---
 
@@ -121,19 +138,25 @@ and idle-tab discarding via the native tabs.discard API.
 Permissions notes for reviewers:
 - <all_urls> is used only on-device: (1) a content script that reports a
   boolean "has unsaved form" flag so the guardian can skip that tab —
-  form contents are never read, stored, or transmitted; (2) a one-shot
-  content script that prefixes document.title immediately
-  before tabs.discard(), because Firefox has no API to set a tab title.
+  form contents are never read, stored, or transmitted; (2) the same
+  on-device probe reports a boolean "has in-use media" flag (playing or
+  paused-with-progress video/audio, or a known media host) — like the
+  dirty-form flag, this is a boolean only, never the media bytes or page
+  contents; (3) a one-shot content script that prefixes document.title
+  immediately before tabs.discard(), because Firefox has no API to set
+  a tab title.
 - unlimitedStorage is for the local snapshot history when the user raises
   the size cap; nothing is uploaded.
 - tabGroups is used to capture/restore native Firefox tab group name/color.
 - notifications is used for the optional crash-restore prompt after an
-  unclean shutdown.
+  unclean shutdown. The prompt is skipped on install/update/reload and
+  does not re-fire.
 - No remote code, no analytics, no third-party servers. Data never leaves
   the user's machine.
 
-Source and tests: the GitHub repository linked as Homepage. Jest unit tests
-cover pure logic in core.js; CI runs on every push.
+The add-on is open source (MIT). Source and tests: the public GitHub
+repository linked as Homepage. Jest unit tests cover pure logic in
+core.js; CI runs on every push.
 ```
 
 ### Whiteboard
@@ -143,14 +166,16 @@ Leave empty.
 
 ## Checklist before Submit changes
 
-- [ ] Description en-US pasted from LISTING.md
-- [ ] Description ru-RU (recommended)
+- [ ] Description en-US pasted from LISTING.md (includes open-source MIT + repo URL)
+- [ ] Description ru-RU pasted from LISTING.md (same repo/support URLs; do not drop ru)
 - [ ] Email filled in
-- [ ] Homepage left empty (private repo)
+- [ ] Homepage set on en-US and ru: https://github.com/itsuppartem/artek-tab-vault
+- [ ] Support site set on en-US and ru: https://github.com/itsuppartem/artek-tab-vault/issues
+- [ ] Slug `artek-tab-vault` if AMO allows
 - [ ] Icons 32/64/128 uploaded
-- [ ] Three store images uploaded with captions
-- [ ] Tags added
-- [ ] Developer Comments pasted
+- [ ] Three store images uploaded with required captions
+- [ ] Tags added (tabs, session, backup, memory, discard, productivity, privacy, crash recovery)
+- [ ] Developer Comments pasted (media probe is on-device boolean only, like dirty-form)
 - [ ] Save (Submit Changes)
 
 After save, the AMO page updates; reviewers of a pending version will see the filled listing.
