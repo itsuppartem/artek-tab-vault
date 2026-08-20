@@ -81,7 +81,7 @@ Captions, en-US:
 
 1. Popup: session snapshots, discard controls, and per-tab active/loaded/discarded state.
 2. Settings: Guardian options, unsaved-form protection, title marker, whitelist.
-3. Backup retention presets, size limits, export/import, prune history.
+3. Backup retention presets (Balanced default: 5 min interval), size limits, export/import, prune history.
 
 ru-RU captions stay in Russian (they are store-listing copy, not repo docs).
 

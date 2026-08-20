@@ -57,9 +57,29 @@ function e2eMatchedByJest(testMatch, e2eRelPath) {
   });
 }
 
+const LISTING_SCREENSHOT_PATHS = [
+  'listing/screenshot-01-popup.png',
+  'listing/screenshot-02-options.png',
+  'listing/screenshot-03-backup.png',
+];
+
+function rejectMissingListingScreenshots(readme) {
+  if (typeof readme !== 'string' || !readme.trim()) {
+    throw new Error('README must be a non-empty string');
+  }
+  for (const rel of LISTING_SCREENSHOT_PATHS) {
+    if (!readme.includes(rel)) {
+      throw new Error(`README must embed ${rel}`);
+    }
+  }
+  return true;
+}
+
 module.exports = {
   rejectBadWorkflowShape,
   assertCiHasFirefoxJob,
   assertReleaseWorkflow,
   e2eMatchedByJest,
+  rejectMissingListingScreenshots,
+  LISTING_SCREENSHOT_PATHS,
 };
