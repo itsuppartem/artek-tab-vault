@@ -40,10 +40,44 @@
     return Array.from(new Set(items));
   }
 
-  function shouldDiscardTab(tab, { now, lastActiveAt, idleMs, whitelist = [] }) {
+  const KNOWN_MEDIA_HOSTS = [
+    'youtube.com',
+    'youtu.be',
+    'vimeo.com',
+    'dailymotion.com',
+    'twitch.tv',
+    'netflix.com',
+    'soundcloud.com',
+    'open.spotify.com',
+    'music.apple.com',
+    'music.yandex.ru',
+    'music.yandex.com',
+  ];
+
+  function isKnownMediaUrl(url) {
+    const hostname = getHostname(url);
+    if (!hostname) return false;
+    return KNOWN_MEDIA_HOSTS.some((domain) => hostname === domain || hostname.endsWith(`.${domain}`));
+  }
+
+  function mediaElementIsInUse(el) {
+    if (!el) return false;
+    if (el.ended) return false;
+    if (!el.paused) return true;
+    return typeof el.currentTime === 'number' && el.currentTime > 0;
+  }
+
+  function pageHasInUseMedia(elements, iframeSrcs) {
+    if ((elements || []).some(mediaElementIsInUse)) return true;
+    return (iframeSrcs || []).some((src) => isKnownMediaUrl(src));
+  }
+
+  function shouldDiscardTab(tab, { now, lastActiveAt, idleMs, whitelist = [], hasMedia = false } = {}) {
     if (!tab) return false;
     if (tab.discarded) return false;
     if (tab.active || tab.pinned || tab.audible) return false;
+    if (hasMedia) return false;
+    if (isKnownMediaUrl(tab.url)) return false;
     if (isWhitelisted(tab.url, whitelist)) return false;
 
     const seenAt = typeof lastActiveAt === 'number' ? lastActiveAt : now;
@@ -448,6 +482,10 @@
     getHostname,
     isWhitelisted,
     parseDomainList,
+    isKnownMediaUrl,
+    mediaElementIsInUse,
+    pageHasInUseMedia,
+    KNOWN_MEDIA_HOSTS,
     shouldDiscardTab,
     buildSnapshotFromWindows,
     snapshotSignature,

@@ -12,6 +12,7 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 - countTabsInSnapshot returns 0 for null or malformed snapshots instead of throwing (#10).
 - Crash-restore notification no longer re-fires after it was already shown, and it is skipped on addon install/update (#11).
 - Unsaved-form protection clears the dirty flag on form reset and same-document SPA navigations (#12).
+- Guardian does not discard tabs with in-use video/audio (playing or paused with progress) or known media hosts such as YouTube (#17).
 
 ## [0.3.1] - 2026-07-29
 

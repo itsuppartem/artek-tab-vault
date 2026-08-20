@@ -79,6 +79,38 @@ describe('shouldDiscardTab', () => {
       Core.shouldDiscardTab(tab, { now, lastActiveAt, idleMs, whitelist: ['google.com'] })
     ).toBe(false);
   });
+
+  test('does not discard known media hosts like YouTube even when idle and silent', () => {
+    const lastActiveAt = now - idleMs - 1;
+    expect(Core.shouldDiscardTab({ url: 'https://www.youtube.com/watch?v=abc' }, { now, lastActiveAt, idleMs })).toBe(false);
+    expect(Core.shouldDiscardTab({ url: 'https://youtu.be/abc' }, { now, lastActiveAt, idleMs })).toBe(false);
+    expect(Core.shouldDiscardTab({ url: 'https://music.youtube.com/watch?v=abc' }, { now, lastActiveAt, idleMs })).toBe(false);
+  });
+
+  test('does not discard a tab the content script marked as having media', () => {
+    const lastActiveAt = now - idleMs - 1;
+    expect(Core.shouldDiscardTab({ url: 'https://news.example.com' }, { now, lastActiveAt, idleMs, hasMedia: true })).toBe(false);
+  });
+});
+
+describe('media detection helpers', () => {
+  test('isKnownMediaUrl matches hosts and subdomains only', () => {
+    expect(Core.isKnownMediaUrl('https://www.youtube.com/watch?v=1')).toBe(true);
+    expect(Core.isKnownMediaUrl('https://notyoutube.com')).toBe(false);
+    expect(Core.isKnownMediaUrl('not-a-url')).toBe(false);
+  });
+
+  test('mediaElementIsInUse treats playing and paused-with-progress as in use', () => {
+    expect(Core.mediaElementIsInUse({ paused: false, ended: false, currentTime: 0 })).toBe(true);
+    expect(Core.mediaElementIsInUse({ paused: true, ended: false, currentTime: 42 })).toBe(true);
+    expect(Core.mediaElementIsInUse({ paused: true, ended: false, currentTime: 0 })).toBe(false);
+    expect(Core.mediaElementIsInUse({ paused: true, ended: true, currentTime: 99 })).toBe(false);
+  });
+
+  test('pageHasInUseMedia sees embed iframes for known media hosts', () => {
+    expect(Core.pageHasInUseMedia([], ['https://www.youtube.com/embed/abc'])).toBe(true);
+    expect(Core.pageHasInUseMedia([], ['https://example.com/player'])).toBe(false);
+  });
 });
 
 describe('snapshot helpers', () => {
