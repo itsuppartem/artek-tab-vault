@@ -4,6 +4,8 @@ All notable user-facing changes to Artek Tab Vault are documented here, followin
 
 ## [Unreleased]
 
+## [0.3.2] - 2026-08-20
+
 ### Added
 - Live Firefox e2e (`npm run test:firefox`): web-ext zip, headless Firefox, addon id + example.com title. Skips locally if firefox/geckodriver are missing (#20).
 - CI `firefox` canary job (setup-firefox + setup-geckodriver). Jest `test` stays the merge gate (#20).
