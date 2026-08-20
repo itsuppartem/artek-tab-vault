@@ -9,7 +9,7 @@ const SESSION_STATE_KEY = 'tabvault_session_state';
 const DEFAULT_SETTINGS = {
   guardianEnabled: true,
   idleMinutes: 15,
-  backupIntervalMinutes: 1,
+  backupIntervalMinutes: 5,
   maxSnapshots: 20,
   maxBackupMB: 15,
   neverDiscardDomains: [],
@@ -17,6 +17,7 @@ const DEFAULT_SETTINGS = {
   protectUnsavedForms: true,
   markDiscardedInTitle: true,
   discardedTitlePrefix: '💤 ',
+  restoreIntoCurrentWindow: false,
 };
 
 function tab(partial) {
@@ -63,6 +64,8 @@ describe('background GET_STATE', () => {
     expect(state.totalTabs).toBe(2);
     expect(state.discardedCount).toBe(1);
     expect(state.settings.guardianEnabled).toBe(true);
+    expect(state.settings.backupIntervalMinutes).toBe(5);
+    expect(state.settings.restoreIntoCurrentWindow).toBe(false);
     const stamps = state.snapshots.map((s) => s.timestamp);
     expect(stamps.indexOf(2)).toBeGreaterThanOrEqual(0);
     expect(stamps.indexOf(1)).toBeGreaterThan(stamps.indexOf(2));
@@ -235,6 +238,59 @@ describe('background discardAllExceptCurrent', () => {
     const result = await mock.browser.runtime.sendMessage({ type: 'DISCARD_ALL_EXCEPT_CURRENT' });
     expect(result.discardedCount).toBe(1);
     expect(mock.calls.tabsDiscard).toEqual([2]);
+  });
+  test("discards other windows and keeps only the focused active tab (#42)", async () => {
+    const { mock } = await boot({
+      windows: [
+        {
+          id: 1,
+          focused: true,
+          type: "normal",
+          tabs: [
+            tab({ id: 1, active: true, url: "https://now.com" }),
+            tab({ id: 2, url: "https://gone-here.com" }),
+          ],
+        },
+        {
+          id: 2,
+          focused: false,
+          type: "normal",
+          tabs: [
+            tab({ id: 3, active: true, url: "https://other-active.com" }),
+            tab({ id: 4, url: "https://other-bg.com" }),
+          ],
+        },
+      ],
+    });
+    const result = await mock.browser.runtime.sendMessage({ type: "DISCARD_ALL_EXCEPT_CURRENT" });
+    expect(result.discardedCount).toBe(3);
+    expect(mock.calls.tabsDiscard.sort((a, b) => a - b)).toEqual([2, 3, 4]);
+    const loaded = mock.tabs.filter((t) => !t.discarded).map((t) => t.id);
+    expect(loaded).toEqual([1]);
+  });
+
+  test("does not discard a pinned tab in another window (#42)", async () => {
+    const { mock } = await boot({
+      windows: [
+        { id: 1, focused: true, tabs: [tab({ id: 1, active: true, url: "https://now.com" })] },
+        { id: 2, focused: false, tabs: [tab({ id: 8, pinned: true, url: "https://pin-other.com" }), tab({ id: 9, url: "https://gone.com" })] },
+      ],
+    });
+    await mock.browser.runtime.sendMessage({ type: "DISCARD_ALL_EXCEPT_CURRENT" });
+    expect(mock.calls.tabsDiscard).toEqual([9]);
+    expect(mock.tabs.find((t) => t.id === 8).discarded).toBe(false);
+  });
+
+  test("does not discard an audible tab in another window (#42)", async () => {
+    const { mock } = await boot({
+      windows: [
+        { id: 1, focused: true, tabs: [tab({ id: 1, active: true, url: "https://now.com" })] },
+        { id: 2, focused: false, tabs: [tab({ id: 8, audible: true, url: "https://music.com" }), tab({ id: 9, url: "https://gone.com" })] },
+      ],
+    });
+    await mock.browser.runtime.sendMessage({ type: "DISCARD_ALL_EXCEPT_CURRENT" });
+    expect(mock.calls.tabsDiscard).toEqual([9]);
+    expect(mock.tabs.find((t) => t.id === 8).discarded).toBe(false);
   });
 });
 

@@ -262,6 +262,7 @@ describe('sanitizeSettings', () => {
     protectUnsavedForms: true,
     markDiscardedInTitle: true,
     discardedTitlePrefix: '💤 ',
+    restoreIntoCurrentWindow: false,
   };
 
   test('fills in missing fields with defaults', () => {
@@ -319,6 +320,10 @@ describe('sanitizeSettings', () => {
   test('discardedTitlePrefix: falls back to default for empty or non-string input', () => {
     expect(Core.sanitizeSettings({ discardedTitlePrefix: '' }, defaults).discardedTitlePrefix).toBe(defaults.discardedTitlePrefix);
     expect(Core.sanitizeSettings({ discardedTitlePrefix: 42 }, defaults).discardedTitlePrefix).toBe(defaults.discardedTitlePrefix);
+  });
+  test("restoreIntoCurrentWindow defaults to false and accepts true (#40)", () => {
+    expect(Core.sanitizeSettings({}, defaults).restoreIntoCurrentWindow).toBe(false);
+    expect(Core.sanitizeSettings({ restoreIntoCurrentWindow: true }, defaults).restoreIntoCurrentWindow).toBe(true);
   });
 });
 
@@ -866,6 +871,7 @@ describe('backupIntervalMinutes clamp', () => {
     protectUnsavedForms: true,
     markDiscardedInTitle: true,
     discardedTitlePrefix: '💤 ',
+    restoreIntoCurrentWindow: false,
   };
 
   test('clamps backupIntervalMinutes to 0.5–60', () => {
@@ -895,3 +901,30 @@ describe('shouldShowCrashPrompt extra contract (#11 characterization)', () => {
     expect(Core.shouldShowCrashPrompt(unclean, { launchKind: 'reload' })).toBe(false);
   });
 });
+
+describe("default backup interval (#43)", () => {
+  test("default and balanced preset backupIntervalMinutes is 5", () => {
+    expect(Core.RETENTION_PRESETS.balanced.backupIntervalMinutes).toBe(5);
+    expect(Core.RETENTION_PRESETS.compact.backupIntervalMinutes).toBe(2);
+    expect(Core.RETENTION_PRESETS.archivist.backupIntervalMinutes).toBe(1);
+  });
+
+  test("sanitizeSettings still allows backupIntervalMinutes of 1", () => {
+    const defaults = {
+      guardianEnabled: true,
+      idleMinutes: 15,
+      backupIntervalMinutes: 5,
+      maxSnapshots: 20,
+      maxBackupMB: 15,
+      neverDiscardDomains: [],
+      smartTabActivation: true,
+      protectUnsavedForms: true,
+      markDiscardedInTitle: true,
+      discardedTitlePrefix: "💤 ",
+      restoreIntoCurrentWindow: false,
+    };
+    expect(Core.sanitizeSettings({ backupIntervalMinutes: 1 }, defaults).backupIntervalMinutes).toBe(1);
+    expect(Core.sanitizeSettings({}, defaults).backupIntervalMinutes).toBe(5);
+  });
+});
+

@@ -16,6 +16,7 @@ const SETTINGS = {
   protectUnsavedForms: true,
   markDiscardedInTitle: true,
   discardedTitlePrefix: '💤 ',
+  restoreIntoCurrentWindow: false,
 };
 
 function makeState(overrides = {}) {
@@ -41,7 +42,7 @@ async function mount(state = makeState(), responses = {}) {
   const messages = [];
   const mock = createMockBrowser({
     i18n: loadEnI18n(),
-    storage: { tabvault_settings: SETTINGS },
+    storage: { tabvault_settings: state.settings || SETTINGS },
     sendMessage: async (message) => {
       messages.push(message);
       if (message.type === 'GET_STATE') return state;
@@ -54,7 +55,11 @@ async function mount(state = makeState(), responses = {}) {
             : { ok: true, restored: 2, skipped: 0 };
         return typeof r === 'function' ? r(message) : r;
       }
-      if (message.type === 'ACTIVATE_TAB') return true;
+      if (message.type === 'ACTIVATE_TAB') {
+        const row = (state.tabsList || []).find((tab) => tab.id === message.tabId);
+        if (row && row.state === 'discarded') row.state = 'loaded';
+        return true;
+      }
       return undefined;
     },
   });
@@ -188,4 +193,68 @@ describe('popup', () => {
     await flushPromises(20);
     expect(messages.filter((m) => m.type === 'RESTORE_SNAPSHOT')).toHaveLength(1);
   });
+
+  test("showPopupStatus stays visible past 1800ms and a second call replaces the text (#39)", async () => {
+    jest.useFakeTimers();
+    try {
+      await mount();
+      document.getElementById("backupNowBtn").click();
+      await flushPromises(15);
+      const status = document.getElementById("popupStatus");
+      expect(status.textContent).toBe("Session snapshot saved");
+      expect(status.classList.contains("visible")).toBe(true);
+      jest.advanceTimersByTime(2500);
+      expect(status.classList.contains("visible")).toBe(true);
+      expect(status.textContent).toBe("Session snapshot saved");
+      document.getElementById("discardNowBtn").click();
+      await flushPromises(15);
+      expect(status.textContent).toBe("Discarded 2 tabs");
+      expect(status.classList.contains("visible")).toBe(true);
+    } finally {
+      jest.useRealTimers();
+    }
+  });
+
+  test("refresh reads stored restoreIntoCurrentWindow onto the checkbox (#40)", async () => {
+    const settings = { ...SETTINGS, restoreIntoCurrentWindow: true };
+    await mount(makeState({ settings }));
+    expect(document.getElementById("restoreIntoCurrentWindow").checked).toBe(true);
+  });
+
+  test("toggling restoreIntoCurrentWindow writes settings (#40)", async () => {
+    const { mock } = await mount();
+    const box = document.getElementById("restoreIntoCurrentWindow");
+    expect(box.checked).toBe(false);
+    box.checked = true;
+    box.dispatchEvent(new Event("change"));
+    await flushPromises(10);
+    expect(mock.storageData.tabvault_settings.restoreIntoCurrentWindow).toBe(true);
+  });
+
+  test("restore click refreshes the tab list even when nothing was restored (#41)", async () => {
+    const { messages } = await mount(makeState(), { RESTORE_SNAPSHOT: { ok: false, restored: 0, skipped: 3 } });
+    const before = messages.filter((m) => m.type === "GET_STATE").length;
+    document.querySelector("#snapshotList button").click();
+    await flushPromises(15);
+    expect(messages.filter((m) => m.type === "GET_STATE").length).toBeGreaterThan(before);
+    expect(document.getElementById("popupStatus").textContent).toBe("Nothing was restored");
+  });
+
+  test("activate click refreshes GET_STATE and shows discarded as loaded (#41)", async () => {
+    const { messages } = await mount();
+    const before = messages.filter((m) => m.type === "GET_STATE").length;
+    const discarded = [...document.querySelectorAll("#tabList .tab-item")].find((el) =>
+      el.textContent.includes("discarded")
+    );
+    expect(discarded).toBeTruthy();
+    discarded.click();
+    await flushPromises(20);
+    expect(messages.filter((m) => m.type === "GET_STATE").length).toBeGreaterThan(before);
+    const updated = [...document.querySelectorAll("#tabList .tab-item")].find((el) =>
+      el.textContent.includes("Sleeping")
+    );
+    expect(updated.textContent).toMatch(/loaded/);
+    expect(updated.textContent).not.toMatch(/discarded/);
+  });
+
 });

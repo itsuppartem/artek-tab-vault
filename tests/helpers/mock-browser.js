@@ -377,15 +377,19 @@ function createMockBrowser(options = {}) {
     },
     windows: {
       getAll: async (opts = {}) => {
+        let list = windows;
+        if (opts.windowTypes && opts.windowTypes.length) {
+          list = list.filter((w) => opts.windowTypes.includes(w.type));
+        }
         if (opts.populate) {
-          return windows.map((w) => ({
+          return list.map((w) => ({
             id: w.id,
             focused: w.focused,
             type: w.type,
             tabs: tabs.filter((t) => t.windowId === w.id).sort((a, b) => a.index - b.index).map((t) => ({ ...t })),
           }));
         }
-        return windows.map((w) => ({ id: w.id, focused: w.focused, type: w.type }));
+        return list.map((w) => ({ id: w.id, focused: w.focused, type: w.type }));
       },
       getLastFocused: async () => {
         const w = windows.find((x) => x.focused) || windows[0];

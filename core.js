@@ -166,6 +166,7 @@
       protectUnsavedForms: merged.protectUnsavedForms !== undefined ? !!merged.protectUnsavedForms : !!defaults.protectUnsavedForms,
       markDiscardedInTitle: merged.markDiscardedInTitle !== undefined ? !!merged.markDiscardedInTitle : !!defaults.markDiscardedInTitle,
       discardedTitlePrefix: sanitizeTitlePrefix(merged.discardedTitlePrefix, defaults.discardedTitlePrefix),
+      restoreIntoCurrentWindow: !!merged.restoreIntoCurrentWindow,
     };
   }
 
@@ -488,7 +489,7 @@
   // field stays editable afterwards.
   const RETENTION_PRESETS = {
     compact: { idleMinutes: 10, backupIntervalMinutes: 2, maxSnapshots: 10, maxBackupMB: 5 },
-    balanced: { idleMinutes: 15, backupIntervalMinutes: 1, maxSnapshots: 20, maxBackupMB: 15 },
+    balanced: { idleMinutes: 15, backupIntervalMinutes: 5, maxSnapshots: 20, maxBackupMB: 15 },
     archivist: { idleMinutes: 30, backupIntervalMinutes: 1, maxSnapshots: 100, maxBackupMB: 60 },
   };
 

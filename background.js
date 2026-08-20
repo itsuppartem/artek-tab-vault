@@ -23,7 +23,7 @@ const STORAGE_KEYS = {
 const DEFAULT_SETTINGS = {
   guardianEnabled: true,
   idleMinutes: 15,
-  backupIntervalMinutes: 1,
+  backupIntervalMinutes: 5,
   maxSnapshots: 20,
   maxBackupMB: 15,
   neverDiscardDomains: [],
@@ -31,6 +31,7 @@ const DEFAULT_SETTINGS = {
   protectUnsavedForms: true,
   markDiscardedInTitle: true,
   discardedTitlePrefix: '💤 ',
+  restoreIntoCurrentWindow: false,
 };
 
 const MAX_PRUNE_LOG_ENTRIES = 50;
@@ -220,13 +221,23 @@ async function updateBadge() {
 
 async function discardAllExceptCurrent() {
   const [activeTab] = await browser.tabs.query({ active: true, currentWindow: true });
-  const tabs = await browser.tabs.query({ currentWindow: true });
+  const windows = await browser.windows.getAll({ populate: true, windowTypes: ['normal'] });
+  const tabs = windows.flatMap((win) => win.tabs || []);
+  const now = Date.now();
   let discardedCount = 0;
   for (const tab of tabs) {
     if (tab.id === activeTab?.id) continue;
-    if (Core.isWhitelisted(tab.url, settings.neverDiscardDomains)) continue;
-    if (tab.pinned || tab.audible || tab.discarded) continue;
-    if (Core.isKnownMediaUrl(tab.url)) continue;
+    const candidate = { ...tab, active: false };
+    if (
+      !Core.shouldDiscardTab(candidate, {
+        now,
+        lastActiveAt: 0,
+        idleMs: 0,
+        whitelist: settings.neverDiscardDomains,
+      })
+    ) {
+      continue;
+    }
     const guards = await probeTabGuards(tab.id);
     if (guards.hasMedia) continue;
     if (settings.protectUnsavedForms && guards.dirty) continue;
