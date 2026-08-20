@@ -1,0 +1,38 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - v*
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm test
+
+      - run: npm run build
+
+      - name: Create GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ $GITHUB_REF_TYPE = tag ]; then
+            TAG=$GITHUB_REF_NAME
+          else
+            TAG=v$(node -p "require('./package.json').version")
+          fi
+          gh release create $TAG web-ext-artifacts/*.zip --title $TAG --generate-notes --target $GITHUB_SHA
