@@ -115,7 +115,8 @@
   }
 
   function countTabsInSnapshot(snapshot) {
-    return snapshot.windows.reduce((sum, w) => sum + w.tabs.length, 0);
+    if (!snapshot || !Array.isArray(snapshot.windows)) return 0;
+    return snapshot.windows.reduce((sum, w) => sum + (w && Array.isArray(w.tabs) ? w.tabs.length : 0), 0);
   }
 
   function sanitizeSettings(settings, defaults) {
@@ -230,14 +231,27 @@
       title: (raw && typeof raw === 'object' && raw.title) || trimmedUrl,
       favIconUrl: (raw && typeof raw === 'object' && raw.favIconUrl) || null,
       pinned: !!(raw && typeof raw === 'object' && raw.pinned),
-      groupId: -1,
+      groupId: raw && typeof raw === 'object' && typeof raw.groupId === 'number' ? raw.groupId : -1,
+    };
+  }
+
+  function normalizeImportedGroup(raw) {
+    if (!raw || typeof raw !== 'object' || typeof raw.id !== 'number') return null;
+    return {
+      id: raw.id,
+      title: raw.title || '',
+      color: raw.color || 'grey',
+      collapsed: !!raw.collapsed,
     };
   }
 
   function normalizeImportedWindow(raw, fallbackId) {
     const rawTabs = Array.isArray(raw && raw.tabs) ? raw.tabs : Array.isArray(raw) ? raw : [];
     const tabs = rawTabs.map(normalizeImportedTab).filter(Boolean);
-    return { id: (raw && raw.id) ?? fallbackId, groups: [], tabs };
+    const groups = Array.isArray(raw && raw.groups)
+      ? raw.groups.map(normalizeImportedGroup).filter(Boolean)
+      : [];
+    return { id: (raw && raw.id) ?? fallbackId, groups, tabs };
   }
 
   function normalizeImportedSnapshot(raw, index) {
@@ -348,9 +362,9 @@
     return safeTitle.startsWith(p) ? safeTitle.slice(p.length) : safeTitle;
   }
 
-  // --- UI polish: correct Russian pluralization for count-based success
-  // messages ("1 снимок" / "2 снимка" / "5 снимков") in the popup/options
-  // confirmation toasts, instead of always picking one fixed word form.
+  // --- UI polish: Slavic pluralization for count-based success
+  // messages (one / few / many) in the popup/options confirmation toasts,
+  // instead of always picking one fixed word form.
   function pluralizeRu(count, forms) {
     const n = Math.abs(Math.trunc(Number(count) || 0));
     const mod10 = n % 10;

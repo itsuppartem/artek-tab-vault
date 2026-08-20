@@ -172,10 +172,10 @@ async function uploadPreviews() {
       },
     },
     {
-      file: 'screenshot-03-crash-prompt.png',
+      file: 'screenshot-03-backup.png',
       caption: {
-        'en-US': 'After an unclean shutdown, a notification offers to restore the last backup.',
-        'ru': 'После «грязного» завершения Firefox предлагает восстановить последний бэкап.',
+        'en-US': 'Backup retention presets, size limits, export/import, prune history.',
+        'ru': 'Бэкап: профили хранения, лимиты, экспорт/импорт, журнал обрезки.',
       },
     },
   ];
@@ -285,7 +285,7 @@ async function main() {
       const shots = [
         'screenshot-01-popup.png',
         'screenshot-02-options.png',
-        'screenshot-03-crash-prompt.png',
+        'screenshot-03-backup.png',
       ];
       const captions = [
         {

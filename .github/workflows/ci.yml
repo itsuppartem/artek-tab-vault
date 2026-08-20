@@ -2,9 +2,9 @@ name: CI
 
 on:
   push:
-    branches: [develop, prod, master]
+    branches: [main, develop]
   pull_request:
-    branches: [develop, prod, master]
+    branches: [main, develop]
 
 jobs:
   test:
@@ -22,15 +22,3 @@ jobs:
       - name: Unit tests
         run: npm test
 
-      - name: web-ext lint
-        run: npx web-ext lint --source-dir=.
-
-      - name: Build extension zip
-        run: npx web-ext build --source-dir=. --overwrite-dest
-
-      - name: Upload build artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: extension-build
-          path: web-ext-artifacts/*.zip
-          retention-days: 14

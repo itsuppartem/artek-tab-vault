@@ -44,3 +44,6 @@ const TabVaultI18n = {
     if (document.documentElement) document.documentElement.lang = htmlLang;
   },
 };
+
+// Expose on window — top-level const is not a global in page scripts.
+window.TabVaultI18n = TabVaultI18n;

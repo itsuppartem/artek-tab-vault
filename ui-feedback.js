@@ -35,3 +35,5 @@ const TabVaultUI = {
     setTimeout(() => el.classList.remove('tv-flash'), duration);
   },
 };
+
+window.TabVaultUI = TabVaultUI;

@@ -1,6 +1,6 @@
 {
   "name": "artek-tab-vault",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "Crash-proof tab session backup and idle tab memory guardian for Firefox.",
   "private": true,
   "scripts": {
@@ -15,6 +15,14 @@
   },
   "devDependencies": {
     "jest": "^29.7.0",
+    "jest-environment-jsdom": "^29.7.0",
+    "puppeteer-core": "^24.43.1",
     "web-ext": "^8.3.0"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "testMatch": [
+      "<rootDir>/tests/**/*.test.js"
+    ]
   }
 }

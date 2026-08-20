@@ -64,7 +64,21 @@ const STORE = {
   tabvault_prune_log: PRUNE_LOG,
 };
 
+// Filled in by make-store-assets.js with flat { key: message } from _locales/en
+// (AMO listing screenshots are English).
+const I18N = typeof globalThis.__TV_I18N__ === 'object' && globalThis.__TV_I18N__ ? globalThis.__TV_I18N__ : {};
+
+function getMessage(key, substitutions) {
+  let msg = I18N[key] || key;
+  const subs = substitutions == null ? [] : Array.isArray(substitutions) ? substitutions : [substitutions];
+  subs.forEach((s, i) => {
+    msg = msg.replace(new RegExp(`\\$${i + 1}`, 'g'), String(s));
+  });
+  return msg;
+}
+
 window.browser = {
+  i18n: { getMessage },
   runtime: {
     sendMessage: async (message) => {
       if (message.type === 'GET_STATE') {
@@ -79,6 +93,7 @@ window.browser = {
       return true;
     },
     openOptionsPage: async () => {},
+    getURL: (p) => p,
     onMessage: { addListener() {} },
   },
   storage: {
